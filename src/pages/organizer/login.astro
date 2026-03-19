@@ -1,0 +1,62 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Organizer Login | Hatch">
+  <section class="mx-auto w-full max-w-md px-6 py-16">
+    <div class="card space-y-6">
+      <div>
+        <span class="eyebrow">Organizer portal</span>
+        <h1 class="mt-4 text-3xl font-semibold">Welcome back</h1>
+        <p class="mt-3 text-cream-70">Log in to manage your hackathons.</p>
+      </div>
+
+      <form class="grid gap-4" data-form>
+        <label class="grid gap-2">
+          <span class="form-label">Email</span>
+          <input class="input-field" name="email" type="email" required placeholder="you@email.com" />
+        </label>
+        <label class="grid gap-2">
+          <span class="form-label">Password</span>
+          <input class="input-field" name="password" type="password" required placeholder="••••••••" />
+        </label>
+        <button class="btn-primary" type="submit">Log in</button>
+        <span class="status-pill" data-status aria-live="polite"></span>
+      </form>
+
+      <p class="text-sm text-cream-70">
+        Need an account? <a class="underline" href="/organizer/signup">Create one</a>.
+      </p>
+    </div>
+  </section>
+
+  <script>
+    const form = document.querySelector("[data-form]");
+    const status = document.querySelector("[data-status]");
+
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!form || !status) return;
+      status.textContent = "Signing in...";
+      status.style.color = "rgba(254, 245, 230, 0.9)";
+
+      const payload = Object.fromEntries(new FormData(form));
+
+      try {
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(result.error || "Unable to sign in.");
+        }
+        window.location.href = "/organizer/dashboard";
+      } catch (error) {
+        status.textContent = error.message || "Unable to sign in.";
+        status.style.color = "#ff7a7a";
+      }
+    });
+  </script>
+</BaseLayout>

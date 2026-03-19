@@ -1,0 +1,153 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Submit | Hatch">
+  <section class="mx-auto w-full max-w-4xl px-6 py-16">
+    <div class="card space-y-6">
+      <div>
+        <span class="eyebrow">Project submission</span>
+        <h1 class="mt-4 text-3xl font-semibold md:text-4xl" data-event-title>
+          Submit your project
+        </h1>
+        <p class="mt-3 text-cream-70" data-event-tagline>
+          Share your build, links, and team details so judges can review your work.
+        </p>
+      </div>
+
+      <form class="grid gap-6" method="post" action="/api/events" data-form>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="grid gap-2">
+            <span class="form-label">Team name</span>
+            <input class="input-field" name="teamName" required placeholder="Hack Squad" />
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">Project name</span>
+            <input class="input-field" name="projectName" required placeholder="Neighborhood Radar" />
+          </label>
+        </div>
+
+        <label class="grid gap-2">
+          <span class="form-label">Project description</span>
+          <textarea
+            class="input-field"
+            name="description"
+            rows="4"
+            required
+            placeholder="What did you build and why does it matter?"
+          ></textarea>
+        </label>
+
+        <div class="grid gap-4 md:grid-cols-3">
+          <label class="grid gap-2">
+            <span class="form-label">Repository URL</span>
+            <input class="input-field" type="url" name="repoUrl" placeholder="https://github.com/..." />
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">Demo URL</span>
+            <input class="input-field" type="url" name="demoUrl" placeholder="https://demo..." />
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">Slide deck</span>
+            <input class="input-field" type="url" name="deckUrl" placeholder="https://slides..." />
+          </label>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="grid gap-2">
+            <span class="form-label">Track</span>
+            <select class="input-field" name="track" required data-track-select>
+              <option value="">Choose a track</option>
+            </select>
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">Contact email</span>
+            <input class="input-field" type="email" name="contactEmail" required placeholder="team@email.com" />
+          </label>
+        </div>
+
+        <label class="grid gap-2">
+          <span class="form-label">Team members (names + emails)</span>
+          <textarea
+            class="input-field"
+            name="members"
+            rows="4"
+            required
+            placeholder="Avery Patel — avery@email.com"
+          ></textarea>
+        </label>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <button class="btn-primary" type="submit">Submit project</button>
+          <span class="status-pill" data-status aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const slug = window.location.pathname.split("/").filter(Boolean).slice(-2)[0];
+    const form = document.querySelector("[data-form]");
+    const status = document.querySelector("[data-status]");
+    const titleEl = document.querySelector("[data-event-title]");
+    const taglineEl = document.querySelector("[data-event-tagline]");
+    const trackSelect = document.querySelector("[data-track-select]");
+    const button = form?.querySelector("button[type='submit']");
+    const defaultLabel = button?.textContent;
+
+    const loadEvent = async () => {
+      try {
+        const response = await fetch(`/api/events/${slug}`);
+        if (!response.ok) throw new Error("Event not found.");
+        const { event, tracks } = await response.json();
+        if (titleEl) titleEl.textContent = `Submit for ${event.title}`;
+        if (taglineEl) taglineEl.textContent = event.tagline || "";
+        if (trackSelect) {
+          trackSelect.innerHTML = '<option value="">Choose a track</option>';
+          tracks.forEach((track) => {
+            const option = document.createElement("option");
+            option.value = track.name;
+            option.textContent = track.name;
+            trackSelect.appendChild(option);
+          });
+        }
+      } catch (error) {
+        if (status) {
+          status.textContent = "This event is unavailable.";
+          status.style.color = "#ff7a7a";
+        }
+        if (button) button.disabled = true;
+      }
+    };
+
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!status || !form) return;
+
+      status.textContent = "Submitting...";
+      status.style.color = "rgba(254, 245, 230, 0.9)";
+      if (button) button.disabled = true;
+
+      try {
+        const response = await fetch(`/api/events/${slug}/submit`, {
+          method: "POST",
+          body: new FormData(form)
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.error || "Something went wrong.");
+        }
+        status.textContent = "Submission received. We will review soon.";
+        form.reset();
+      } catch (error) {
+        status.textContent = error.message || "Unable to submit right now.";
+        status.style.color = "#ff7a7a";
+      } finally {
+        if (button) button.disabled = false;
+        if (button) button.textContent = defaultLabel || "Submit project";
+      }
+    });
+
+    loadEvent();
+  </script>
+</BaseLayout>

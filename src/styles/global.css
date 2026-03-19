@@ -1,0 +1,202 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    color-scheme: only light;
+    --ink: #0e0b1d;
+    --ink-muted: #17112f;
+    --cream: #fef5e6;
+    --lime: #d8ff3f;
+    --coral: #ff7a7a;
+    --sky: #63d2ff;
+    --violet: #8d6bff;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    background: var(--ink);
+    color: var(--cream);
+    position: relative;
+    min-height: 100%;
+    isolation: isolate;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Space Grotesk", "Segoe UI", sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+@layer components {
+  .site-glow {
+    position: fixed;
+    inset: -40vh -10vw auto -10vw;
+    height: 60vh;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(216, 255, 63, 0.35), transparent 60%),
+      radial-gradient(circle at 70% 10%, rgba(141, 107, 255, 0.4), transparent 55%),
+      radial-gradient(circle at 40% 80%, rgba(99, 210, 255, 0.3), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body > header,
+  body > main,
+  body > footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: var(--lime);
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .nav-link {
+    color: rgba(254, 245, 230, 0.75);
+    transition: color 150ms ease;
+  }
+
+  .nav-link:hover {
+    color: var(--cream);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    background: var(--lime);
+    color: var(--ink);
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+    box-shadow: 0 16px 30px rgba(216, 255, 63, 0.2);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 34px rgba(216, 255, 63, 0.32);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(254, 245, 230, 0.3);
+    padding: 0.7rem 1.4rem;
+    color: rgba(254, 245, 230, 0.9);
+    transition: border 150ms ease, color 150ms ease;
+  }
+
+  .btn-ghost:hover {
+    border-color: rgba(254, 245, 230, 0.6);
+    color: var(--cream);
+  }
+
+  .card {
+    background: rgba(23, 17, 47, 0.85);
+    border: 1px solid rgba(254, 245, 230, 0.08);
+    border-radius: 24px;
+    padding: 1.5rem;
+    box-shadow: 0 30px 60px rgba(9, 6, 21, 0.35);
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    border-radius: 999px;
+    background: rgba(255, 122, 122, 0.18);
+    color: var(--coral);
+    padding: 0.35rem 0.9rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 2vw + 1rem, 2.6rem);
+    margin-bottom: 1rem;
+  }
+
+  .input-field {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(254, 245, 230, 0.16);
+    background: rgba(9, 6, 21, 0.6);
+    padding: 0.75rem 1rem;
+    color: var(--cream);
+  }
+
+  .input-field:focus {
+    outline: 2px solid rgba(216, 255, 63, 0.6);
+    outline-offset: 2px;
+  }
+
+  .form-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(254, 245, 230, 0.7);
+  }
+
+  .status-pill {
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    background: rgba(254, 245, 230, 0.08);
+  }
+}
+
+@layer utilities {
+  .text-cream {
+    color: var(--cream);
+  }
+
+  .text-cream-80 {
+    color: rgba(254, 245, 230, 0.8);
+  }
+
+  .text-cream-75 {
+    color: rgba(254, 245, 230, 0.75);
+  }
+
+  .text-cream-70 {
+    color: rgba(254, 245, 230, 0.7);
+  }
+
+  .text-cream-60 {
+    color: rgba(254, 245, 230, 0.6);
+  }
+
+  .bg-ink {
+    background-color: var(--ink);
+  }
+}

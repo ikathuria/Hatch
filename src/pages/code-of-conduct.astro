@@ -1,0 +1,31 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../content/site";
+---
+
+<BaseLayout title={`Code of Conduct | ${site.brand.name}`}>
+  <section class="mx-auto w-full max-w-3xl px-6 py-16">
+    <div class="card space-y-6">
+      <h1 class="text-3xl font-semibold md:text-4xl">Code of Conduct</h1>
+      <p class="text-cream-70">
+        Hatch is dedicated to providing a friendly, safe, and welcoming
+        environment for everyone, regardless of background or identity.
+      </p>
+      <div class="space-y-4 text-cream-75">
+        <p>
+          Be kind, considerate, and respectful. Harassment, discrimination, and
+          abusive behavior are not tolerated.
+        </p>
+        <p>
+          Respect personal boundaries. Ask for consent before recording or
+          sharing someone’s image, name, or project details.
+        </p>
+        <p>
+          If you experience or witness unacceptable behavior, contact the
+          organizers immediately at <a class="underline" href={`mailto:${site.links.email}`}>{site.links.email}</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+

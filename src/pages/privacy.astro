@@ -1,0 +1,27 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../content/site";
+---
+
+<BaseLayout title={`Privacy | ${site.brand.name}`}>
+  <section class="mx-auto w-full max-w-3xl px-6 py-16">
+    <div class="card space-y-6">
+      <h1 class="text-3xl font-semibold md:text-4xl">Privacy</h1>
+      <p class="text-cream-70">
+        We only collect information needed to run the hackathon. Your data is
+        never sold and is shared only with organizers and judges.
+      </p>
+      <div class="space-y-4 text-cream-75">
+        <p>
+          Registration details are used to confirm your participation and match
+          you with teams. Submission details are used for judging and showcasing
+          your work.
+        </p>
+        <p>
+          If you want your data removed, email us at <a class="underline" href={`mailto:${site.links.email}`}>{site.links.email}</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+

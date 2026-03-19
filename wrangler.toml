@@ -1,0 +1,8 @@
+name = "hatch"
+compatibility_date = "2026-03-19"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hatch"
+database_id = "5f3c909e-784a-428b-af7e-80bf7e4f4ca4"

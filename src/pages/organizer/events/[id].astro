@@ -1,0 +1,266 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Manage Event | Hatch">
+  <section class="mx-auto w-full max-w-5xl px-6 py-16">
+    <div class="card space-y-8">
+      <div>
+        <span class="eyebrow">Event settings</span>
+        <h1 class="mt-4 text-3xl font-semibold md:text-4xl" data-event-title>
+          Loading event…
+        </h1>
+        <p class="mt-3 text-cream-70">
+          Update details, tracks, and FAQ. Changes are live instantly.
+        </p>
+      </div>
+
+      <form class="grid gap-6" data-event-form>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="grid gap-2">
+            <span class="form-label">Event title</span>
+            <input class="input-field" name="title" required />
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">Slug</span>
+            <input class="input-field" name="slug" required />
+          </label>
+        </div>
+        <label class="grid gap-2">
+          <span class="form-label">Tagline</span>
+          <input class="input-field" name="tagline" />
+        </label>
+        <label class="grid gap-2">
+          <span class="form-label">Description</span>
+          <textarea class="input-field" name="description" rows="4"></textarea>
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="grid gap-2">
+            <span class="form-label">Start date</span>
+            <input class="input-field" name="startDate" type="date" />
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">End date</span>
+            <input class="input-field" name="endDate" type="date" />
+          </label>
+        </div>
+        <label class="grid gap-2">
+          <span class="form-label">Location</span>
+          <input class="input-field" name="location" />
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="grid gap-2">
+            <span class="form-label">Mode</span>
+            <select class="input-field" name="mode">
+              <option>Hybrid</option>
+              <option>In-person</option>
+              <option>Online</option>
+            </select>
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">Apply by</span>
+            <input class="input-field" name="applicationDeadline" type="date" />
+          </label>
+        </div>
+        <label class="grid gap-2">
+          <span class="form-label">Theme</span>
+          <input class="input-field" name="theme" />
+        </label>
+        <label class="flex items-center gap-3 text-sm text-cream-80">
+          <input type="checkbox" name="isPublished" />
+          Published
+        </label>
+
+        <div>
+          <h2 class="text-2xl font-semibold">Tracks</h2>
+          <div class="mt-4 grid gap-4" data-tracks></div>
+          <button class="btn-ghost mt-4" type="button" data-add-track>Add track</button>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-semibold">FAQ</h2>
+          <div class="mt-4 grid gap-4" data-faqs></div>
+          <button class="btn-ghost mt-4" type="button" data-add-faq>Add FAQ</button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <button class="btn-primary" type="submit">Save changes</button>
+          <a class="btn-ghost" data-public-link href="#">View public page</a>
+          <span class="status-pill" data-status aria-live="polite"></span>
+        </div>
+      </form>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="card">
+          <h3 class="text-xl font-semibold">Applications</h3>
+          <p class="mt-2 text-cream-70">Download all registrations.</p>
+          <a class="btn-ghost mt-4" data-applications-link href="#">Download CSV</a>
+        </div>
+        <div class="card">
+          <h3 class="text-xl font-semibold">Submissions</h3>
+          <p class="mt-2 text-cream-70">Download project submissions.</p>
+          <a class="btn-ghost mt-4" data-submissions-link href="#">Download CSV</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const eventId = window.location.pathname.split("/").filter(Boolean).pop();
+    const form = document.querySelector("[data-event-form]");
+    const status = document.querySelector("[data-status]");
+    const titleEl = document.querySelector("[data-event-title]");
+    const tracksContainer = document.querySelector("[data-tracks]");
+    const faqsContainer = document.querySelector("[data-faqs]");
+    const addTrack = document.querySelector("[data-add-track]");
+    const addFaq = document.querySelector("[data-add-faq]");
+    const publicLink = document.querySelector("[data-public-link]");
+    const applicationsLink = document.querySelector("[data-applications-link]");
+    const submissionsLink = document.querySelector("[data-submissions-link]");
+
+    const buildRow = (type, data = {}) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "card grid gap-3";
+      if (type === "track") {
+        wrapper.innerHTML = `
+          <label class="grid gap-2">
+            <span class="form-label">Track name</span>
+            <input class="input-field" name="trackName" value="${data.name || ""}" />
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">Description</span>
+            <textarea class="input-field" name="trackDescription" rows="2">${data.description || ""}</textarea>
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">Prize</span>
+            <input class="input-field" name="trackPrize" value="${data.prize || ""}" />
+          </label>
+          <button class="btn-ghost" type="button" data-remove>Remove</button>
+        `;
+      }
+      if (type === "faq") {
+        wrapper.innerHTML = `
+          <label class="grid gap-2">
+            <span class="form-label">Question</span>
+            <input class="input-field" name="faqQuestion" value="${data.question || ""}" />
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">Answer</span>
+            <textarea class="input-field" name="faqAnswer" rows="2">${data.answer || ""}</textarea>
+          </label>
+          <button class="btn-ghost" type="button" data-remove>Remove</button>
+        `;
+      }
+      wrapper.querySelector("[data-remove]")?.addEventListener("click", () => wrapper.remove());
+      return wrapper;
+    };
+
+    addTrack?.addEventListener("click", () => {
+      tracksContainer?.appendChild(buildRow("track"));
+    });
+
+    addFaq?.addEventListener("click", () => {
+      faqsContainer?.appendChild(buildRow("faq"));
+    });
+
+    const loadEvent = async () => {
+      try {
+        const response = await fetch(`/api/organizer/events/${eventId}`);
+        if (response.status === 401) {
+          window.location.href = "/organizer/login";
+          return;
+        }
+        const payload = await response.json();
+        const event = payload.event;
+        if (!event) throw new Error("Event not found.");
+
+        if (titleEl) titleEl.textContent = `Manage ${event.title}`;
+        if (form) {
+          form.title.value = event.title || "";
+          form.slug.value = event.slug || "";
+          form.tagline.value = event.tagline || "";
+          form.description.value = event.description || "";
+          form.startDate.value = event.startDate || "";
+          form.endDate.value = event.endDate || "";
+          form.location.value = event.location || "";
+          form.mode.value = event.mode || "Hybrid";
+          form.applicationDeadline.value = event.applicationDeadline || "";
+          form.theme.value = event.theme || "";
+          form.isPublished.checked = !!event.isPublished;
+        }
+
+        if (publicLink) publicLink.href = `/events/${event.slug}`;
+        if (applicationsLink) applicationsLink.href = `/api/organizer/events/${eventId}/applications.csv`;
+        if (submissionsLink) submissionsLink.href = `/api/organizer/events/${eventId}/submissions.csv`;
+
+        tracksContainer.innerHTML = "";
+        (payload.tracks || []).forEach((track) => {
+          tracksContainer.appendChild(buildRow("track", track));
+        });
+
+        faqsContainer.innerHTML = "";
+        (payload.faqs || []).forEach((faq) => {
+          faqsContainer.appendChild(buildRow("faq", faq));
+        });
+      } catch (error) {
+        if (status) {
+          status.textContent = error.message || "Unable to load event.";
+          status.style.color = "#ff7a7a";
+        }
+      }
+    };
+
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!form || !status) return;
+      status.textContent = "Saving...";
+      status.style.color = "rgba(254, 245, 230, 0.9)";
+
+      const trackRows = Array.from(tracksContainer?.children || []).map((row) => ({
+        name: row.querySelector("input[name='trackName']")?.value || "",
+        description: row.querySelector("textarea[name='trackDescription']")?.value || "",
+        prize: row.querySelector("input[name='trackPrize']")?.value || ""
+      }));
+      const faqRows = Array.from(faqsContainer?.children || []).map((row) => ({
+        question: row.querySelector("input[name='faqQuestion']")?.value || "",
+        answer: row.querySelector("textarea[name='faqAnswer']")?.value || ""
+      }));
+
+      const payload = {
+        title: form.title.value,
+        slug: form.slug.value,
+        tagline: form.tagline.value,
+        description: form.description.value,
+        startDate: form.startDate.value,
+        endDate: form.endDate.value,
+        location: form.location.value,
+        mode: form.mode.value,
+        applicationDeadline: form.applicationDeadline.value,
+        theme: form.theme.value,
+        isPublished: form.isPublished.checked,
+        tracks: trackRows.filter((track) => track.name.trim()),
+        faqs: faqRows.filter((faq) => faq.question.trim())
+      };
+
+      try {
+        const response = await fetch(`/api/organizer/events/${eventId}`, {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(result.error || "Unable to save event.");
+        }
+        status.textContent = "Saved.";
+        status.style.color = "rgba(216, 255, 63, 0.9)";
+        if (publicLink) publicLink.href = `/events/${result.event.slug}`;
+      } catch (error) {
+        status.textContent = error.message || "Unable to save event.";
+        status.style.color = "#ff7a7a";
+      }
+    });
+
+    loadEvent();
+  </script>
+</BaseLayout>

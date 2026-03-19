@@ -1,0 +1,23 @@
+{
+  "name": "hatch",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^13.1.2",
+    "@tailwindcss/vite": "^4.2.2",
+    "astro": "^6.0.6",
+    "tailwindcss": "^4.2.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260317.1"
+  }
+}

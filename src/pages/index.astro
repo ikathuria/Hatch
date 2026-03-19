@@ -1,0 +1,157 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../content/site";
+---
+
+<BaseLayout title={`${site.brand.name} | Hackathon hosting platform`}>
+  <section class="relative overflow-hidden">
+    <div class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-16 md:flex-row md:items-center md:py-24">
+      <div class="relative z-10 flex-1 space-y-6">
+        <span class="eyebrow">Hackathon hosting platform</span>
+        <h1 class="text-4xl font-semibold md:text-6xl">{site.hero.title}</h1>
+        <p class="text-lg text-cream-80 md:text-xl">{site.hero.description}</p>
+        <div class="flex flex-wrap gap-4">
+          <a class="btn-primary" href={site.hero.primaryCta.href}>
+            {site.hero.primaryCta.label}
+          </a>
+          <a class="btn-ghost" href={site.hero.secondaryCta.href}>
+            {site.hero.secondaryCta.label}
+          </a>
+        </div>
+      </div>
+      <div class="grid flex-1 gap-4 sm:grid-cols-2">
+        {site.stats.map((stat) => (
+          <div class="card">
+            <p class="text-sm uppercase tracking-widest text-cream-60">
+              {stat.label}
+            </p>
+            <p class="mt-2 text-3xl font-semibold">{stat.value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="mx-auto w-full max-w-6xl px-6 py-16">
+    <div class="grid gap-10 md:grid-cols-[1.1fr_1fr] md:items-center">
+      <div>
+        <h2 class="section-title">Built for organizers</h2>
+        <p class="text-cream-75">
+          Everything you need to launch a hackathon with clarity — no custom
+          tooling or spreadsheets required.
+        </p>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        {site.features.map((feature) => (
+          <div class="card">
+            <h3 class="text-lg font-semibold">{feature.title}</h3>
+            <p class="mt-3 text-sm text-cream-70">{feature.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="mx-auto w-full max-w-6xl px-6 py-16">
+    <h2 class="section-title">How it works</h2>
+    <div class="grid gap-4 md:grid-cols-3">
+      {site.steps.map((step, index) => (
+        <div class="card">
+          <p class="text-sm uppercase tracking-widest text-cream-60">
+            Step {index + 1}
+          </p>
+          <h3 class="mt-3 text-xl font-semibold">{step.title}</h3>
+          <p class="mt-3 text-cream-70">{step.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section id="events" class="mx-auto w-full max-w-6xl px-6 py-16">
+    <div class="flex items-center justify-between gap-6">
+      <div>
+        <h2 class="section-title">Live hackathons</h2>
+        <p class="text-cream-70">
+          Browse upcoming events hosted by the Hatch community.
+        </p>
+      </div>
+      <a class="btn-ghost" href="/organizer/signup">Host your event</a>
+    </div>
+    <div class="mt-8 grid gap-4 md:grid-cols-2" data-events-grid>
+      <div class="card text-cream-70">Loading events…</div>
+    </div>
+    <div class="mt-6 text-sm text-cream-60" data-events-empty hidden>
+      No events are published yet.
+    </div>
+  </section>
+
+  <section class="mx-auto w-full max-w-6xl px-6 py-20">
+    <div class="card flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 class="text-3xl font-semibold">Ready to launch yours?</h2>
+        <p class="mt-2 text-cream-70">
+          Create an organizer account and publish your hackathon in minutes.
+        </p>
+      </div>
+      <a class="btn-primary" href="/organizer/signup">Get started free</a>
+    </div>
+  </section>
+
+  <script>
+    const grid = document.querySelector("[data-events-grid]");
+    const empty = document.querySelector("[data-events-empty]");
+
+    const formatDate = (value) => {
+      if (!value) return "TBD";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      }).format(date);
+    };
+
+    const formatRange = (start, end) => {
+      if (!start && !end) return "Dates TBD";
+      if (!start || !end) return formatDate(start || end);
+      return `${formatDate(start)} – ${formatDate(end)}`;
+    };
+
+    const createCard = (event) => {
+      const dateRange = formatRange(event.startDate, event.endDate);
+      const card = document.createElement("a");
+      card.href = `/events/${event.slug}`;
+      card.className = "card block transition hover:-translate-y-1";
+      card.innerHTML = `
+        <p class="text-sm uppercase tracking-widest text-cream-60">${event.mode || "Hackathon"}</p>
+        <h3 class="mt-3 text-2xl font-semibold">${event.title}</h3>
+        <p class="mt-2 text-cream-70">${event.tagline || ""}</p>
+        <div class="mt-5 flex flex-wrap gap-3 text-sm text-cream-70">
+          <span>${dateRange}</span>
+          <span>•</span>
+          <span>${event.location || "Location TBD"}</span>
+        </div>
+      `;
+      return card;
+    };
+
+    const loadEvents = async () => {
+      if (!grid) return;
+      try {
+        const response = await fetch("/api/events");
+        const payload = await response.json();
+        grid.innerHTML = "";
+        if (!payload.events || payload.events.length === 0) {
+          empty?.removeAttribute("hidden");
+          return;
+        }
+        payload.events.forEach((event) => grid.appendChild(createCard(event)));
+      } catch (error) {
+        grid.innerHTML = '<div class="card text-cream-70">Unable to load events.</div>';
+      }
+    };
+
+    loadEvents();
+  </script>
+</BaseLayout>

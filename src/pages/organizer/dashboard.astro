@@ -1,0 +1,212 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Organizer Dashboard | Hatch">
+  <section class="mx-auto w-full max-w-6xl px-6 py-16">
+    <div class="flex flex-col gap-8">
+      <div class="flex flex-wrap items-start justify-between gap-6">
+        <div>
+          <span class="eyebrow">Organizer dashboard</span>
+          <h1 class="mt-4 text-3xl font-semibold md:text-4xl">Your events</h1>
+          <p class="mt-3 text-cream-70">
+            Manage event details, tracks, and applications from one place.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <button class="btn-ghost" data-logout>Log out</button>
+          <button class="btn-primary" data-open-create>Create new event</button>
+        </div>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2" data-events-grid>
+        <div class="card text-cream-70">Loading events…</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="fixed inset-0 hidden items-center justify-center bg-black/50 p-6" data-modal>
+    <div class="card w-full max-w-lg space-y-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-semibold">Create event</h2>
+          <p class="text-cream-70">Add the basics. You can refine later.</p>
+        </div>
+        <button class="btn-ghost" type="button" data-close-modal>Close</button>
+      </div>
+
+      <form class="grid gap-4" data-create-form>
+        <label class="grid gap-2">
+          <span class="form-label">Event title</span>
+          <input class="input-field" name="title" required placeholder="Midwest Impact Hack" />
+        </label>
+        <label class="grid gap-2">
+          <span class="form-label">Slug</span>
+          <input class="input-field" name="slug" required placeholder="midwest-impact-hack" />
+        </label>
+        <label class="grid gap-2">
+          <span class="form-label">Tagline</span>
+          <input class="input-field" name="tagline" placeholder="Build for local impact in 24 hours." />
+        </label>
+        <label class="grid gap-2">
+          <span class="form-label">Description</span>
+          <textarea class="input-field" name="description" rows="3"></textarea>
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="grid gap-2">
+            <span class="form-label">Start date</span>
+            <input class="input-field" name="startDate" type="date" required />
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">End date</span>
+            <input class="input-field" name="endDate" type="date" required />
+          </label>
+        </div>
+        <label class="grid gap-2">
+          <span class="form-label">Location</span>
+          <input class="input-field" name="location" placeholder="Chicago, IL + Online" />
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="grid gap-2">
+            <span class="form-label">Mode</span>
+            <select class="input-field" name="mode">
+              <option>Hybrid</option>
+              <option>In-person</option>
+              <option>Online</option>
+            </select>
+          </label>
+          <label class="grid gap-2">
+            <span class="form-label">Apply by</span>
+            <input class="input-field" name="applicationDeadline" type="date" />
+          </label>
+        </div>
+        <label class="grid gap-2">
+          <span class="form-label">Theme</span>
+          <input class="input-field" name="theme" placeholder="Local impact" />
+        </label>
+        <label class="flex items-center gap-3 text-sm text-cream-80">
+          <input type="checkbox" name="isPublished" />
+          Publish immediately
+        </label>
+        <div class="flex flex-wrap items-center gap-4">
+          <button class="btn-primary" type="submit">Create event</button>
+          <span class="status-pill" data-status aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const eventsGrid = document.querySelector("[data-events-grid]");
+    const modal = document.querySelector("[data-modal]");
+    const openModal = document.querySelector("[data-open-create]");
+    const closeModal = document.querySelector("[data-close-modal]");
+    const createForm = document.querySelector("[data-create-form]");
+    const status = document.querySelector("[data-status]");
+    const logoutButton = document.querySelector("[data-logout]");
+
+    const open = () => modal?.classList.remove("hidden");
+    const close = () => modal?.classList.add("hidden");
+    openModal?.addEventListener("click", open);
+    closeModal?.addEventListener("click", close);
+
+    logoutButton?.addEventListener("click", async () => {
+      await fetch("/api/auth/logout", { method: "POST" });
+      window.location.href = "/";
+    });
+
+    const formatDate = (value) => {
+      if (!value) return "TBD";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      }).format(date);
+    };
+
+    const formatRange = (start, end) => {
+      if (!start && !end) return "Dates TBD";
+      if (!start || !end) return formatDate(start || end);
+      return `${formatDate(start)} – ${formatDate(end)}`;
+    };
+
+    const renderEvents = (events) => {
+      if (!eventsGrid) return;
+      eventsGrid.innerHTML = "";
+      if (events.length === 0) {
+        eventsGrid.innerHTML = '<div class="card text-cream-70">No events yet.</div>';
+        return;
+      }
+      events.forEach((event) => {
+        const dateRange = formatRange(event.startDate, event.endDate);
+        const card = document.createElement("div");
+        card.className = "card flex flex-col gap-4";
+        card.innerHTML = `
+          <div>
+            <p class="text-sm uppercase tracking-widest text-cream-60">${event.isPublished ? "Published" : "Draft"}</p>
+            <h3 class="mt-3 text-2xl font-semibold">${event.title}</h3>
+            <p class="mt-2 text-cream-70">${event.tagline || ""}</p>
+          </div>
+          <div class="flex flex-wrap gap-3 text-sm text-cream-70">
+            <span>${dateRange}</span>
+            <span>•</span>
+            <span>${event.location || "Location TBD"}</span>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <a class="btn-ghost" href="/events/${event.slug}">View public</a>
+            <a class="btn-primary" href="/organizer/events/${event.id}">Manage</a>
+          </div>
+        `;
+        eventsGrid.appendChild(card);
+      });
+    };
+
+    const loadEvents = async () => {
+      try {
+        const response = await fetch("/api/organizer/events");
+        if (response.status === 401) {
+          window.location.href = "/organizer/login";
+          return;
+        }
+        const payload = await response.json();
+        renderEvents(payload.events || []);
+      } catch (error) {
+        if (eventsGrid) {
+          eventsGrid.innerHTML = '<div class="card text-cream-70">Unable to load events.</div>';
+        }
+      }
+    };
+
+    createForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!createForm || !status) return;
+      status.textContent = "Creating...";
+      status.style.color = "rgba(254, 245, 230, 0.9)";
+      const payload = Object.fromEntries(new FormData(createForm));
+      payload.isPublished = payload.isPublished === "on";
+
+      try {
+        const response = await fetch("/api/organizer/events", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(result.error || "Unable to create event.");
+        }
+        status.textContent = "Event created!";
+        createForm.reset();
+        close();
+        loadEvents();
+      } catch (error) {
+        status.textContent = error.message || "Unable to create event.";
+        status.style.color = "#ff7a7a";
+      }
+    });
+
+    loadEvents();
+  </script>
+</BaseLayout>
