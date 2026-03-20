@@ -3,17 +3,17 @@ import { json } from "../../../lib/server/responses";
 import { getEnv } from "../../../lib/server/env";
 
 export const GET: APIRoute = async (context) => {
-  const env = getEnv();
   try {
-    const { results } = await env.DB.prepare(
+    const env = getEnv(context.locals);
+    const { results: events } = await env.DB.prepare(
       `SELECT id, slug, title, tagline, start_date as startDate, end_date as endDate,
-        location, mode, application_deadline as applicationDeadline, is_published as isPublished
+        location, mode, organization_name as organizationName, theme
        FROM events
        WHERE is_published = 1
-       ORDER BY start_date IS NULL, start_date ASC`
+       ORDER BY start_date ASC`
     ).all();
 
-    return json({ events: results ?? [] });
+    return json({ events: events ?? [] });
   } catch (error) {
     return json({ error: "Unable to load events." }, 500);
   }

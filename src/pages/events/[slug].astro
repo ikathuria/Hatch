@@ -2,38 +2,98 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Event | Hatch">
-  <section class="mx-auto w-full max-w-6xl px-6 py-16">
-    <div class="card space-y-6">
-      <div>
-        <span class="eyebrow" data-event-mode>Hackathon</span>
-        <h1 class="mt-4 text-3xl font-semibold md:text-5xl" data-event-title>
-          Loading event…
-        </h1>
-        <p class="mt-3 text-cream-70" data-event-tagline></p>
-        <div class="mt-6 flex flex-wrap gap-4 text-sm text-cream-70" data-event-meta></div>
-      </div>
-      <p class="text-cream-75" data-event-description></p>
-      <div class="flex flex-wrap gap-4">
-        <a class="btn-primary" data-apply-link href="#">Apply</a>
-        <a class="btn-ghost" data-submit-link href="#">Submit project</a>
+<BaseLayout title="Event Details | Hatch">
+  {/* Event Hero */}
+  <section class="relative pt-12 pb-24 overflow-hidden">
+    <div class="site-glow opacity-30"></div>
+    <div class="mx-auto max-w-6xl px-6 relative z-10">
+      <div class="card !p-0 overflow-hidden border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
+        <div class="bg-gradient-to-br from-violet/20 via-sky/10 to-transparent p-12 md:p-20">
+            <div class="space-y-8 max-w-4xl">
+                <div class="flex flex-wrap items-center gap-4">
+                  <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20" data-event-mode>Loading...</span>
+                  <span class="text-xs uppercase tracking-widest text-cream/40 font-bold border-l border-white/10 pl-4 hidden" data-event-org></span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold tracking-tighter leading-tight" data-event-title>
+                    Synchronizing...
+                </h1>
+                <p class="text-xl text-cream/60 leading-relaxed font-medium" data-event-tagline></p>
+                
+                <div class="flex flex-wrap gap-8 text-sm font-bold uppercase tracking-widest text-cream/40 py-6 border-y border-white/5" data-event-meta>
+                    {/* Hydrated by JS */}
+                </div>
+
+                <div class="flex flex-wrap gap-6 pt-4">
+                    <a class="btn-primary !px-12 !py-4" data-apply-link href="#">Apply to Participate</a>
+                    <a class="btn-ghost !px-12 !py-4" data-submit-link href="#">Submit Project</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-12 md:p-20 bg-ink-muted/30 backdrop-blur-xl">
+            <h2 class="text-xs font-bold uppercase tracking-[0.3em] text-violet mb-6">About the Event</h2>
+            <p class="text-lg text-cream/70 leading-relaxed max-w-4xl whitespace-pre-wrap" data-event-description></p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="mx-auto w-full max-w-6xl px-6 py-10">
-    <h2 class="section-title">Tracks</h2>
-    <div class="grid gap-4 md:grid-cols-2" data-event-tracks>
-      <div class="card text-cream-70">Loading tracks…</div>
+  {/* Content Grid */}
+  <section class="pb-32 relative">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="grid lg:grid-cols-[1fr_350px] gap-16">
+        {/* Main Content: Tracks */}
+        <div class="space-y-16">
+            <div>
+                <h2 class="section-title text-4xl">Event Tracks</h2>
+                <div class="grid gap-6 mt-10" data-event-tracks>
+                    <div class="card !p-12 text-cream/20 italic border-dashed">Awaiting track definitions...</div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="section-title text-4xl">Frequently Asked</h2>
+                <div class="grid gap-4 mt-10" data-event-faqs>
+                    <div class="card !p-12 text-cream/20 italic border-dashed">FAQ grid is Offline.</div>
+                </div>
+            </div>
+        </div>
+
+        {/* Sidebar: Dynamic Info */}
+        <aside class="space-y-8">
+            <div class="card !p-8 border-violet/20 bg-violet/5">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-violet mb-6">Event Status</h3>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-2 h-2 rounded-full bg-lime animate-pulse"></div>
+                        <span class="text-sm font-medium text-cream">Applications Open</span>
+                    </div>
+                    <p class="text-xs text-cream/40 leading-relaxed">Join a community of builders and manifest your vision into reality.</p>
+                </div>
+            </div>
+
+            <div class="card !p-8 hidden" data-event-socials-card>
+                <h3 class="text-sm font-bold uppercase tracking-widest text-lime mb-6">Connect & Share</h3>
+                <div class="space-y-6" data-event-socials>
+                    <!-- Hydrated by JS -->
+                </div>
+            </div>
+
+            <div class="card !p-8">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-sky mb-6">Need Support?</h3>
+                <p class="text-sm text-cream/50 mb-6">Reach out to the organizers if you have questions about the logistics or tracks.</p>
+                <a href="mailto:hello@hatch.dev" class="btn-ghost !w-full !py-3 !text-xs justify-center uppercase tracking-widest" data-contact-link>Contact Organizer</a>
+            </div>
+        </aside>
+      </div>
     </div>
   </section>
 
-  <section class="mx-auto w-full max-w-6xl px-6 py-10">
-    <h2 class="section-title">FAQ</h2>
-    <div class="grid gap-4 md:grid-cols-2" data-event-faqs>
-      <div class="card text-cream-70">Loading FAQ…</div>
-    </div>
-  </section>
+  <style>
+      details[open] summary svg {
+          transform: rotate(180deg);
+      }
+  </style>
 
   <script>
     const slug = window.location.pathname.split("/").filter(Boolean).pop();
@@ -46,6 +106,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const faqsEl = document.querySelector("[data-event-faqs]");
     const applyLink = document.querySelector("[data-apply-link]");
     const submitLink = document.querySelector("[data-submit-link]");
+    const orgEl = document.querySelector("[data-event-org]");
+    const socialsCard = document.querySelector("[data-event-socials-card]");
+    const socialsEl = document.querySelector("[data-event-socials]");
 
     const formatDate = (value) => {
       if (!value) return "TBD";
@@ -58,13 +121,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }).format(date);
     };
 
-    const renderList = (items, render, fallback) => {
-      if (!items || items.length === 0) {
-        return `<div class="card text-cream-70">${fallback}</div>`;
-      }
-      return items.map(render).join("");
-    };
-
     const loadEvent = async () => {
       if (!slug) return;
       try {
@@ -74,15 +130,73 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
         if (titleEl) titleEl.textContent = event.title;
         if (taglineEl) taglineEl.textContent = event.tagline || "";
-        if (descEl) descEl.textContent = event.description || "";
+        if (descEl) descEl.textContent = event.description || "The organizer hasn't shared a full description yet.";
         if (modeEl) modeEl.textContent = event.mode || "Hackathon";
+        
+        if (orgEl && event.organizationName) {
+          orgEl.textContent = `Hosted by ${event.organizationName}`;
+          orgEl.classList.remove("hidden");
+        }
+
         if (metaEl) {
           metaEl.innerHTML = `
-            <span>${formatDate(event.startDate)} – ${formatDate(event.endDate)}</span>
-            <span>•</span>
-            <span>${event.location || "Location TBD"}</span>
-            <span>•</span>
-            <span>Apply by ${formatDate(event.applicationDeadline)}</span>
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-violet"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                ${formatDate(event.startDate)} – ${formatDate(event.endDate)}
+            </div>
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                ${event.location || "Location TBD"}
+            </div>
+            ${event.maxParticipants ? `
+              <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-lime"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Capacity: ${event.maxParticipants} Hackers
+              </div>
+            ` : ""}
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-coral"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                Apply by ${formatDate(event.applicationDeadline)}
+            </div>
+          `;
+        }
+
+        if (socialsEl && (event.websiteUrl || event.twitterUrl || event.discordUrl)) {
+          socialsCard.classList.remove("hidden");
+          socialsEl.innerHTML = `
+            ${event.websiteUrl ? `
+              <a href="${event.websiteUrl}" target="_blank" class="flex items-center gap-4 group/item">
+                <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover/item:bg-lime/20 group-hover/item:text-lime transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-cream">Official Site</p>
+                  <p class="text-[10px] text-cream/30 uppercase tracking-widest">External Link</p>
+                </div>
+              </a>
+            ` : ""}
+            ${event.twitterUrl ? `
+              <a href="${event.twitterUrl}" target="_blank" class="flex items-center gap-4 group/item">
+                <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover/item:bg-sky/20 group-hover/item:text-sky transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-cream">Twitter / X</p>
+                  <p class="text-[10px] text-cream/30 uppercase tracking-widest">Connect</p>
+                </div>
+              </a>
+            ` : ""}
+            ${event.discordUrl ? `
+              <a href="${event.discordUrl}" target="_blank" class="flex items-center gap-4 group/item">
+                <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover/item:bg-[#5865F2]/20 group-hover/item:text-[#5865F2] transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M9.9 4.2c.5 0 .8.3.8.8v.7c0 .2-.1.4-.3.5-1.1.2-2.1.7-2.9 1.4-.1.1-.3.2-.5.2-.2 0-.3-.1-.4-.2-.5-.5-1.1-.8-1.7-.8-.5 0-.8.3-.8.8s.3.8.8.8c.3 0 .6.1.9.3.1.1.2.2.2.4v1.1c0 .2-.1.4-.3.5-1.1.2-2.1.7-2.9 1.4-.1.1-.3.2-.5.2-.2 0-.3-.1-.4-.2-.5-.5-1.1-.8-1.7-.8-.5 0-.8.3-.8.8s.3.8.8.8c.8 0 1.6.5 1.9 1.2.1.2.3.3.5.3.2 0 .4-.1.5-.3.3-.8.9-1.2 1.6-1.2.7 0 1.2.4 1.5 1.2.1.2.3.3.5.3.2 0 .4-.1.5-.3.2-.5.7-1.1 1.4-1.3.1 0 .2-.1.2-.2v-1.1c0-.2.1-.4.3-.5.8-.2 1.5-.6 2-1.2.1-.1.2-.2.4-.2s.3.1.4.2c.5.5 1.1.8 1.7.8.5 0 .8-.3.8-.8s-.3-.8-.8-.8c-.3 0-.6-.1-.9-.3-.1-.1-.2-.2-.2-.4v-1.1c0-.2.1-.4.3-.5 1.1-.2 2.1-.7 2.9-1.4.1-.1.3-.2.5-.2.2 0 .3.1.4.2.5.5 1.1.8 1.7.8.5 0 .8-.3.8-.8s-.3-.8-.8-.8c-.8 0-1.6-.5-1.9-1.2-.1-.2-.3-.3-.5-.3-.2 0-.4.1-.5.3-.2.5-.7 1.1-1.4 1.3-.1 0-.2.1-.2.2V5c0-.5-.3-.8-.8-.8z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-cream">Discord</p>
+                  <p class="text-[10px] text-cream/30 uppercase tracking-widest">Community</p>
+                </div>
+              </a>
+            ` : ""}
           `;
         }
 
@@ -90,34 +204,48 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         if (submitLink) submitLink.href = `/events/${slug}/submit`;
 
         if (tracksEl) {
-          tracksEl.innerHTML = renderList(
-            tracks,
-            (track) => `
-              <div class="card">
-                <h3 class="text-xl font-semibold">${track.name}</h3>
-                <p class="mt-3 text-cream-70">${track.description || ""}</p>
-                <p class="mt-5 text-sm text-[color:var(--lime)]">${track.prize || ""}</p>
+          if (tracks && tracks.length > 0) {
+            tracksEl.innerHTML = tracks.map(track => `
+              <div class="card !p-10 group hover:border-lime/30 transition-all">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                    <div class="space-y-4">
+                        <h3 class="text-2xl font-bold">${track.name}</h3>
+                        <p class="text-cream/50 leading-relaxed">${track.description || ""}</p>
+                    </div>
+                    ${track.prize ? `
+                        <div class="shrink-0 bg-lime/10 border border-lime/20 px-6 py-4 rounded-2xl">
+                            <span class="text-xs font-bold uppercase tracking-widest text-lime block mb-1">Prize pool</span>
+                            <span class="text-xl font-bold text-white">${track.prize}</span>
+                        </div>
+                    ` : ''}
+                </div>
               </div>
-            `,
-            "Tracks will be announced soon."
-          );
+            `).join("");
+          } else {
+            tracksEl.innerHTML = '<div class="card !p-12 text-cream/40 text-center italic">Tracks will be announced once the system stabilizes.</div>';
+          }
         }
 
         if (faqsEl) {
-          faqsEl.innerHTML = renderList(
-            faqs,
-            (faq) => `
-              <details class="card">
-                <summary class="cursor-pointer text-lg font-semibold">${faq.question}</summary>
-                <p class="mt-3 text-cream-70">${faq.answer}</p>
+          if (faqs && faqs.length > 0) {
+            faqsEl.innerHTML = faqs.map(faq => `
+              <details class="card group !p-0 overflow-hidden border-white/5 bg-white/[0.02]">
+                <summary class="flex items-center justify-between p-8 cursor-pointer list-none">
+                    <span class="text-lg font-bold group-hover:text-violet transition-colors">${faq.question}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-cream/30 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="px-8 pb-8 text-cream/50 leading-relaxed border-t border-white/5 pt-6">
+                    ${faq.answer}
+                </div>
               </details>
-            `,
-            "FAQ updates coming soon."
-          );
+            `).join("");
+          } else {
+            faqsEl.innerHTML = '<div class="card !p-12 text-cream/40 text-center italic">FAQ updates are currently in development.</div>';
+          }
         }
       } catch (error) {
-        if (titleEl) titleEl.textContent = "Event not found";
-        if (descEl) descEl.textContent = "This event may be private or unpublished.";
+        if (titleEl) titleEl.textContent = "Signal Lost";
+        if (descEl) descEl.textContent = "We couldn't synchronize with this event's data. It may be unpublished or non-existent.";
         if (tracksEl) tracksEl.innerHTML = "";
         if (faqsEl) faqsEl.innerHTML = "";
       }

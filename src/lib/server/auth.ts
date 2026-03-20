@@ -2,11 +2,11 @@ import { json } from "./responses";
 import type { Env, Organizer } from "./types";
 
 const encoder = new TextEncoder();
-const SESSION_COOKIE = "eh_session";
+const SESSION_COOKIE = "hatch_session";
 const SESSION_TTL_DAYS = 7;
 
-const toHex = (buffer: ArrayBuffer) =>
-  Array.from(new Uint8Array(buffer))
+const toHex = (data: Uint8Array) =>
+  Array.from(data)
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 
@@ -32,14 +32,14 @@ export const hashPassword = async (password: string, salt?: Uint8Array) => {
       name: "PBKDF2",
       hash: "SHA-256",
       iterations: 120000,
-      salt: actualSalt
+      salt: actualSalt as any
     },
     keyMaterial,
     256
   );
 
   return {
-    hash: toHex(derivedBits),
+    hash: toHex(new Uint8Array(derivedBits)),
     salt: toHex(actualSalt)
   };
 };

@@ -2,86 +2,82 @@
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Submit | Hatch">
+<BaseLayout title="Submit Your Build | Hatch">
   <section class="mx-auto w-full max-w-4xl px-6 py-16">
-    <div class="card space-y-6">
-      <div>
-        <span class="eyebrow">Project submission</span>
-        <h1 class="mt-4 text-3xl font-semibold md:text-4xl" data-event-title>
-          Submit your project
-        </h1>
-        <p class="mt-3 text-cream-70" data-event-tagline>
-          Share your build, links, and team details so judges can review your work.
-        </p>
+    <div class="card !p-12 relative overflow-hidden group">
+      <div class="absolute inset-0 bg-gradient-to-br from-violet/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+      
+      <div class="relative z-10 space-y-12">
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+              <a href=".." class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              </a>
+              <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Final Uplink</span>
+          </div>
+          <h1 class="text-4xl md:text-5xl font-bold tracking-tighter" data-event-title>Submit Your Project</h1>
+          <p class="text-lg text-cream/50 leading-relaxed font-medium" data-event-tagline>Transmit your final build data to the judging collective.</p>
+        </div>
+
+        <form class="space-y-10" data-form>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="form-label">Squad Designation</label>
+                    <input class="input-field" name="teamName" required placeholder="Nova Force" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Project Identity</label>
+                    <input class="input-field" name="projectName" required placeholder="Neural Bridge v1.0" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Target Track</label>
+                    <select class="input-field" name="track" required data-track-select>
+                        <option value="">Choosing objective...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                 <div class="space-y-2">
+                    <label class="form-label">Source Nexus (Repository)</label>
+                    <input class="input-field" type="url" name="repoUrl" placeholder="https://github.com/..." />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Live Link (Demo)</label>
+                    <input class="input-field" type="url" name="demoUrl" placeholder="https://live-deploy.app" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Briefing Artifact (Slides)</label>
+                    <input class="input-field" type="url" name="deckUrl" placeholder="https://pitch.deck/..." />
+                </div>
+            </div>
+          </div>
+
+          <div class="space-y-8 pt-6 border-t border-white/5">
+            <div class="space-y-2">
+                <label class="form-label">Mission Briefing (Description)</label>
+                <textarea class="input-field" name="description" rows="5" required placeholder="What did you manifest and why is it essential for the future?"></textarea>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label class="form-label">Contact Endpoint</label>
+                    <input class="input-field" type="email" name="contactEmail" required placeholder="lead@squad.io" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Squad Manifest (Names + Emails)</label>
+                    <textarea class="input-field" name="members" rows="3" required placeholder="Avery P. — avery@io.com"></textarea>
+                </div>
+            </div>
+          </div>
+
+          <div class="pt-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div class="status-pill !bg-transparent !border-none hidden" data-status></div>
+              <button class="btn-primary !px-16 !py-5 text-lg w-full md:w-auto" type="submit">Terminate Uplink (Submit)</button>
+          </div>
+        </form>
       </div>
-
-      <form class="grid gap-6" method="post" action="/api/events" data-form>
-        <div class="grid gap-4 md:grid-cols-2">
-          <label class="grid gap-2">
-            <span class="form-label">Team name</span>
-            <input class="input-field" name="teamName" required placeholder="Hack Squad" />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Project name</span>
-            <input class="input-field" name="projectName" required placeholder="Neighborhood Radar" />
-          </label>
-        </div>
-
-        <label class="grid gap-2">
-          <span class="form-label">Project description</span>
-          <textarea
-            class="input-field"
-            name="description"
-            rows="4"
-            required
-            placeholder="What did you build and why does it matter?"
-          ></textarea>
-        </label>
-
-        <div class="grid gap-4 md:grid-cols-3">
-          <label class="grid gap-2">
-            <span class="form-label">Repository URL</span>
-            <input class="input-field" type="url" name="repoUrl" placeholder="https://github.com/..." />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Demo URL</span>
-            <input class="input-field" type="url" name="demoUrl" placeholder="https://demo..." />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Slide deck</span>
-            <input class="input-field" type="url" name="deckUrl" placeholder="https://slides..." />
-          </label>
-        </div>
-
-        <div class="grid gap-4 md:grid-cols-2">
-          <label class="grid gap-2">
-            <span class="form-label">Track</span>
-            <select class="input-field" name="track" required data-track-select>
-              <option value="">Choose a track</option>
-            </select>
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Contact email</span>
-            <input class="input-field" type="email" name="contactEmail" required placeholder="team@email.com" />
-          </label>
-        </div>
-
-        <label class="grid gap-2">
-          <span class="form-label">Team members (names + emails)</span>
-          <textarea
-            class="input-field"
-            name="members"
-            rows="4"
-            required
-            placeholder="Avery Patel — avery@email.com"
-          ></textarea>
-        </label>
-
-        <div class="flex flex-wrap items-center gap-4">
-          <button class="btn-primary" type="submit">Submit project</button>
-          <span class="status-pill" data-status aria-live="polite"></span>
-        </div>
-      </form>
     </div>
   </section>
 
@@ -98,12 +94,12 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const loadEvent = async () => {
       try {
         const response = await fetch(`/api/events/${slug}`);
-        if (!response.ok) throw new Error("Event not found.");
+        if (!response.ok) throw new Error("Mission not found.");
         const { event, tracks } = await response.json();
         if (titleEl) titleEl.textContent = `Submit for ${event.title}`;
         if (taglineEl) taglineEl.textContent = event.tagline || "";
         if (trackSelect) {
-          trackSelect.innerHTML = '<option value="">Choose a track</option>';
+          trackSelect.innerHTML = '<option value="">Choose an objective...</option>';
           tracks.forEach((track) => {
             const option = document.createElement("option");
             option.value = track.name;
@@ -113,8 +109,9 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         }
       } catch (error) {
         if (status) {
-          status.textContent = "This event is unavailable.";
-          status.style.color = "#ff7a7a";
+          status.textContent = "Signal failure: Event unavailable.";
+          status.classList.remove("hidden");
+          status.classList.add("!text-coral");
         }
         if (button) button.disabled = true;
       }
@@ -124,9 +121,12 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       event.preventDefault();
       if (!status || !form) return;
 
-      status.textContent = "Submitting...";
-      status.style.color = "rgba(254, 245, 230, 0.9)";
-      if (button) button.disabled = true;
+      if (button) {
+          button.disabled = true;
+          button.textContent = "Transmitting...";
+      }
+      status.textContent = "";
+      status.classList.add("hidden");
 
       try {
         const response = await fetch(`/api/events/${slug}/submit`, {
@@ -135,16 +135,24 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(payload.error || "Something went wrong.");
+          throw new Error(payload.error || "Uplink failure.");
         }
-        status.textContent = "Submission received. We will review soon.";
+        status.textContent = "Transmission successful. Judging collective notified.";
+        status.classList.remove("hidden");
+        status.classList.add("!text-lime", "font-bold");
         form.reset();
+        if (button) {
+            button.textContent = "Complete";
+            button.style.background = "#d8ff3f";
+        }
       } catch (error) {
-        status.textContent = error.message || "Unable to submit right now.";
-        status.style.color = "#ff7a7a";
-      } finally {
-        if (button) button.disabled = false;
-        if (button) button.textContent = defaultLabel || "Submit project";
+        status.textContent = error.message;
+        status.classList.remove("hidden");
+        status.classList.add("!text-coral", "font-bold");
+        if (button) {
+            button.disabled = false;
+            button.textContent = defaultLabel;
+        }
       }
     });
 

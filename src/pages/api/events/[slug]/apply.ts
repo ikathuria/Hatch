@@ -9,13 +9,12 @@ const getValue = (form: FormData, key: string) => {
 };
 
 export const POST: APIRoute = async (context) => {
-  const env = getEnv();
-  const slug = context.params.slug ? String(context.params.slug) : "";
-  if (!slug) {
-    return json({ error: "Missing event." }, 400);
-  }
-
   try {
+    const env = getEnv(context.locals);
+    const slug = context.params.slug ? String(context.params.slug) : "";
+    if (!slug) {
+      return json({ error: "Missing event." }, 400);
+    }
     const event = await env.DB.prepare(
       "SELECT id FROM events WHERE slug = ? AND is_published = 1"
     )

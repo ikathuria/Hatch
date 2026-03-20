@@ -5,11 +5,10 @@ import { getEnv } from "../../../../lib/server/env";
 import { normalizeSlug, slugPattern } from "../../../../lib/server/validation";
 
 export const GET: APIRoute = async (context) => {
-  const env = getEnv();
-  const { organizer, response } = await requireOrganizer(context.request, env);
-  if (response) return response;
-
   try {
+    const env = getEnv(context.locals);
+    const { organizer, response } = await requireOrganizer(context.request, env);
+    if (response) return response;
     const { results } = await env.DB.prepare(
       `SELECT id, slug, title, tagline, start_date as startDate, end_date as endDate,
         location, mode, application_deadline as applicationDeadline, is_published as isPublished
@@ -27,24 +26,22 @@ export const GET: APIRoute = async (context) => {
 };
 
 export const POST: APIRoute = async (context) => {
-  const env = getEnv();
-  const { organizer, response } = await requireOrganizer(context.request, env);
-  if (response) return response;
-
   try {
-    const payload = await context.request.json();
+    const env = getEnv(context.locals);
+    const { organizer, response } = await requireOrganizer(context.request, env);
+    if (response) return response;
+    const payload = (await context.request.json()) as any;
     const title = String(payload.title || "").trim();
-    const rawSlug = String(payload.slug || "").trim();
-    const slug = normalizeSlug(rawSlug);
+    const slug = normalizeSlug(String(payload.slug || "").trim());
     const tagline = String(payload.tagline || "").trim();
     const description = String(payload.description || "").trim();
     const startDate = String(payload.startDate || "").trim();
     const endDate = String(payload.endDate || "").trim();
+    const mode = String(payload.mode || "Hybrid").trim();
+    const organizationName = String(payload.organizationName || "").trim();
     const location = String(payload.location || "").trim();
-    const mode = String(payload.mode || "").trim();
     const applicationDeadline = String(payload.applicationDeadline || "").trim();
     const theme = String(payload.theme || "").trim();
-    const isPublished = payload.isPublished ? 1 : 0;
 
     if (!title || !slug) {
       return json({ error: "Title and slug are required." }, 400);
@@ -63,9 +60,11 @@ export const POST: APIRoute = async (context) => {
 
     const eventId = crypto.randomUUID();
     await env.DB.prepare(
-      `INSERT INTO events
-      (id, organizer_id, created_at, updated_at, slug, title, tagline, description, start_date, end_date, location, mode, application_deadline, theme, is_published)
-      VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO events (
+        id, organizer_id, created_at, updated_at, slug, title, tagline, description,
+        start_date, end_date, mode, organization_name, location,
+        application_deadline, theme, is_published
+      ) VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`
     )
       .bind(
         eventId,
@@ -76,11 +75,11 @@ export const POST: APIRoute = async (context) => {
         description,
         startDate,
         endDate,
-        location,
         mode,
+        organizationName,
+        location,
         applicationDeadline,
-        theme,
-        isPublished
+        theme
       )
       .run();
 
@@ -96,7 +95,7 @@ export const POST: APIRoute = async (context) => {
           location,
           mode,
           applicationDeadline,
-          isPublished: Boolean(isPublished)
+          isPublished: false
         }
       },
       201

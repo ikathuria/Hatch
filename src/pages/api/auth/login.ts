@@ -4,9 +4,9 @@ import { json } from "../../../lib/server/responses";
 import { getEnv } from "../../../lib/server/env";
 
 export const POST: APIRoute = async (context) => {
-  const env = getEnv();
   try {
-    const { email, password } = await context.request.json();
+    const env = getEnv(context.locals);
+    const { email, password } = (await context.request.json()) as any;
     if (!email || !password) {
       return json({ error: "Email and password are required." }, 400);
     }

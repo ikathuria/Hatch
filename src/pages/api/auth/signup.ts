@@ -6,7 +6,7 @@ import { emailPattern } from "../../../lib/server/validation";
 
 export const POST: APIRoute = async (context) => {
   try {
-    const env = getEnv();
+    const env = getEnv(context.locals);
     const payload = await context.request.json();
     console.log("Signup payload:", payload);
     const { name, email, password } = payload as any;

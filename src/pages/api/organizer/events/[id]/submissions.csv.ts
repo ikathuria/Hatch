@@ -5,14 +5,14 @@ import { getEnv } from "../../../../../lib/server/env";
 import { toCsv } from "../../../../../lib/server/csv";
 
 export const GET: APIRoute = async (context) => {
-  const env = getEnv();
-  const { organizer, response } = await requireOrganizer(context.request, env);
-  if (response) return response;
-
-  const id = context.params.id ? String(context.params.id) : "";
-  if (!id) return text("Missing event id.", 400);
-
   try {
+    const env = getEnv(context.locals);
+    const { organizer, response } = await requireOrganizer(context.request, env);
+    if (response) return response;
+
+    const id = context.params.id ? String(context.params.id) : "";
+    if (!id) return text("Missing event id.", 400);
+
     const event = await env.DB.prepare(
       "SELECT id FROM events WHERE id = ? AND organizer_id = ?"
     )
@@ -46,6 +46,7 @@ export const GET: APIRoute = async (context) => {
       "content-disposition": `attachment; filename="submissions-${id}.csv"`
     });
   } catch (error) {
+    console.error("DEBUG: [GET submissions.csv] Error:", error);
     return text("Unable to export submissions.", 500);
   }
 };

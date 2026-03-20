@@ -3,19 +3,18 @@ import { json } from "../../../lib/server/responses";
 import { getEnv } from "../../../lib/server/env";
 
 export const GET: APIRoute = async (context) => {
-  const env = getEnv();
-  const slug = context.params.slug ? String(context.params.slug) : "";
-  if (!slug) {
-    return json({ error: "Missing slug." }, 400);
-  }
-
   try {
+    const env = getEnv(context.locals);
+    const slug = context.params.slug ? String(context.params.slug) : "";
+    if (!slug) {
+      return json({ error: "Missing slug." }, 400);
+    }
     const event = await env.DB.prepare(
-      `SELECT id, slug, title, tagline, description,
-        start_date as startDate, end_date as endDate,
-        location, mode, application_deadline as applicationDeadline, theme
-       FROM events
-       WHERE slug = ? AND is_published = 1`
+      `SELECT id, slug, title, tagline, description, start_date as startDate, end_date as endDate,
+        location, mode, organization_name as organizationName, website_url as websiteUrl,
+        twitter_url as twitterUrl, discord_url as discordUrl, max_participants as maxParticipants,
+        application_deadline as applicationDeadline, theme
+       FROM events WHERE slug = ? AND is_published = 1`
     )
       .bind(slug)
       .first<Record<string, unknown>>();

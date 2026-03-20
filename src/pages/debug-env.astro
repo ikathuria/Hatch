@@ -1,0 +1,13 @@
+---
+import { env } from "cloudflare:workers";
+
+const dbExists = !!(env as any)?.DB;
+const envKeys = env ? Object.keys(env) : [];
+---
+<html>
+  <body>
+    <h1>Worker Import Debug</h1>
+    <p>Env Keys: {JSON.stringify(envKeys)}</p>
+    <p>DB exists in imported env: {String(dbExists)}</p>
+  </body>
+</html>

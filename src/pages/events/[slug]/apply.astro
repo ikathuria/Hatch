@@ -2,92 +2,98 @@
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Apply | Hatch">
+<BaseLayout title="Apply to Compete | Hatch">
   <section class="mx-auto w-full max-w-4xl px-6 py-16">
-    <div class="card space-y-6">
-      <div>
-        <span class="eyebrow">Registration</span>
-        <h1 class="mt-4 text-3xl font-semibold md:text-4xl" data-event-title>
-          Apply to compete
-        </h1>
-        <p class="mt-3 text-cream-70" data-event-tagline>
-          Tell us about yourself and we’ll confirm your spot.
-        </p>
+    <div class="card !p-12 relative overflow-hidden group">
+      <div class="absolute inset-0 bg-gradient-to-br from-lime/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+      
+      <div class="relative z-10 space-y-12">
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+              <a href=".." class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              </a>
+              <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Mission Entry</span>
+          </div>
+          <h1 class="text-4xl md:text-5xl font-bold tracking-tighter" data-event-title>Apply to Compete</h1>
+          <p class="text-lg text-cream/50 leading-relaxed font-medium" data-event-tagline>Initialize your participation protocol. We'll synchronize your status shortly.</p>
+        </div>
+
+        <form class="space-y-10" data-form>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="form-label">Personnel Identifier</label>
+                    <input class="input-field" name="fullName" required placeholder="Jordan Lee" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Communication Endpoint</label>
+                    <input class="input-field" type="email" name="email" required placeholder="you@stellar.io" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Affiliation / Colony</label>
+                    <input class="input-field" name="organization" placeholder="School, Hub, or Collective" />
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="form-label">Primary Specialization</label>
+                    <select class="input-field" name="role" required>
+                        <option value="">Select Specialization</option>
+                        <option>Architect (Developer)</option>
+                        <option>Designer (UI/UX)</option>
+                        <option>Strategist (Business)</option>
+                        <option>Synthesizer (AI/Data)</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Target Track</label>
+                    <select class="input-field" name="track" required data-track-select>
+                        <option value="">Choose an objective...</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Synchronization Mode</label>
+                    <input class="input-field" name="location" placeholder="Chicago / UTC-6" />
+                </div>
+            </div>
+          </div>
+
+          <div class="space-y-6 pt-6 border-t border-white/5">
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label class="form-label">Squad Configuration</label>
+                    <select class="input-field" name="teamStatus" required>
+                        <option value="">Select configuration</option>
+                        <option>Solo Operator (Looking for Squad)</option>
+                        <option>Squad Leader (Have a Team)</option>
+                        <option>Flexible (Open to Either)</option>
+                    </select>
+                </div>
+                <div class="flex items-center h-full pt-8">
+                    <label class="flex items-start gap-4 cursor-pointer group">
+                        <input type="checkbox" name="consent" required class="w-6 h-6 rounded-lg bg-white/5 border border-white/10 accent-lime cursor-pointer mt-1" />
+                        <span class="text-sm text-cream/40 group-hover:text-cream/60 transition-colors pt-1">
+                            I verify compliance with the <a class="text-lime font-bold hover:underline" href="/code-of-conduct">Protocol of Conduct</a>.
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="form-label">Mission Objectives (Optional)</label>
+                <textarea class="input-field" name="idea" rows="4" placeholder="Briefly describe your proposed build or problem set."></textarea>
+            </div>
+          </div>
+
+          <div class="pt-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div class="status-pill !bg-transparent !border-none hidden" data-status></div>
+              <button class="btn-primary !px-16 !py-5 text-lg w-full md:w-auto" type="submit">Establish Participation</button>
+          </div>
+        </form>
       </div>
-
-      <form class="grid gap-6" method="post" action="/api/events" data-form>
-        <div class="grid gap-4 md:grid-cols-2">
-          <label class="grid gap-2">
-            <span class="form-label">Full name</span>
-            <input class="input-field" name="fullName" required placeholder="Jordan Lee" />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Email</span>
-            <input class="input-field" type="email" name="email" required placeholder="you@email.com" />
-          </label>
-        </div>
-
-        <div class="grid gap-4 md:grid-cols-2">
-          <label class="grid gap-2">
-            <span class="form-label">Organization</span>
-            <input class="input-field" name="organization" placeholder="School, company, or community" />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Role</span>
-            <select class="input-field" name="role" required>
-              <option value="">Choose one</option>
-              <option>Student</option>
-              <option>Professional</option>
-              <option>Designer</option>
-              <option>Developer</option>
-              <option>Other</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="grid gap-4 md:grid-cols-2">
-          <label class="grid gap-2">
-            <span class="form-label">Location / timezone</span>
-            <input class="input-field" name="location" placeholder="Chicago, CST" />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Track interest</span>
-            <select class="input-field" name="track" required data-track-select>
-              <option value="">Choose a track</option>
-            </select>
-          </label>
-        </div>
-
-        <label class="grid gap-2">
-          <span class="form-label">Team status</span>
-          <select class="input-field" name="teamStatus" required>
-            <option value="">Select one</option>
-            <option>Looking for a team</option>
-            <option>Have a team</option>
-            <option>Open to either</option>
-          </select>
-        </label>
-
-        <label class="grid gap-2">
-          <span class="form-label">What do you want to build?</span>
-          <textarea
-            class="input-field"
-            name="idea"
-            rows="4"
-            placeholder="Share a project idea or problem you want to solve."
-          ></textarea>
-        </label>
-
-        <label class="flex items-start gap-3 text-sm text-cream-80">
-          <input type="checkbox" name="consent" required class="mt-1" />
-          I agree to the <a class="underline" href="/code-of-conduct">code of conduct</a>.
-        </label>
-
-        <div class="flex flex-wrap items-center gap-4">
-          <button class="btn-primary" type="submit">Submit application</button>
-          <span class="status-pill" data-status aria-live="polite"></span>
-        </div>
-      </form>
     </div>
   </section>
 
@@ -104,12 +110,12 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const loadEvent = async () => {
       try {
         const response = await fetch(`/api/events/${slug}`);
-        if (!response.ok) throw new Error("Event not found.");
+        if (!response.ok) throw new Error("Mission not found.");
         const { event, tracks } = await response.json();
         if (titleEl) titleEl.textContent = `Apply to ${event.title}`;
         if (taglineEl) taglineEl.textContent = event.tagline || "";
         if (trackSelect) {
-          trackSelect.innerHTML = '<option value="">Choose a track</option>';
+          trackSelect.innerHTML = '<option value="">Choose an objective...</option>';
           tracks.forEach((track) => {
             const option = document.createElement("option");
             option.value = track.name;
@@ -119,8 +125,9 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         }
       } catch (error) {
         if (status) {
-          status.textContent = "This event is unavailable.";
-          status.style.color = "#ff7a7a";
+          status.textContent = "Signal failure: Event unavailable.";
+          status.classList.remove("hidden");
+          status.classList.add("!text-coral");
         }
         if (button) button.disabled = true;
       }
@@ -130,9 +137,12 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       event.preventDefault();
       if (!status || !form) return;
 
-      status.textContent = "Submitting...";
-      status.style.color = "rgba(254, 245, 230, 0.9)";
-      if (button) button.disabled = true;
+      if (button) {
+          button.disabled = true;
+          button.textContent = "Synchronizing...";
+      }
+      status.textContent = "";
+      status.classList.add("hidden");
 
       try {
         const response = await fetch(`/api/events/${slug}/apply`, {
@@ -141,16 +151,24 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(payload.error || "Something went wrong.");
+          throw new Error(payload.error || "Uplink failure.");
         }
-        status.textContent = "Application received. Check your email soon.";
+        status.textContent = "Entry established. Monitor your inbox for confirmation.";
+        status.classList.remove("hidden");
+        status.classList.add("!text-lime", "font-bold");
         form.reset();
+        if (button) {
+            button.textContent = "Success";
+            button.style.background = "#d8ff3f";
+        }
       } catch (error) {
-        status.textContent = error.message || "Unable to submit right now.";
-        status.style.color = "#ff7a7a";
-      } finally {
-        if (button) button.disabled = false;
-        if (button) button.textContent = defaultLabel || "Submit application";
+        status.textContent = error.message;
+        status.classList.remove("hidden");
+        status.classList.add("!text-coral", "font-bold");
+        if (button) {
+            button.disabled = false;
+            button.textContent = defaultLabel;
+        }
       }
     });
 

@@ -3,107 +3,203 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="Manage Event | Hatch">
-  <section class="mx-auto w-full max-w-5xl px-6 py-16">
-    <div class="card space-y-8">
-      <div>
-        <span class="eyebrow">Event settings</span>
-        <h1 class="mt-4 text-3xl font-semibold md:text-4xl" data-event-title>
-          Loading event…
-        </h1>
-        <p class="mt-3 text-cream-70">
-          Update details, tracks, and FAQ. Changes are live instantly.
-        </p>
+  <div class="mx-auto max-w-6xl px-6 py-12">
+    {/* Page Header */}
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+            <a href="/organizer/dashboard" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </a>
+            <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Mission Control</span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tighter" data-event-title>Loading Event...</h1>
+        <p class="text-cream/50 max-w-2xl leading-relaxed">Update your event's configuration in real-time. All changes synchronize instantly with the global grid once saved.</p>
       </div>
-
-      <form class="grid gap-6" data-event-form>
-        <div class="grid gap-4 md:grid-cols-2">
-          <label class="grid gap-2">
-            <span class="form-label">Event title</span>
-            <input class="input-field" name="title" required />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Slug</span>
-            <input class="input-field" name="slug" required />
-          </label>
-        </div>
-        <label class="grid gap-2">
-          <span class="form-label">Tagline</span>
-          <input class="input-field" name="tagline" />
-        </label>
-        <label class="grid gap-2">
-          <span class="form-label">Description</span>
-          <textarea class="input-field" name="description" rows="4"></textarea>
-        </label>
-        <div class="grid gap-4 md:grid-cols-2">
-          <label class="grid gap-2">
-            <span class="form-label">Start date</span>
-            <input class="input-field" name="startDate" type="date" />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">End date</span>
-            <input class="input-field" name="endDate" type="date" />
-          </label>
-        </div>
-        <label class="grid gap-2">
-          <span class="form-label">Location</span>
-          <input class="input-field" name="location" />
-        </label>
-        <div class="grid gap-4 md:grid-cols-2">
-          <label class="grid gap-2">
-            <span class="form-label">Mode</span>
-            <select class="input-field" name="mode">
-              <option>Hybrid</option>
-              <option>In-person</option>
-              <option>Online</option>
-            </select>
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Apply by</span>
-            <input class="input-field" name="applicationDeadline" type="date" />
-          </label>
-        </div>
-        <label class="grid gap-2">
-          <span class="form-label">Theme</span>
-          <input class="input-field" name="theme" />
-        </label>
-        <label class="flex items-center gap-3 text-sm text-cream-80">
-          <input type="checkbox" name="isPublished" />
-          Published
-        </label>
-
-        <div>
-          <h2 class="text-2xl font-semibold">Tracks</h2>
-          <div class="mt-4 grid gap-4" data-tracks></div>
-          <button class="btn-ghost mt-4" type="button" data-add-track>Add track</button>
-        </div>
-
-        <div>
-          <h2 class="text-2xl font-semibold">FAQ</h2>
-          <div class="mt-4 grid gap-4" data-faqs></div>
-          <button class="btn-ghost mt-4" type="button" data-add-faq>Add FAQ</button>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-4">
-          <button class="btn-primary" type="submit">Save changes</button>
-          <a class="btn-ghost" data-public-link href="#">View public page</a>
-          <span class="status-pill" data-status aria-live="polite"></span>
-        </div>
-      </form>
-
-      <div class="grid gap-4 md:grid-cols-2">
-        <div class="card">
-          <h3 class="text-xl font-semibold">Applications</h3>
-          <p class="mt-2 text-cream-70">Download all registrations.</p>
-          <a class="btn-ghost mt-4" data-applications-link href="#">Download CSV</a>
-        </div>
-        <div class="card">
-          <h3 class="text-xl font-semibold">Submissions</h3>
-          <p class="mt-2 text-cream-70">Download project submissions.</p>
-          <a class="btn-ghost mt-4" data-submissions-link href="#">Download CSV</a>
-        </div>
+      <div class="flex items-center gap-4">
+          <a class="btn-ghost !px-6" data-public-link href="#" target="_blank">
+             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2 opacity-60"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+             Live View
+          </a>
+          <button class="btn-primary !px-10" id="save-btn-top">Save Mission</button>
       </div>
     </div>
-  </section>
+
+    <form class="space-y-12" data-event-form>
+      {/* 1. Core Identity */}
+      <section class="space-y-8">
+        <div class="flex items-center gap-4 mb-2">
+            <span class="w-8 h-8 rounded-lg bg-violet/10 text-violet flex items-center justify-center font-bold text-xs border border-violet/20">01</span>
+            <h2 class="text-2xl font-bold tracking-tight">Core Identity</h2>
+        </div>
+        <div class="card !p-10 grid md:grid-cols-2 gap-10 border-white/5 bg-white/[0.02]">
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="form-label">Event Title</label>
+                    <input class="input-field" name="title" required placeholder="Technosphere 2026" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Global Slug</label>
+                    <input class="input-field" name="slug" required placeholder="technosphere-2026" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Brief Tagline</label>
+                    <input class="input-field" name="tagline" placeholder="Bending reality with code..." />
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="form-label">Full Description</label>
+                <textarea class="input-field !h-[calc(100%-2rem)]" name="description" placeholder="Tell the world about your mission..."></textarea>
+            </div>
+        </div>
+      </section>
+
+      {/* 2. Logistics & Parameters */}
+      <section class="space-y-8">
+        <div class="flex items-center gap-4 mb-2">
+            <span class="w-8 h-8 rounded-lg bg-sky/10 text-sky flex items-center justify-center font-bold text-xs border border-sky/20">02</span>
+            <h2 class="text-2xl font-bold tracking-tight">Logistics & Parameters</h2>
+        </div>
+        <div class="card !p-10 grid md:grid-cols-3 gap-10 border-white/5 bg-white/[0.02]">
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="form-label">Start Horizon</label>
+                    <input class="input-field" name="startDate" type="datetime-local" required />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">End Horizon</label>
+                    <input class="input-field" name="endDate" type="datetime-local" required />
+                </div>
+            </div>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="form-label">Deployment Hub</label>
+                    <input class="input-field" name="location" placeholder="San Francisco / Global" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Operational Mode</label>
+                    <select class="input-field" name="mode">
+                        <option>Hybrid</option>
+                        <option>In-person</option>
+                        <option>Online</option>
+                    </select>
+                </div>
+            </div>
+            </div>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="form-label">Organization Branding</label>
+                    <input class="input-field" name="organizationName" placeholder="e.g. Major League Hacking" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Official Website</label>
+                    <input class="input-field" name="websiteUrl" placeholder="https://hackathon.com" />
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="form-label">Twitter/X Profile</label>
+                    <input class="input-field" name="twitterUrl" placeholder="https://x.com/handle" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Discord Server</label>
+                    <input class="input-field" name="discordUrl" placeholder="https://discord.gg/invitelink" />
+                </div>
+            </div>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="form-label">Participant Capacity</label>
+                    <input class="input-field" name="maxParticipants" type="number" placeholder="e.g. 500" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Application Cutoff</label>
+                    <input class="input-field" name="applicationDeadline" type="datetime-local" />
+                </div>
+                <div class="space-y-2 text-center pt-8">
+                    <label class="flex items-center justify-center gap-3 cursor-pointer group">
+                        <div class="w-12 h-7 bg-white/5 border border-white/10 rounded-full relative transition-colors group-hover:border-lime/30">
+                            <input type="checkbox" name="isPublished" class="sr-only peer" />
+                            <div class="w-5 h-5 bg-cream/20 rounded-full absolute left-1 top-1 transition-all peer-checked:left-6 peer-checked:bg-lime"></div>
+                        </div>
+                        <span class="text-sm font-bold text-cream/40 peer-checked:text-cream">Publish Status</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+      </section>
+
+      {/* 3. Specialized Tracks */}
+      <section class="space-y-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <span class="w-8 h-8 rounded-lg bg-lime/10 text-lime flex items-center justify-center font-bold text-xs border border-lime/20">03</span>
+                <h2 class="text-2xl font-bold tracking-tight">Specialized Tracks</h2>
+            </div>
+            <button class="btn-ghost !py-2 !px-4 !text-xs uppercase tracking-widest hover:border-lime/30 hover:text-lime" type="button" data-add-track>
+                + Add Track
+            </button>
+        </div>
+        <div class="grid gap-6" data-tracks></div>
+      </section>
+
+      {/* 4. Knowledge Base (FAQ) */}
+      <section class="space-y-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <span class="w-8 h-8 rounded-lg bg-coral/10 text-coral flex items-center justify-center font-bold text-xs border border-coral/20">04</span>
+                <h2 class="text-2xl font-bold tracking-tight">Knowledge Base</h2>
+            </div>
+            <button class="btn-ghost !py-2 !px-4 !text-xs uppercase tracking-widest hover:border-coral/30 hover:text-coral" type="button" data-add-faq>
+                + Add FAQ
+            </button>
+        </div>
+        <div class="grid gap-4" data-faqs></div>
+      </section>
+
+      {/* 5. Data Export */}
+      <section class="space-y-8">
+        <div class="flex items-center gap-4 mb-2">
+            <span class="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center font-bold text-xs border border-white/20">05</span>
+            <h2 class="text-2xl font-bold tracking-tight">Data Integrity</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="card !p-10 border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all">
+                <div class="flex justify-between items-start mb-6">
+                    <h3 class="text-xl font-bold">Applications</h3>
+                    <div class="w-10 h-10 rounded-full bg-sky/10 flex items-center justify-center text-sky">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </div>
+                </div>
+                <p class="text-sm text-cream/40 mb-8 leading-relaxed">Download a comprehensive dataset of all registered participants for external processing.</p>
+                <a class="btn-ghost !w-full justify-center !py-4 text-xs font-bold uppercase tracking-widest" data-applications-link href="#">Fetch .CSV Dataset</a>
+            </div>
+
+            <div class="card !p-10 border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all">
+                <div class="flex justify-between items-start mb-6">
+                    <h3 class="text-xl font-bold">Submissions</h3>
+                    <div class="w-10 h-10 rounded-full bg-violet/10 flex items-center justify-center text-violet">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </div>
+                </div>
+                <p class="text-sm text-cream/40 mb-8 leading-relaxed">Retrieve final project submissions including links, descriptions, and track designations.</p>
+                <a class="btn-ghost !w-full justify-center !py-4 text-xs font-bold uppercase tracking-widest" data-submissions-link href="#">Fetch .CSV Submissions</a>
+            </div>
+        </div>
+      </section>
+
+      {/* Footer Save Action */}
+      <div class="pt-20 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-10">
+          <div class="space-y-1">
+              <p class="text-sm font-bold text-cream">Unsaved changes detected.</p>
+              <p class="text-xs text-cream/40">Remember to persist your mission parameters.</p>
+          </div>
+          <div class="flex items-center gap-6 w-full md:w-auto">
+              <span class="status-pill !bg-transparent !border-none hidden" data-status></span>
+              <button class="btn-primary !px-16 !py-5 text-lg w-full md:w-auto" type="submit">Persist Mission Changes</button>
+          </div>
+      </div>
+    </form>
+  </div>
 
   <script>
     const eventId = window.location.pathname.split("/").filter(Boolean).pop();
@@ -117,41 +213,61 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const publicLink = document.querySelector("[data-public-link]");
     const applicationsLink = document.querySelector("[data-applications-link]");
     const submissionsLink = document.querySelector("[data-submissions-link]");
+    const topSaveBtn = document.querySelector("#save-btn-top");
+
+    topSaveBtn?.addEventListener("click", () => form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true })));
 
     const buildRow = (type, data = {}) => {
       const wrapper = document.createElement("div");
-      wrapper.className = "card grid gap-3";
+      wrapper.className = "card !p-8 grid md:grid-cols-[1fr_auto] items-start gap-10 animate-in fade-in slide-in-from-bottom-2 duration-300";
+      
       if (type === "track") {
         wrapper.innerHTML = `
-          <label class="grid gap-2">
-            <span class="form-label">Track name</span>
-            <input class="input-field" name="trackName" value="${data.name || ""}" />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Description</span>
-            <textarea class="input-field" name="trackDescription" rows="2">${data.description || ""}</textarea>
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Prize</span>
-            <input class="input-field" name="trackPrize" value="${data.prize || ""}" />
-          </label>
-          <button class="btn-ghost" type="button" data-remove>Remove</button>
+          <div class="grid md:grid-cols-2 gap-8 flex-1">
+             <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="form-label">Track Identifier</label>
+                    <input class="input-field" name="trackName" value="${data.name || ""}" placeholder="AI / Sustainability" />
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">Prize Allotment</label>
+                    <input class="input-field" name="trackPrize" value="${data.prize || ""}" placeholder="$5,000 + Macbook Pro" />
+                </div>
+             </div>
+             <div class="space-y-2">
+                <label class="form-label">Track Objectives</label>
+                <textarea class="input-field !h-[calc(100%-2rem)]" name="trackDescription" rows="3" placeholder="Define the goals of this specific track...">${data.description || ""}</textarea>
+             </div>
+          </div>
+          <button class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-coral/20 hover:text-coral transition-all" type="button" data-remove>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         `;
       }
+      
       if (type === "faq") {
         wrapper.innerHTML = `
-          <label class="grid gap-2">
-            <span class="form-label">Question</span>
-            <input class="input-field" name="faqQuestion" value="${data.question || ""}" />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Answer</span>
-            <textarea class="input-field" name="faqAnswer" rows="2">${data.answer || ""}</textarea>
-          </label>
-          <button class="btn-ghost" type="button" data-remove>Remove</button>
+          <div class="grid md:grid-cols-2 gap-8 flex-1">
+             <div class="space-y-2">
+                <label class="form-label">Subject Probe</label>
+                <input class="input-field" name="faqQuestion" value="${data.question || ""}" placeholder="Is there travel reimbursement?" />
+             </div>
+             <div class="space-y-2">
+                <label class="form-label">Response Directive</label>
+                <textarea class="input-field" name="faqAnswer" rows="2" placeholder="Provide clarity on the subject...">${data.answer || ""}</textarea>
+             </div>
+          </div>
+          <button class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-coral/20 hover:text-coral transition-all" type="button" data-remove>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         `;
       }
-      wrapper.querySelector("[data-remove]")?.addEventListener("click", () => wrapper.remove());
+
+      wrapper.querySelector("[data-remove]")?.addEventListener("click", () => {
+          wrapper.style.opacity = "0";
+          wrapper.style.transform = "scale(0.95)";
+          setTimeout(() => wrapper.remove(), 300);
+      });
       return wrapper;
     };
 
@@ -172,20 +288,35 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         }
         const payload = await response.json();
         const event = payload.event;
-        if (!event) throw new Error("Event not found.");
+        if (!event) throw new Error("Event dataset not found.");
 
-        if (titleEl) titleEl.textContent = `Manage ${event.title}`;
+        if (titleEl) titleEl.textContent = event.title;
         if (form) {
+          const formatForInput = (val) => {
+            if (!val) return "";
+            const d = new Date(val);
+            if (isNaN(d.getTime())) return val;
+            // Native inputs expect YYYY-MM-DDTHH:mm (local to the machine usually, or UTC if we slice)
+            // We'll use local ISO to preserve what the user sees
+            const offset = d.getTimezoneOffset() * 60000;
+            const localISOTime = new Date(d.getTime() - offset).toISOString().slice(0, 16);
+            return localISOTime;
+          };
+
           form.title.value = event.title || "";
           form.slug.value = event.slug || "";
           form.tagline.value = event.tagline || "";
           form.description.value = event.description || "";
-          form.startDate.value = event.startDate || "";
-          form.endDate.value = event.endDate || "";
+          form.startDate.value = formatForInput(event.startDate);
+          form.endDate.value = formatForInput(event.endDate);
           form.location.value = event.location || "";
           form.mode.value = event.mode || "Hybrid";
-          form.applicationDeadline.value = event.applicationDeadline || "";
-          form.theme.value = event.theme || "";
+          form.organizationName.value = event.organizationName || "";
+          form.websiteUrl.value = event.websiteUrl || "";
+          form.twitterUrl.value = event.twitterUrl || "";
+          form.discordUrl.value = event.discordUrl || "";
+          form.maxParticipants.value = event.maxParticipants || "";
+          form.applicationDeadline.value = formatForInput(event.applicationDeadline);
           form.isPublished.checked = !!event.isPublished;
         }
 
@@ -204,8 +335,9 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         });
       } catch (error) {
         if (status) {
-          status.textContent = error.message || "Unable to load event.";
-          status.style.color = "#ff7a7a";
+          status.textContent = "Signal failure: " + error.message;
+          status.classList.remove("hidden");
+          status.classList.add("!text-coral");
         }
       }
     };
@@ -213,8 +345,13 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     form?.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!form || !status) return;
-      status.textContent = "Saving...";
-      status.style.color = "rgba(254, 245, 230, 0.9)";
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Persisting...";
+      
+      status.textContent = "";
+      status.classList.add("hidden");
 
       const trackRows = Array.from(tracksContainer?.children || []).map((row) => ({
         name: row.querySelector("input[name='trackName']")?.value || "",
@@ -236,8 +373,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         location: form.location.value,
         mode: form.mode.value,
         applicationDeadline: form.applicationDeadline.value,
-        theme: form.theme.value,
-        isPublished: form.isPublished.checked,
+        isPublished: form.querySelector('input[name="isPublished"]').checked,
         tracks: trackRows.filter((track) => track.name.trim()),
         faqs: faqRows.filter((faq) => faq.question.trim())
       };
@@ -250,14 +386,25 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(result.error || "Unable to save event.");
+          throw new Error(result.error || "Persistence failed.");
         }
-        status.textContent = "Saved.";
-        status.style.color = "rgba(216, 255, 63, 0.9)";
+        submitBtn.textContent = "Success";
+        submitBtn.style.background = "#d8ff3f";
+        
+        if (titleEl) titleEl.textContent = result.event.title;
         if (publicLink) publicLink.href = `/events/${result.event.slug}`;
+        
+        setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Persist Mission Changes";
+            submitBtn.style.background = "";
+        }, 2000);
       } catch (error) {
-        status.textContent = error.message || "Unable to save event.";
-        status.style.color = "#ff7a7a";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Retry Persistence";
+        status.textContent = error.message;
+        status.classList.remove("hidden");
+        status.classList.add("!text-coral");
       }
     });
 

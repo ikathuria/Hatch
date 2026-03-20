@@ -3,94 +3,131 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="Organizer Dashboard | Hatch">
-  <section class="mx-auto w-full max-w-6xl px-6 py-16">
-    <div class="flex flex-col gap-8">
-      <div class="flex flex-wrap items-start justify-between gap-6">
-        <div>
-          <span class="eyebrow">Organizer dashboard</span>
-          <h1 class="mt-4 text-3xl font-semibold md:text-4xl">Your events</h1>
-          <p class="mt-3 text-cream-70">
-            Manage event details, tracks, and applications from one place.
-          </p>
-        </div>
-        <div class="flex flex-wrap gap-3">
-          <button class="btn-ghost" data-logout>Log out</button>
-          <button class="btn-primary" data-open-create>Create new event</button>
-        </div>
+  <div class="mx-auto max-w-6xl px-6 py-12">
+    {/* Dashboard Header */}
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+      <div class="space-y-4">
+        <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Control Center</span>
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">Your Hackathons</h1>
+        <p class="text-cream/50 max-w-2xl leading-relaxed">
+          Manage your events, review applications, and track submissions from your centralized organizer command center.
+        </p>
       </div>
-
-      <div class="grid gap-4 md:grid-cols-2" data-events-grid>
-        <div class="card text-cream-70">Loading events…</div>
+      <div class="flex items-center gap-4">
+        <button class="btn-ghost !px-6" data-logout>
+           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2 opacity-60"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+           Sign Out
+        </button>
+        <button class="btn-primary !px-8" data-open-create>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          New Event
+        </button>
       </div>
     </div>
-  </section>
 
-  <div class="fixed inset-0 hidden items-center justify-center bg-black/50 p-6" data-modal>
-    <div class="card w-full max-w-lg space-y-6">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h2 class="text-2xl font-semibold">Create event</h2>
-          <p class="text-cream-70">Add the basics. You can refine later.</p>
+    {/* Quick Stats */}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16">
+        <div class="card !p-8 border-white/5 bg-white/[0.02]">
+            <span class="text-xs font-bold uppercase tracking-widest text-cream/30 mb-2 block">Total Events</span>
+            <span class="text-4xl font-bold" id="stat-total-events">0</span>
         </div>
-        <button class="btn-ghost" type="button" data-close-modal>Close</button>
+        <div class="card !p-8 border-white/5 bg-white/[0.02]">
+            <span class="text-xs font-bold uppercase tracking-widest text-cream/30 mb-2 block">Active Hackers</span>
+            <span class="text-4xl font-bold" id="stat-total-hackers">--</span>
+        </div>
+        <div class="card !p-8 border-white/5 bg-white/[0.02]">
+            <span class="text-xs font-bold uppercase tracking-widest text-cream/30 mb-2 block">Global Reach</span>
+            <span class="text-4xl font-bold">12+</span>
+        </div>
+    </div>
+
+    {/* Events Grid */}
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3" data-events-grid>
+      <div class="card p-20 flex items-center justify-center text-cream/20 italic col-span-full">
+        Synchronizing with the D1 Grid...
+      </div>
+    </div>
+  </div>
+
+  {/* Premium Create Modal */}
+  <div class="modal-overlay hidden opacity-0" data-modal>
+    <div class="card w-full max-w-2xl !p-0 overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] border-white/10" id="modal-container">
+      <div class="bg-gradient-to-r from-lime/20 to-sky/20 p-8 border-b border-white/10 flex justify-between items-center">
+        <div>
+          <h2 class="text-3xl font-bold tracking-tight">Create Mission</h2>
+          <p class="text-sm text-cream/60 mt-1">Configure your hackathon's core parameters.</p>
+        </div>
+        <button class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors" data-close-modal>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
 
-      <form class="grid gap-4" data-create-form>
-        <label class="grid gap-2">
-          <span class="form-label">Event title</span>
-          <input class="input-field" name="title" required placeholder="Midwest Impact Hack" />
-        </label>
-        <label class="grid gap-2">
-          <span class="form-label">Slug</span>
-          <input class="input-field" name="slug" required placeholder="midwest-impact-hack" />
-        </label>
-        <label class="grid gap-2">
-          <span class="form-label">Tagline</span>
-          <input class="input-field" name="tagline" placeholder="Build for local impact in 24 hours." />
-        </label>
-        <label class="grid gap-2">
-          <span class="form-label">Description</span>
-          <textarea class="input-field" name="description" rows="3"></textarea>
-        </label>
-        <div class="grid gap-4 md:grid-cols-2">
-          <label class="grid gap-2">
-            <span class="form-label">Start date</span>
-            <input class="input-field" name="startDate" type="date" required />
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">End date</span>
-            <input class="input-field" name="endDate" type="date" required />
-          </label>
+      <form class="p-8 space-y-8" data-create-form>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="space-y-6">
+            <div class="space-y-2">
+              <label class="form-label">Event Name</label>
+              <input class="input-field" name="title" required placeholder="Technosphere 2026" />
+            </div>
+            <div class="space-y-2">
+              <label class="form-label">Unique Slug</label>
+              <input class="input-field" name="slug" required placeholder="technosphere-2026" />
+            </div>
+            <div class="space-y-2">
+              <label class="form-label">Tagline</label>
+              <input class="input-field" name="tagline" placeholder="Bending the curve of reality..." />
+            </div>
+          </div>
+
+          <div class="space-y-6">
+             <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="form-label">Start Date & Time</label>
+                  <input class="input-field" name="startDate" type="datetime-local" required />
+                </div>
+                <div class="space-y-2">
+                  <label class="form-label">End Date & Time</label>
+                  <input class="input-field" name="endDate" type="datetime-local" required />
+                </div>
+             </div>
+             <div class="space-y-2">
+                <label class="form-label">Organization Name</label>
+                <input class="input-field" name="organizationName" placeholder="e.g. Acme Tech" />
+             </div>
+             <div class="space-y-2">
+              <label class="form-label">Location</label>
+              <input class="input-field" name="location" placeholder="e.g. San Francisco / Remote" />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="form-label">Mode</label>
+                  <select class="input-field" name="mode">
+                    <option>Hybrid</option>
+                    <option>In-person</option>
+                    <option>Online</option>
+                  </select>
+                </div>
+                <div class="space-y-2">
+                  <label class="form-label">Deadline</label>
+                  <input class="input-field" name="applicationDeadline" type="datetime-local" />
+                </div>
+             </div>
+          </div>
         </div>
-        <label class="grid gap-2">
-          <span class="form-label">Location</span>
-          <input class="input-field" name="location" placeholder="Chicago, IL + Online" />
-        </label>
-        <div class="grid gap-4 md:grid-cols-2">
-          <label class="grid gap-2">
-            <span class="form-label">Mode</span>
-            <select class="input-field" name="mode">
-              <option>Hybrid</option>
-              <option>In-person</option>
-              <option>Online</option>
-            </select>
-          </label>
-          <label class="grid gap-2">
-            <span class="form-label">Apply by</span>
-            <input class="input-field" name="applicationDeadline" type="date" />
-          </label>
-        </div>
-        <label class="grid gap-2">
-          <span class="form-label">Theme</span>
-          <input class="input-field" name="theme" placeholder="Local impact" />
-        </label>
-        <label class="flex items-center gap-3 text-sm text-cream-80">
-          <input type="checkbox" name="isPublished" />
-          Publish immediately
-        </label>
-        <div class="flex flex-wrap items-center gap-4">
-          <button class="btn-primary" type="submit">Create event</button>
-          <span class="status-pill" data-status aria-live="polite"></span>
+
+        <div class="pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+            <label class="flex items-center gap-3 cursor-pointer group">
+                <div class="w-10 h-6 bg-white/5 border border-white/10 rounded-full relative transition-colors group-hover:border-lime/30">
+                    <input type="checkbox" name="isPublished" class="sr-only peer" />
+                    <div class="w-4 h-4 bg-cream/20 rounded-full absolute left-1 top-1 transition-all peer-checked:left-5 peer-checked:bg-lime"></div>
+                </div>
+                <span class="text-sm font-bold text-cream/40 peer-checked:text-cream">Go Live Immediately</span>
+            </label>
+
+            <div class="flex items-center gap-4 w-full md:w-auto">
+                <span class="status-pill !bg-transparent !border-none !p-0 hidden" data-status></span>
+                <button class="btn-primary !px-12 w-full md:w-auto" type="submit">Initialize Event</button>
+            </div>
         </div>
       </form>
     </div>
@@ -99,14 +136,31 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   <script>
     const eventsGrid = document.querySelector("[data-events-grid]");
     const modal = document.querySelector("[data-modal]");
+    const modalContainer = document.querySelector("#modal-container");
     const openModal = document.querySelector("[data-open-create]");
     const closeModal = document.querySelector("[data-close-modal]");
     const createForm = document.querySelector("[data-create-form]");
     const status = document.querySelector("[data-status]");
     const logoutButton = document.querySelector("[data-logout]");
+    const totalEventsStat = document.querySelector("#stat-total-events");
 
-    const open = () => modal?.classList.remove("hidden");
-    const close = () => modal?.classList.add("hidden");
+    const open = () => {
+      modal?.classList.remove("hidden");
+      setTimeout(() => {
+          modal?.classList.remove("opacity-0");
+          modalContainer?.classList.add("translate-y-0");
+          modalContainer?.classList.remove("translate-y-8");
+      }, 10);
+    };
+
+    const close = () => {
+      modal?.classList.add("opacity-0");
+      modalContainer?.classList.add("translate-y-8");
+      setTimeout(() => {
+          modal?.classList.add("hidden");
+      }, 300);
+    };
+
     openModal?.addEventListener("click", open);
     closeModal?.addEventListener("click", close);
 
@@ -119,10 +173,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       if (!value) return "TBD";
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return value;
+      
+      const hasTime = value.includes("T") || (value.includes(" ") && value.length > 10);
+      
       return new Intl.DateTimeFormat(undefined, {
         month: "short",
         day: "numeric",
-        year: "numeric"
+        year: "numeric",
+        ...(hasTime ? { hour: "numeric", minute: "numeric" } : {})
       }).format(date);
     };
 
@@ -135,29 +193,50 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const renderEvents = (events) => {
       if (!eventsGrid) return;
       eventsGrid.innerHTML = "";
+      
+      if (totalEventsStat) totalEventsStat.textContent = events.length;
+
       if (events.length === 0) {
-        eventsGrid.innerHTML = '<div class="card text-cream-70">No events yet.</div>';
+        eventsGrid.innerHTML = '<div class="card p-20 flex flex-col items-center justify-center text-cream/20 italic col-span-full border-dashed">No events found in your orbit.</div>';
         return;
       }
+
       events.forEach((event) => {
         const dateRange = formatRange(event.startDate, event.endDate);
         const card = document.createElement("div");
-        card.className = "card flex flex-col gap-4";
+        card.className = "card group flex flex-col !p-8 animate-in fade-in slide-in-from-bottom-4 duration-500 hover:border-violet/30";
         card.innerHTML = `
-          <div>
-            <p class="text-sm uppercase tracking-widest text-cream-60">${event.isPublished ? "Published" : "Draft"}</p>
-            <h3 class="mt-3 text-2xl font-semibold">${event.title}</h3>
-            <p class="mt-2 text-cream-70">${event.tagline || ""}</p>
+          <div class="flex justify-between items-start mb-6">
+            <span class="status-pill ${event.isPublished ? '!bg-lime/10 !text-lime !border-lime/20' : '!bg-sky/10 !text-sky !border-sky/20'} !py-1 !px-3 !text-[10px] uppercase tracking-[0.2em]">
+                ${event.isPublished ? "Live" : "Draft"}
+            </span>
+            <div class="flex gap-2">
+                <a href="/events/${event.slug}" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors" title="View Public Page">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+            </div>
           </div>
-          <div class="flex flex-wrap gap-3 text-sm text-cream-70">
-            <span>${dateRange}</span>
-            <span>•</span>
-            <span>${event.location || "Location TBD"}</span>
+
+          <div class="space-y-2 mb-8">
+            <h3 class="text-2xl font-bold tracking-tight group-hover:text-violet transition-colors">${event.title}</h3>
+            <p class="text-sm text-cream/40 line-clamp-1">${event.tagline || ""}</p>
           </div>
-          <div class="flex flex-wrap gap-3">
-            <a class="btn-ghost" href="/events/${event.slug}">View public</a>
-            <a class="btn-primary" href="/organizer/events/${event.id}">Manage</a>
+
+          <div class="space-y-3 pt-6 border-t border-white/5 mb-8">
+            <div class="flex items-center gap-3 text-xs text-cream/60">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-violet"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                ${dateRange}
+            </div>
+            <div class="flex items-center gap-3 text-xs text-cream/60">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                ${event.location || "Location TBD"}
+            </div>
           </div>
+
+          <a class="btn-ghost !w-full justify-center !py-3 !text-xs uppercase tracking-widest hover:border-violet/40 hover:text-violet" href="/organizer/events/${event.id}">
+             Configure Event
+             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </a>
         `;
         eventsGrid.appendChild(card);
       });
@@ -174,7 +253,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         renderEvents(payload.events || []);
       } catch (error) {
         if (eventsGrid) {
-          eventsGrid.innerHTML = '<div class="card text-cream-70">Unable to load events.</div>';
+          eventsGrid.innerHTML = '<div class="card p-12 text-cream/40 text-center italic border-red-500/20">Critical system error while syncing events.</div>';
         }
       }
     };
@@ -182,10 +261,17 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     createForm?.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!createForm || !status) return;
-      status.textContent = "Creating...";
-      status.style.color = "rgba(254, 245, 230, 0.9)";
+      
+      const submitBtn = createForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Initializing Base...";
+      
+      status.textContent = "";
+      status.classList.add("hidden");
+      
       const payload = Object.fromEntries(new FormData(createForm));
-      payload.isPublished = payload.isPublished === "on";
+      payload.isPublished = createForm.querySelector('input[name="isPublished"]').checked;
 
       try {
         const response = await fetch("/api/organizer/events", {
@@ -195,15 +281,26 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(result.error || "Unable to create event.");
+          throw new Error(result.error || "Unable to initialize event.");
         }
-        status.textContent = "Event created!";
+        
+        submitBtn.textContent = "Success!";
+        submitBtn.style.background = "#d8ff3f";
         createForm.reset();
-        close();
-        loadEvents();
+        
+        setTimeout(() => {
+          close();
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          submitBtn.style.background = "";
+          loadEvents();
+        }, 800);
       } catch (error) {
-        status.textContent = error.message || "Unable to create event.";
-        status.style.color = "#ff7a7a";
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        status.textContent = error.message;
+        status.classList.remove("hidden");
+        status.classList.add("!text-coral");
       }
     });
 

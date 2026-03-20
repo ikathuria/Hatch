@@ -1,10 +1,15 @@
 ---
 import { site } from "../content/site";
 import "../styles/global.css";
+import { getEnv } from "../lib/server/env";
+import { getOrganizerFromRequest } from "../lib/server/auth";
 
 const { title, description } = Astro.props;
 const pageTitle = title ?? `${site.brand.name}`;
 const metaDescription = description ?? site.hero.description;
+
+const env = getEnv(Astro.locals);
+const organizer = await getOrganizerFromRequest(Astro.request, env);
 ---
 
 <!doctype html>
@@ -22,45 +27,123 @@ const metaDescription = description ?? site.hero.description;
   </head>
   <body class="bg-ink text-cream">
     <div class="site-glow" aria-hidden="true"></div>
-    <header class="sticky top-0 z-40 border-b border-ink/40 bg-ink/80 backdrop-blur">
-      <div class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-        <a href="/" class="flex items-center gap-3 text-lg font-semibold tracking-tight">
-          <span class="badge">EH</span>
-          <span>{site.brand.name}</span>
-        </a>
-        <nav class="hidden items-center gap-6 text-sm font-semibold uppercase tracking-wide md:flex">
-          <a class="nav-link" href="/#events">Events</a>
-          <a class="nav-link" href="/#features">Features</a>
-          <a class="nav-link" href="/#how">How it works</a>
-        </nav>
-        <div class="flex items-center gap-3">
-          <a class="btn-ghost hidden sm:inline-flex" href="/organizer/login">
-            Organizer login
+    <header class="fixed top-0 left-0 right-0 z-[100] px-6 py-6 pointer-events-none">
+      <div class="mx-auto max-w-6xl w-full pointer-events-auto">
+        <div class="glass-panel px-6 py-4 flex items-center justify-between shadow-2xl shadow-black/40">
+          <a href="/" class="flex items-center gap-4 group transition-all">
+            <span class="badge shadow-lime/40">H</span>
+            <span class="text-xl font-bold tracking-tight text-white group-hover:text-lime transition-colors">
+              {site.brand.name}
+            </span>
           </a>
-          <a class="btn-primary" href="/organizer/signup">
-            Create an event
-          </a>
+          
+          <nav class="hidden md:flex items-center gap-10">
+            <a class="nav-link" href="/#events">Events</a>
+            <a class="nav-link" href="/#features">Features</a>
+            <a class="nav-link" href="/#how">How it works</a>
+          </nav>
+
+          <div class="flex items-center gap-6">
+            {organizer ? (
+              <>
+                <button class="nav-link hidden sm:inline-flex text-xs uppercase tracking-[0.2em]" data-logout-header>
+                  Logout
+                </button>
+                <a class="btn-primary !py-2.5 !px-8 !text-xs !rounded-xl" href="/organizer/dashboard">
+                  Dashboard
+                </a>
+              </>
+            ) : (
+              <>
+                <a class="nav-link hidden sm:inline-flex text-xs uppercase tracking-[0.2em]" href="/organizer/login">
+                  Login
+                </a>
+                <a class="btn-primary !py-2.5 !px-8 !text-xs !rounded-xl" href="/organizer/signup">
+                  Launch
+                </a>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>
 
-    <main>
+    <main class="pt-32 pb-20 overflow-hidden">
       <slot />
     </main>
 
-    <footer class="border-t border-ink/40 bg-ink/70">
-      <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p class="text-lg font-semibold">{site.brand.name}</p>
-          <p class="text-sm text-cream-70">{site.brand.byline}</p>
+    <footer class="relative mt-20 border-t border-white/5 bg-ink-muted/30 backdrop-blur-xl">
+      <div class="mx-auto max-w-6xl px-6 py-20">
+        <div class="grid gap-16 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
+          <div class="space-y-6">
+            <div class="flex items-center gap-3">
+              <span class="badge w-8 h-8 rounded-lg">H</span>
+              <span class="text-2xl font-bold tracking-tighter">{site.brand.name}</span>
+            </div>
+            <p class="text-cream/60 max-w-xs leading-relaxed">
+              {site.brand.byline}
+            </p>
+            <div class="pt-4 flex gap-4">
+              <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-lime hover:text-ink transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+              </a>
+              <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-lime hover:text-ink transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+              </a>
+            </div>
+          </div>
+          
+          <div class="space-y-6">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-sky">Platform</h4>
+            <ul class="space-y-4 text-sm text-cream/70">
+              <li><a href="/#events" class="hover:text-lime transition-colors">Find Hackathons</a></li>
+              <li><a href="/#features" class="hover:text-lime transition-colors">For Organizers</a></li>
+              <li><a href="/#how" class="hover:text-lime transition-colors">How it Works</a></li>
+            </ul>
+          </div>
+
+          <div class="space-y-6">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-violet">Resources</h4>
+            <ul class="space-y-4 text-sm text-cream/70">
+              <li><a href="/code-of-conduct" class="hover:text-lime transition-colors">Community</a></li>
+              <li><a href="/privacy" class="hover:text-lime transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms" class="hover:text-lime transition-colors">Terms of Service</a></li>
+            </ul>
+          </div>
+
+          <div class="space-y-6">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-coral">Support</h4>
+            <ul class="space-y-4 text-sm text-cream/70">
+              <li><a href={`mailto:${site.links.email}`} class="hover:text-lime transition-colors lowercase">{site.links.email}</a></li>
+              <li><a href="#" class="hover:text-lime transition-colors">Documentation</a></li>
+              <li><a href="#" class="hover:text-lime transition-colors">Help Center</a></li>
+            </ul>
+          </div>
         </div>
-        <div class="flex flex-wrap gap-4 text-sm">
-          <a class="nav-link" href="/code-of-conduct">Code of Conduct</a>
-          <a class="nav-link" href="/privacy">Privacy</a>
-          <a class="nav-link" href={`mailto:${site.links.email}`}>{site.links.email}</a>
+
+        <div class="mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+          <p class="text-xs text-cream/40">
+            &copy; {new Date().getFullYear()} {site.brand.name}. All rights reserved worldwide.
+          </p>
+          <div class="status-pill !bg-lime/5 !border-lime/20 !text-lime text-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-lime animate-pulse mr-2"></span>
+            System Operational
+          </div>
         </div>
       </div>
     </footer>
+
+    <script>
+      const logoutBtn = document.querySelector("[data-logout-header]");
+      logoutBtn?.addEventListener("click", async () => {
+        try {
+          await fetch("/api/auth/logout", { method: "POST" });
+          window.location.href = "/";
+        } catch (error) {
+          console.error("Logout failed:", error);
+        }
+      });
+    </script>
   </body>
 </html>
 
