@@ -45,7 +45,8 @@ export const POST: APIRoute = async (context) => {
         "set-cookie": cookie
       }
     );
-  } catch {
+  } catch (error) {
+    console.error("signup_error", error);
     return json({ error: "Unable to create account." }, 500);
   }
 };

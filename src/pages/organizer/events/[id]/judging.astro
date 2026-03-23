@@ -206,7 +206,6 @@ const eventId = Astro.params.id ? String(Astro.params.id) : '';
 
   <script define:vars={{ eventId }}>
     const baseApi = `/api/organizer/events/${eventId}`;
-    const publicLinkBase = `/events/`;
 
     const $ = (selector) => document.querySelector(selector);
     const escapeHtml = (value) => String(value ?? '')
@@ -499,7 +498,12 @@ const eventId = Astro.params.id ? String(Astro.params.id) : '';
 
     const renderWorkspace = () => {
       if (elements.title && state.event) elements.title.textContent = state.event.title || 'Judging workspace';
-      if (elements.publicLink && state.event?.slug) elements.publicLink.href = `${publicLinkBase}${state.event.slug}`;
+      if (elements.publicLink && state.event?.slug) {
+        const organizerId = String(state.event.organizerId || "");
+        elements.publicLink.href = organizerId
+          ? `/events/${organizerId}/${state.event.slug}`
+          : `/events/${state.event.slug}`;
+      }
       renderRubric();
       renderJudgeLinks();
       renderOverview();

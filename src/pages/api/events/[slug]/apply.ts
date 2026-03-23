@@ -12,14 +12,38 @@ export const POST: APIRoute = async (context) => {
   try {
     const env = getEnv(context.locals);
     const slug = context.params.slug ? String(context.params.slug) : "";
+    const requestUrl = new URL(context.request.url);
+    const organizerId = String(requestUrl.searchParams.get("organizerId") || "").trim();
     if (!slug) {
       return json({ error: "Missing event." }, 400);
     }
-    const event = await env.DB.prepare(
-      "SELECT id FROM events WHERE slug = ? AND is_published = 1"
-    )
-      .bind(slug)
-      .first<{ id: string }>();
+
+    let event: { id: string } | null = null;
+    if (organizerId) {
+      event = await env.DB.prepare(
+        "SELECT id FROM events WHERE slug = ? AND organizer_id = ? AND is_published = 1"
+      )
+        .bind(slug, organizerId)
+        .first<{ id: string }>();
+    } else {
+      const matches = await env.DB.prepare(
+        "SELECT id FROM events WHERE slug = ? AND is_published = 1 ORDER BY created_at DESC"
+      )
+        .bind(slug)
+        .all<{ id: string }>();
+      const rows = matches.results ?? [];
+      if (rows.length > 1) {
+        return json(
+          {
+            error:
+              "Multiple events share this slug. Use /events/<organizer-id>/<event-slug>.",
+            requiresOrganizerId: true
+          },
+          409
+        );
+      }
+      event = rows[0] ?? null;
+    }
 
     if (!event) {
       return json({ error: "Event not found." }, 404);

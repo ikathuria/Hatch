@@ -6,7 +6,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
   <section class="mx-auto w-full max-w-4xl px-6 py-16">
     <div class="card !p-12 relative overflow-hidden group">
       <div class="absolute inset-0 bg-gradient-to-br from-violet/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-      
+
       <div class="relative z-10 space-y-12">
         <div class="space-y-4">
           <div class="flex items-center gap-3">
@@ -19,71 +19,96 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           <p class="text-lg text-cream/50 leading-relaxed font-medium" data-event-tagline>Transmit your final build data to the judging collective.</p>
         </div>
 
+        <div class="rounded-3xl border border-sky/20 bg-sky/5 p-5 space-y-4 hidden" data-auth-gate>
+          <p class="text-xs uppercase tracking-widest font-bold text-sky">Participant access required</p>
+          <p class="text-sm text-cream/70 leading-relaxed" data-auth-message>
+            Sign in as an authorized participant to unlock project submission.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3" data-participant-login-wrap>
+            <input class="input-field !py-3 !px-4 !text-sm" data-participant-email-input type="email" placeholder="you@example.com" />
+            <button class="btn-primary !px-5 !py-3 !text-sm" type="button" data-participant-login-btn>Get Magic Link</button>
+          </div>
+          <div class="flex items-center justify-between gap-4">
+            <span class="text-xs text-cream/45 hidden" data-participant-email></span>
+            <button class="btn-ghost !px-4 !py-2 !text-xs hidden" data-participant-logout type="button">Sign Out</button>
+          </div>
+          <div class="text-xs text-cream/45 hidden" data-participant-link-wrap>
+            <a class="text-lime font-bold hover:underline" data-participant-link href="#" target="_self">Open your magic link</a>
+          </div>
+          <span class="status-pill hidden !bg-transparent !border-none !p-0 !text-xs" data-auth-status></span>
+        </div>
+
         <form class="space-y-10" data-form>
-          <div class="grid md:grid-cols-2 gap-8">
-            <div class="space-y-6">
-                <div class="space-y-2">
-                    <label class="form-label">Squad Designation</label>
-                    <input class="input-field" name="teamName" required placeholder="Nova Force" />
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label">Project Identity</label>
-                    <input class="input-field" name="projectName" required placeholder="Neural Bridge v1.0" />
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label">Target Track</label>
-                    <select class="input-field" name="track" required data-track-select>
-                        <option value="">Choosing objective...</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="space-y-6">
-                 <div class="space-y-2">
-                    <label class="form-label">Source Nexus (Repository)</label>
-                    <input class="input-field" type="url" name="repoUrl" placeholder="https://github.com/..." />
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label">Live Link (Demo)</label>
-                    <input class="input-field" type="url" name="demoUrl" placeholder="https://live-deploy.app" />
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label">Briefing Artifact (Slides)</label>
-                    <input class="input-field" type="url" name="deckUrl" placeholder="https://pitch.deck/..." />
-                </div>
-            </div>
-          </div>
-
-          <div class="space-y-8 pt-6 border-t border-white/5">
-            <div class="space-y-2">
-                <label class="form-label">Mission Briefing (Description)</label>
-                <textarea class="input-field" name="description" rows="5" required placeholder="What did you manifest and why is it essential for the future?"></textarea>
-            </div>
-
+          <fieldset class="space-y-10" data-submit-fieldset disabled>
             <div class="grid md:grid-cols-2 gap-8">
-                <div class="space-y-2">
-                    <label class="form-label">Contact Endpoint</label>
-                    <input class="input-field" type="email" name="contactEmail" required placeholder="lead@squad.io" />
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label">Squad Manifest (Names + Emails)</label>
-                    <textarea class="input-field" name="members" rows="3" required placeholder="Avery P. — avery@io.com"></textarea>
-                </div>
-            </div>
-          </div>
+              <div class="space-y-6">
+                  <div class="space-y-2">
+                      <label class="form-label">Squad Designation</label>
+                      <input class="input-field" name="teamName" required placeholder="Nova Force" />
+                  </div>
+                  <div class="space-y-2">
+                      <label class="form-label">Project Identity</label>
+                      <input class="input-field" name="projectName" required placeholder="Neural Bridge v1.0" />
+                  </div>
+                  <div class="space-y-2">
+                      <label class="form-label">Target Track</label>
+                      <select class="input-field" name="track" required data-track-select>
+                          <option value="">Choosing objective...</option>
+                      </select>
+                  </div>
+              </div>
 
-          <div class="pt-10 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div class="status-pill !bg-transparent !border-none hidden" data-status></div>
-              <button class="btn-primary !px-16 !py-5 text-lg w-full md:w-auto" type="submit">Terminate Uplink (Submit)</button>
-          </div>
+              <div class="space-y-6">
+                   <div class="space-y-2">
+                      <label class="form-label">Source Nexus (Repository)</label>
+                      <input class="input-field" type="url" name="repoUrl" placeholder="https://github.com/..." />
+                  </div>
+                  <div class="space-y-2">
+                      <label class="form-label">Live Link (Demo)</label>
+                      <input class="input-field" type="url" name="demoUrl" placeholder="https://live-deploy.app" />
+                  </div>
+                  <div class="space-y-2">
+                      <label class="form-label">Briefing Artifact (Slides)</label>
+                      <input class="input-field" type="url" name="deckUrl" placeholder="https://pitch.deck/..." />
+                  </div>
+              </div>
+            </div>
+
+            <div class="space-y-8 pt-6 border-t border-white/5">
+              <div class="space-y-2">
+                  <label class="form-label">Mission Briefing (Description)</label>
+                  <textarea class="input-field" name="description" rows="5" required placeholder="What did you manifest and why is it essential for the future?"></textarea>
+              </div>
+
+              <div class="grid md:grid-cols-2 gap-8">
+                  <div class="space-y-2">
+                      <label class="form-label">Contact Endpoint</label>
+                      <input class="input-field" type="email" name="contactEmail" required placeholder="lead@squad.io" />
+                  </div>
+                  <div class="space-y-2">
+                      <label class="form-label">Squad Manifest (Names + Emails)</label>
+                      <textarea class="input-field" name="members" rows="3" required placeholder="Avery P. - avery@io.com"></textarea>
+                  </div>
+              </div>
+            </div>
+
+            <div class="pt-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="status-pill !bg-transparent !border-none hidden" data-status></div>
+                <button class="btn-primary !px-16 !py-5 text-lg w-full md:w-auto" type="submit">Terminate Uplink (Submit)</button>
+            </div>
+          </fieldset>
         </form>
       </div>
     </div>
   </section>
 
   <script>
-    const slug = window.location.pathname.split("/").filter(Boolean).slice(-2)[0];
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const slug = pathParts[pathParts.length - 2] || "";
+    const organizerId = pathParts.length >= 4 ? pathParts[pathParts.length - 3] : "";
+    const querySuffix = organizerId ? `?organizerId=${encodeURIComponent(organizerId)}` : "";
     const form = document.querySelector("[data-form]");
+    const submitFieldset = document.querySelector("[data-submit-fieldset]");
     const status = document.querySelector("[data-status]");
     const titleEl = document.querySelector("[data-event-title]");
     const taglineEl = document.querySelector("[data-event-tagline]");
@@ -91,11 +116,115 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const button = form?.querySelector("button[type='submit']");
     const defaultLabel = button?.textContent;
 
+    const authGate = document.querySelector("[data-auth-gate]");
+    const authMessage = document.querySelector("[data-auth-message]");
+    const authStatus = document.querySelector("[data-auth-status]");
+    const participantEmailInput = document.querySelector("[data-participant-email-input]");
+    const participantLoginWrap = document.querySelector("[data-participant-login-wrap]");
+    const participantLoginBtn = document.querySelector("[data-participant-login-btn]");
+    const participantEmailEl = document.querySelector("[data-participant-email]");
+    const participantLogoutBtn = document.querySelector("[data-participant-logout]");
+    const participantLinkWrap = document.querySelector("[data-participant-link-wrap]");
+    const participantLink = document.querySelector("[data-participant-link]");
+
+    const state = {
+      eventId: "",
+      participantEmail: "",
+      sessionEmail: "",
+      hasForeignSession: false
+    };
+
+    const setStatus = (el, message, tone = "") => {
+      if (!el) return;
+      if (!message) {
+        el.textContent = "";
+        el.classList.add("hidden");
+        el.classList.remove("!text-lime", "!text-coral", "!text-sky");
+        return;
+      }
+      el.textContent = message;
+      el.classList.remove("hidden", "!text-lime", "!text-coral", "!text-sky");
+      if (tone) el.classList.add(tone);
+    };
+
+    const setSubmissionEnabled = (enabled) => {
+      if (submitFieldset) submitFieldset.disabled = !enabled;
+      if (!button) return;
+      button.disabled = !enabled;
+      if (!enabled) {
+        button.textContent = "Participant login required";
+      } else if (button.textContent !== "Complete") {
+        button.textContent = defaultLabel;
+      }
+    };
+
+    const renderAuthGate = () => {
+      const authorized = Boolean(state.participantEmail);
+      if (authGate) authGate.classList.toggle("hidden", authorized);
+
+      if (participantEmailEl) {
+        if (state.sessionEmail) {
+          participantEmailEl.textContent = `Signed in as ${state.sessionEmail}`;
+          participantEmailEl.classList.remove("hidden");
+        } else {
+          participantEmailEl.textContent = "";
+          participantEmailEl.classList.add("hidden");
+        }
+      }
+
+      if (participantLogoutBtn) {
+        participantLogoutBtn.classList.toggle("hidden", !state.sessionEmail);
+      }
+
+      if (participantLoginWrap) {
+        participantLoginWrap.classList.toggle("hidden", state.hasForeignSession || authorized);
+      }
+
+      if (authMessage) {
+        if (state.hasForeignSession) {
+          authMessage.textContent =
+            "You are signed in for a different event. Sign out, then request a magic link for this event.";
+        } else {
+          authMessage.textContent =
+            "Sign in as an authorized participant to unlock project submission.";
+        }
+      }
+    };
+
+    const loadParticipant = async () => {
+      try {
+        const response = await fetch("/api/participants/me");
+        const payload = await response.json().catch(() => ({ participant: null }));
+        const participant = payload.participant || null;
+
+        state.sessionEmail = participant?.email || "";
+        state.hasForeignSession = Boolean(participant && participant.eventId !== state.eventId);
+        state.participantEmail =
+          participant && participant.eventId === state.eventId ? participant.email || "" : "";
+
+        if (state.participantEmail && form?.contactEmail && !String(form.contactEmail.value || "").trim()) {
+          form.contactEmail.value = state.participantEmail;
+        }
+
+        setSubmissionEnabled(Boolean(state.participantEmail));
+        renderAuthGate();
+      } catch {
+        state.sessionEmail = "";
+        state.hasForeignSession = false;
+        state.participantEmail = "";
+        setSubmissionEnabled(false);
+        renderAuthGate();
+      }
+    };
+
     const loadEvent = async () => {
       try {
-        const response = await fetch(`/api/events/${slug}`);
-        if (!response.ok) throw new Error("Mission not found.");
-        const { event, tracks } = await response.json();
+        const response = await fetch(`/api/events/${slug}${querySuffix}`);
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Mission not found.");
+        const { event, tracks } = payload;
+        state.eventId = String(event?.id || "");
+
         if (titleEl) titleEl.textContent = `Submit for ${event.title}`;
         if (taglineEl) taglineEl.textContent = event.tagline || "";
         if (trackSelect) {
@@ -107,29 +236,74 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
             trackSelect.appendChild(option);
           });
         }
+
+        await loadParticipant();
       } catch (error) {
-        if (status) {
-          status.textContent = "Signal failure: Event unavailable.";
-          status.classList.remove("hidden");
-          status.classList.add("!text-coral");
-        }
-        if (button) button.disabled = true;
+        setStatus(status, "Signal failure: Event unavailable.", "!text-coral");
+        setSubmissionEnabled(false);
       }
     };
+
+    participantLoginBtn?.addEventListener("click", async () => {
+      const email = String(participantEmailInput?.value || "").trim();
+      if (!email) {
+        setStatus(authStatus, "Enter an email.", "!text-coral");
+        return;
+      }
+
+      try {
+        setStatus(authStatus, "Generating link...", "!text-sky");
+        const response = await fetch(`/api/participants/events/${slug}/request-magic-link${querySuffix}`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Unable to generate magic link.");
+
+        if (participantLinkWrap && participantLink) {
+          const verifyBase = String(payload.verifyUrl || "");
+          const separator = verifyBase.includes("?") ? "&" : "?";
+          const nextPath = encodeURIComponent(window.location.pathname);
+          participantLink.href = `${verifyBase}${separator}next=${nextPath}`;
+          participantLinkWrap.classList.remove("hidden");
+        }
+        setStatus(authStatus, "Magic link ready. Open it to sign in.", "!text-lime");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to generate magic link.";
+        setStatus(authStatus, message, "!text-coral");
+      }
+    });
+
+    participantLogoutBtn?.addEventListener("click", async () => {
+      await fetch("/api/participants/logout", { method: "POST" });
+      state.participantEmail = "";
+      state.sessionEmail = "";
+      state.hasForeignSession = false;
+      setSubmissionEnabled(false);
+      renderAuthGate();
+      setStatus(authStatus, "Signed out", "!text-lime");
+    });
 
     form?.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!status || !form) return;
 
-      if (button) {
-          button.disabled = true;
-          button.textContent = "Transmitting...";
+      if (!state.participantEmail) {
+        setSubmissionEnabled(false);
+        renderAuthGate();
+        setStatus(authStatus, "Sign in as a participant before submitting.", "!text-coral");
+        return;
       }
-      status.textContent = "";
-      status.classList.add("hidden");
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Transmitting...";
+      }
+      setStatus(status, "", "");
 
       try {
-        const response = await fetch(`/api/events/${slug}/submit`, {
+        const response = await fetch(`/api/events/${slug}/submit${querySuffix}`, {
           method: "POST",
           body: new FormData(form)
         });
@@ -137,21 +311,22 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         if (!response.ok) {
           throw new Error(payload.error || "Uplink failure.");
         }
-        status.textContent = "Transmission successful. Judging collective notified.";
-        status.classList.remove("hidden");
-        status.classList.add("!text-lime", "font-bold");
+        setStatus(status, "Transmission successful. Judging collective notified.", "!text-lime");
         form.reset();
+        if (form.contactEmail) form.contactEmail.value = state.participantEmail;
         if (button) {
-            button.textContent = "Complete";
-            button.style.background = "#d8ff3f";
+          button.textContent = "Complete";
+          button.style.background = "#d8ff3f";
         }
       } catch (error) {
-        status.textContent = error.message;
-        status.classList.remove("hidden");
-        status.classList.add("!text-coral", "font-bold");
+        const message = error instanceof Error ? error.message : "Uplink failure.";
+        setStatus(status, message, "!text-coral");
         if (button) {
-            button.disabled = false;
-            button.textContent = defaultLabel;
+          button.disabled = false;
+          button.textContent = defaultLabel;
+        }
+        if (message.toLowerCase().includes("sign in")) {
+          await loadParticipant();
         }
       }
     });

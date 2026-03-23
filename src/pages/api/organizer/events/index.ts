@@ -11,7 +11,7 @@ export const GET: APIRoute = async (context) => {
     const { organizer, response } = await requireOrganizer(context.request, env);
     if (response) return response;
     const { results } = await env.DB.prepare(
-      `SELECT id, slug, title, tagline, start_date as startDate, end_date as endDate,
+      `SELECT id, organizer_id as organizerId, slug, title, tagline, start_date as startDate, end_date as endDate,
         location, mode, application_deadline as applicationDeadline, is_published as isPublished
        FROM events
        WHERE organizer_id = ?
@@ -68,8 +68,10 @@ export const POST: APIRoute = async (context) => {
       return json({ error: "Slug must be lowercase letters, numbers, and hyphens." }, 400);
     }
 
-    const existing = await env.DB.prepare("SELECT id FROM events WHERE slug = ?")
-      .bind(slug)
+    const existing = await env.DB.prepare(
+      "SELECT id FROM events WHERE organizer_id = ? AND slug = ?"
+    )
+      .bind(organizer?.id, slug)
       .first();
     if (existing) {
       return json({ error: "That slug is already taken." }, 409);
@@ -111,6 +113,7 @@ export const POST: APIRoute = async (context) => {
       {
         event: {
           id: eventId,
+          organizerId: organizer?.id,
           slug,
           title,
           tagline,

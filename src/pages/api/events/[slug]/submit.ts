@@ -2,6 +2,8 @@ import type { APIRoute } from "astro";
 import { json } from "../../../../lib/server/responses";
 import { getEnv } from "../../../../lib/server/env";
 import { emailPattern } from "../../../../lib/server/validation";
+import { requireParticipantSession } from "../../../../lib/server/participant-auth";
+import { extractEmails, normalizeEmail } from "../../../../lib/server/email";
 
 const getValue = (form: FormData, key: string) => {
   const value = form.get(key);
@@ -12,17 +14,86 @@ export const POST: APIRoute = async (context) => {
   try {
     const env = getEnv(context.locals);
     const slug = context.params.slug ? String(context.params.slug) : "";
+    const requestUrl = new URL(context.request.url);
+    const organizerId = String(requestUrl.searchParams.get("organizerId") || "").trim();
     if (!slug) {
       return json({ error: "Missing event." }, 400);
     }
-    const event = await env.DB.prepare(
-      "SELECT id FROM events WHERE slug = ? AND is_published = 1"
-    )
-      .bind(slug)
-      .first<{ id: string }>();
+
+    let event: { id: string } | null = null;
+    if (organizerId) {
+      event = await env.DB.prepare(
+        "SELECT id FROM events WHERE slug = ? AND organizer_id = ? AND is_published = 1"
+      )
+        .bind(slug, organizerId)
+        .first<{ id: string }>();
+    } else {
+      const matches = await env.DB.prepare(
+        "SELECT id FROM events WHERE slug = ? AND is_published = 1 ORDER BY created_at DESC"
+      )
+        .bind(slug)
+        .all<{ id: string }>();
+      const rows = matches.results ?? [];
+      if (rows.length > 1) {
+        return json(
+          {
+            error:
+              "Multiple events share this slug. Use /events/<organizer-id>/<event-slug>.",
+            requiresOrganizerId: true
+          },
+          409
+        );
+      }
+      event = rows[0] ?? null;
+    }
 
     if (!event) {
       return json({ error: "Event not found." }, 404);
+    }
+
+    const { participant, response } = await requireParticipantSession(
+      context.request,
+      env,
+      event.id
+    );
+    if (response) {
+      return json(
+        { error: "Sign in as an authorized participant before submitting a project." },
+        401
+      );
+    }
+
+    const participantEmail = normalizeEmail(participant!.email);
+    const applications = await env.DB.prepare(
+      `SELECT email
+       FROM applications
+       WHERE event_id = ?`
+    )
+      .bind(event.id)
+      .all<{ email: string }>();
+
+    const eligibleByApplication = (applications.results ?? []).some(
+      (row) => normalizeEmail(row.email) === participantEmail
+    );
+
+    let participantEligible = eligibleByApplication;
+    if (!participantEligible) {
+      const submissions = await env.DB.prepare(
+        `SELECT contact_email as contactEmail, members
+         FROM submissions
+         WHERE event_id = ?`
+      )
+        .bind(event.id)
+        .all<{ contactEmail: string; members: string | null }>();
+
+      participantEligible = (submissions.results ?? []).some((row) => {
+        if (normalizeEmail(row.contactEmail) === participantEmail) return true;
+        return extractEmails(row.members ?? "").includes(participantEmail);
+      });
+    }
+
+    if (!participantEligible) {
+      return json({ error: "This participant is not eligible to submit in this event." }, 403);
     }
 
     const form = await context.request.formData();

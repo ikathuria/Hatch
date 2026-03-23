@@ -54,6 +54,7 @@ export const POST: APIRoute = async (context) => {
       }
     );
   } catch (error) {
+    console.error("login_error", error);
     return json({ error: "Unable to sign in." }, 500);
   }
 };

@@ -258,6 +258,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
     const defaultTopLabel = isCreateMode ? "Create Mission" : "Save Mission";
     const defaultSubmitLabel = isCreateMode ? "Create Mission" : "Persist Mission Changes";
     const submitBtn = form?.querySelector("[data-hidden-submit]");
+    let currentOrganizerId = "";
 
     const slugify = (raw) =>
       String(raw || "")
@@ -307,7 +308,9 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
         publicLink.classList.add("pointer-events-none", "opacity-50");
         return;
       }
-      publicLink.href = `/events/${normalized}`;
+      publicLink.href = currentOrganizerId
+        ? `/events/${currentOrganizerId}/${normalized}`
+        : `/events/${normalized}`;
       publicLink.classList.remove("pointer-events-none", "opacity-50");
     };
 
@@ -447,6 +450,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
         const payload = await response.json();
         const event = payload.event;
         if (!event) throw new Error("Event dataset not found.");
+        currentOrganizerId = String(event.organizerId || "");
 
         if (titleEl) titleEl.textContent = event.title;
         if (form) {
@@ -530,6 +534,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
           }
 
           const createdId = createResult?.event?.id;
+          currentOrganizerId = String(createResult?.event?.organizerId || currentOrganizerId);
           if (!createdId) {
             throw new Error("Event created but no event id was returned.");
           }

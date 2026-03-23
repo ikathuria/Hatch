@@ -156,7 +156,8 @@ import { site } from "../content/site";
     const createCard = (event) => {
       const dateRange = formatRange(event.startDate, event.endDate);
       const card = document.createElement("a");
-      card.href = `/events/${event.slug}`;
+      const organizerId = String(event.organizerId || "").trim();
+      card.href = organizerId ? `/events/${organizerId}/${event.slug}` : `/events/${event.slug}`;
       card.className = "card group block !p-10 hover:border-lime/40 transition-all";
       card.innerHTML = `
         <div class="flex justify-between items-start mb-8">

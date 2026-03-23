@@ -21,18 +21,54 @@ export const GET: APIRoute = async (context) => {
       return json({ error: "Missing slug." }, 400);
     }
     const organizer = await getOrganizerFromRequest(context.request, env);
-    const event = await env.DB.prepare(
-      `SELECT id, slug, title, tagline, description, start_date as startDate, end_date as endDate,
-        location, mode, organization_name as organizationName, website_url as websiteUrl,
-        twitter_url as twitterUrl, discord_url as discordUrl, max_participants as maxParticipants,
-        application_deadline as applicationDeadline, theme,
-        banner_url as bannerUrl, results_status as resultsStatus,
-        results_published_at as resultsPublishedAt, is_published as isPublished
-       FROM events
-       WHERE slug = ? AND (is_published = 1 OR organizer_id = ?)`
-    )
-      .bind(slug, organizer?.id ?? "")
-      .first<Record<string, unknown>>();
+    const requestUrl = new URL(context.request.url);
+    const organizerId = String(requestUrl.searchParams.get("organizerId") || "").trim();
+
+    let event: Record<string, unknown> | null = null;
+    if (organizerId) {
+      event = await env.DB.prepare(
+        `SELECT id, organizer_id as organizerId, slug, title, tagline, description, start_date as startDate, end_date as endDate,
+          location, mode, organization_name as organizationName, website_url as websiteUrl,
+          twitter_url as twitterUrl, discord_url as discordUrl, max_participants as maxParticipants,
+          application_deadline as applicationDeadline, theme,
+          banner_url as bannerUrl, results_status as resultsStatus,
+          results_published_at as resultsPublishedAt, is_published as isPublished
+         FROM events
+         WHERE slug = ?
+           AND organizer_id = ?
+           AND (is_published = 1 OR organizer_id = ?)`
+      )
+        .bind(slug, organizerId, organizer?.id ?? "")
+        .first<Record<string, unknown>>();
+    } else {
+      const matches = await env.DB.prepare(
+        `SELECT id, organizer_id as organizerId, slug, title, tagline, description, start_date as startDate, end_date as endDate,
+          location, mode, organization_name as organizationName, website_url as websiteUrl,
+          twitter_url as twitterUrl, discord_url as discordUrl, max_participants as maxParticipants,
+          application_deadline as applicationDeadline, theme,
+          banner_url as bannerUrl, results_status as resultsStatus,
+          results_published_at as resultsPublishedAt, is_published as isPublished
+         FROM events
+         WHERE slug = ?
+           AND (is_published = 1 OR organizer_id = ?)
+         ORDER BY is_published DESC, created_at DESC`
+      )
+        .bind(slug, organizer?.id ?? "")
+        .all<Record<string, unknown>>();
+
+      const rows = matches.results ?? [];
+      if (rows.length > 1) {
+        return json(
+          {
+            error:
+              "Multiple events share this slug. Use /events/<organizer-id>/<event-slug>.",
+            requiresOrganizerId: true
+          },
+          409
+        );
+      }
+      event = rows[0] ?? null;
+    }
 
     if (!event) {
       return json({ error: "Event not found." }, 404);

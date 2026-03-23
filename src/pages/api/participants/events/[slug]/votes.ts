@@ -4,14 +4,34 @@ import { getEnv } from "../../../../../lib/server/env";
 import { requireParticipantSession } from "../../../../../lib/server/participant-auth";
 import { extractEmails, normalizeEmail } from "../../../../../lib/server/email";
 
-const loadEvent = async (env: ReturnType<typeof getEnv>, slug: string) =>
-  env.DB.prepare(
+const loadEvent = async (
+  env: ReturnType<typeof getEnv>,
+  slug: string,
+  organizerId: string
+) => {
+  if (organizerId) {
+    return env.DB.prepare(
+      `SELECT id, slug, is_published as isPublished, results_status as resultsStatus
+       FROM events
+       WHERE slug = ? AND organizer_id = ?`
+    )
+      .bind(slug, organizerId)
+      .first<{ id: string; slug: string; isPublished: number; resultsStatus: string }>();
+  }
+
+  const matches = await env.DB.prepare(
     `SELECT id, slug, is_published as isPublished, results_status as resultsStatus
      FROM events
-     WHERE slug = ?`
+     WHERE slug = ?
+     ORDER BY is_published DESC, created_at DESC`
   )
     .bind(slug)
-    .first<{ id: string; slug: string; isPublished: number; resultsStatus: string }>();
+    .all<{ id: string; slug: string; isPublished: number; resultsStatus: string }>();
+
+  const rows = matches.results ?? [];
+  if (rows.length > 1) return "AMBIGUOUS";
+  return rows[0] ?? null;
+};
 
 const loadSubmission = async (env: ReturnType<typeof getEnv>, eventId: string, submissionId: string) =>
   env.DB.prepare(
@@ -57,9 +77,20 @@ export const POST: APIRoute = async (context) => {
   try {
     const env = getEnv(context.locals);
     const slug = context.params.slug ? String(context.params.slug) : "";
+    const organizerId = String(new URL(context.request.url).searchParams.get("organizerId") || "").trim();
     if (!slug) return json({ error: "Missing event slug." }, 400);
 
-    const event = await loadEvent(env, slug);
+    const event = await loadEvent(env, slug, organizerId);
+    if (event === "AMBIGUOUS") {
+      return json(
+        {
+          error:
+            "Multiple events share this slug. Use /events/<organizer-id>/<event-slug>.",
+          requiresOrganizerId: true
+        },
+        409
+      );
+    }
     if (!event) return json({ error: "Event not found." }, 404);
     if (!event.isPublished) return json({ error: "Voting is not available for unpublished events." }, 400);
     if (event.resultsStatus !== "published") {
@@ -104,9 +135,20 @@ export const GET: APIRoute = async (context) => {
   try {
     const env = getEnv(context.locals);
     const slug = context.params.slug ? String(context.params.slug) : "";
+    const organizerId = String(new URL(context.request.url).searchParams.get("organizerId") || "").trim();
     if (!slug) return json({ error: "Missing event slug." }, 400);
 
-    const event = await loadEvent(env, slug);
+    const event = await loadEvent(env, slug, organizerId);
+    if (event === "AMBIGUOUS") {
+      return json(
+        {
+          error:
+            "Multiple events share this slug. Use /events/<organizer-id>/<event-slug>.",
+          requiresOrganizerId: true
+        },
+        409
+      );
+    }
     if (!event) return json({ error: "Event not found." }, 404);
 
     const { participant, response } = await requireParticipantSession(context.request, env, event.id);
@@ -137,9 +179,20 @@ export const DELETE: APIRoute = async (context) => {
   try {
     const env = getEnv(context.locals);
     const slug = context.params.slug ? String(context.params.slug) : "";
+    const organizerId = String(new URL(context.request.url).searchParams.get("organizerId") || "").trim();
     if (!slug) return json({ error: "Missing event slug." }, 400);
 
-    const event = await loadEvent(env, slug);
+    const event = await loadEvent(env, slug, organizerId);
+    if (event === "AMBIGUOUS") {
+      return json(
+        {
+          error:
+            "Multiple events share this slug. Use /events/<organizer-id>/<event-slug>.",
+          requiresOrganizerId: true
+        },
+        409
+      );
+    }
     if (!event) return json({ error: "Event not found." }, 404);
     if (event.resultsStatus !== "published") {
       return json({ error: "Voting is not open yet." }, 409);

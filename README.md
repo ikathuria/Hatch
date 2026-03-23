@@ -69,6 +69,7 @@ wrangler d1 execute hatch --file db/migrations/01_add_org_social.sql --remote
 wrangler d1 execute hatch --file db/migrations/02_banner_url.sql --remote
 wrangler d1 execute hatch --file db/migrations/03_judging_and_participants.sql --remote
 wrangler d1 execute hatch --file db/migrations/04_participant_vote_identity.sql --remote
+wrangler d1 execute hatch --file db/migrations/05_scope_event_slug_to_organizer.sql --remote
 ```
 
 5. Ensure `wrangler.toml` has matching binding names (`DB`, `UPLOADS`).
@@ -93,7 +94,7 @@ npm run deploy
 1. Sign up at `/organizer/signup`
 2. Create an event from `/organizer/dashboard`
 3. Upload banner and configure event settings
-4. Publish event and share `/events/<slug>`
+4. Publish event and share `/events/<organizer-id>/<slug>`
 5. Review applications and submissions in the organizer panel
 
 ## Scripts

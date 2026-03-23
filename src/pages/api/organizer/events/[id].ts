@@ -15,7 +15,7 @@ export const GET: APIRoute = async (context) => {
     if (!id) return json({ error: "Missing event id." }, 400);
 
     const event = await env.DB.prepare(
-      `SELECT id, slug, title, tagline, description, start_date as startDate, end_date as endDate,
+      `SELECT id, organizer_id as organizerId, slug, title, tagline, description, start_date as startDate, end_date as endDate,
         location, mode, organization_name as organizationName, website_url as websiteUrl,
         twitter_url as twitterUrl, discord_url as discordUrl, max_participants as maxParticipants,
         application_deadline as applicationDeadline, theme,
@@ -92,9 +92,9 @@ export const PUT: APIRoute = async (context) => {
     }
 
     const existing = await env.DB.prepare(
-      "SELECT id FROM events WHERE slug = ? AND id != ?"
+      "SELECT id FROM events WHERE organizer_id = ? AND slug = ? AND id != ?"
     )
-      .bind(slug, id)
+      .bind(organizer?.id, slug, id)
       .first();
     if (existing) {
       return json({ error: "That slug is already taken." }, 409);
@@ -172,6 +172,7 @@ export const PUT: APIRoute = async (context) => {
     return json({
       event: {
         id,
+        organizerId: organizer?.id,
         slug,
         title,
         tagline,

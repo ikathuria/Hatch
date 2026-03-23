@@ -4,6 +4,7 @@ import type { Env, Organizer } from "./types";
 const encoder = new TextEncoder();
 const SESSION_COOKIE = "hatch_session";
 const SESSION_TTL_DAYS = 7;
+const PBKDF2_ITERATIONS = 100000;
 
 const toHex = (data: Uint8Array) =>
   Array.from(data)
@@ -31,7 +32,7 @@ export const hashPassword = async (password: string, salt?: Uint8Array) => {
     {
       name: "PBKDF2",
       hash: "SHA-256",
-      iterations: 120000,
+      iterations: PBKDF2_ITERATIONS,
       salt: actualSalt
     },
     keyMaterial,

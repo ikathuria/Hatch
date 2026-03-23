@@ -1,0 +1,107 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Explore Events | Hatch">
+  <section class="mx-auto max-w-6xl px-6 py-12 space-y-10">
+    <div class="space-y-4">
+      <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Discover</span>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">Published Hackathons</h1>
+      <p class="text-cream/55 max-w-3xl leading-relaxed">
+        Browse live hackathons, check tracks, and jump directly into application or submission flows.
+      </p>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-events-grid>
+      <div class="card !p-10 text-cream/35 italic border-dashed col-span-full">
+        Loading events...
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const grid = document.querySelector("[data-events-grid]");
+
+    const escapeHtml = (value) =>
+      String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    const formatDate = (value) => {
+      if (!value) return "TBD";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      }).format(date);
+    };
+
+    const renderEvents = (events) => {
+      if (!grid) return;
+      if (!Array.isArray(events) || events.length === 0) {
+        grid.innerHTML = `
+          <div class="card !p-10 text-cream/35 italic border-dashed col-span-full">
+            No published events yet. Check back soon.
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = events
+        .map((event) => {
+          const title = escapeHtml(event.title || "Untitled event");
+          const tagline = escapeHtml(event.tagline || "No tagline yet.");
+          const slug = escapeHtml(event.slug || "");
+          const organizerId = escapeHtml(event.organizerId || "");
+          const href = organizerId ? `/events/${organizerId}/${slug}` : `/events/${slug}`;
+          const location = escapeHtml(event.location || "Location TBD");
+          const mode = escapeHtml(event.mode || "Hackathon");
+          const start = formatDate(event.startDate);
+          const end = formatDate(event.endDate);
+          const range = `${start} - ${end}`;
+
+          return `
+            <article class="card !p-8 flex flex-col gap-6">
+              <div class="flex items-center justify-between gap-3">
+                <span class="status-pill !bg-sky/10 !text-sky !border-sky/20">${mode}</span>
+                <span class="text-xs uppercase tracking-widest text-cream/35">${location}</span>
+              </div>
+              <div class="space-y-2">
+                <h2 class="text-2xl font-bold tracking-tight">${title}</h2>
+                <p class="text-sm text-cream/55 leading-relaxed">${tagline}</p>
+              </div>
+              <div class="text-xs uppercase tracking-widest text-cream/40">${escapeHtml(range)}</div>
+              <a class="btn-primary !w-full justify-center" href="${href}">
+                Open Event
+              </a>
+            </article>
+          `;
+        })
+        .join("");
+    };
+
+    const loadEvents = async () => {
+      if (!grid) return;
+      try {
+        const response = await fetch("/api/events");
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Unable to load events.");
+        renderEvents(payload.events || []);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to load events.";
+        grid.innerHTML = `
+          <div class="card !p-10 text-coral italic border-coral/20 col-span-full">
+            ${escapeHtml(message)}
+          </div>
+        `;
+      }
+    };
+
+    loadEvents();
+  </script>
+</BaseLayout>

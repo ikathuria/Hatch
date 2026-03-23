@@ -64,12 +64,12 @@ export const GET: APIRoute = async (context) => {
     }
 
     const event = await env.DB.prepare(
-      `SELECT slug
+      `SELECT slug, organizer_id as organizerId
        FROM events
        WHERE id = ?`
     )
       .bind(link.eventId)
-      .first<{ slug: string }>();
+      .first<{ slug: string; organizerId: string }>();
     if (!event) {
       return json({ error: "Event not found." }, 404);
     }
@@ -86,7 +86,11 @@ export const GET: APIRoute = async (context) => {
       .bind(link.id)
       .run();
 
-    const redirectUrl = new URL(`/events/${event.slug}`, context.request.url).toString();
+    const requestUrl = new URL(context.request.url);
+    const nextPath = String(requestUrl.searchParams.get("next") || "").trim();
+    const allowedPrefix = `/events/${event.organizerId}/${event.slug}`;
+    const redirectPath = nextPath.startsWith(allowedPrefix) ? nextPath : allowedPrefix;
+    const redirectUrl = new URL(redirectPath, context.request.url).toString();
 
     return new Response(null, {
       status: 302,

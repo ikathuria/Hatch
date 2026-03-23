@@ -98,7 +98,10 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
   </section>
 
   <script>
-    const slug = window.location.pathname.split("/").filter(Boolean).slice(-2)[0];
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const slug = pathParts[pathParts.length - 2] || "";
+    const organizerId = pathParts.length >= 4 ? pathParts[pathParts.length - 3] : "";
+    const querySuffix = organizerId ? `?organizerId=${encodeURIComponent(organizerId)}` : "";
     const form = document.querySelector("[data-form]");
     const status = document.querySelector("[data-status]");
     const titleEl = document.querySelector("[data-event-title]");
@@ -109,9 +112,10 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
     const loadEvent = async () => {
       try {
-        const response = await fetch(`/api/events/${slug}`);
-        if (!response.ok) throw new Error("Mission not found.");
-        const { event, tracks } = await response.json();
+        const response = await fetch(`/api/events/${slug}${querySuffix}`);
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Mission not found.");
+        const { event, tracks } = payload;
         if (titleEl) titleEl.textContent = `Apply to ${event.title}`;
         if (taglineEl) taglineEl.textContent = event.tagline || "";
         if (trackSelect) {
@@ -145,7 +149,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       status.classList.add("hidden");
 
       try {
-        const response = await fetch(`/api/events/${slug}/apply`, {
+        const response = await fetch(`/api/events/${slug}/apply${querySuffix}`, {
           method: "POST",
           body: new FormData(form)
         });

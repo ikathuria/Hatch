@@ -127,7 +127,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   </style>
 
   <script>
-    const slug = window.location.pathname.split("/").filter(Boolean).pop();
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const slug = pathParts[pathParts.length - 1] || "";
+    const organizerId = pathParts.length >= 3 ? pathParts[pathParts.length - 2] : "";
+    const routeBase = organizerId ? `/events/${organizerId}/${slug}` : `/events/${slug}`;
+    const querySuffix = organizerId ? `?organizerId=${encodeURIComponent(organizerId)}` : "";
     const titleEl = document.querySelector("[data-event-title]");
     const taglineEl = document.querySelector("[data-event-tagline]");
     const descEl = document.querySelector("[data-event-description]");
@@ -323,7 +327,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           if (!submissionId) return;
 
           try {
-            const response = await fetch(`/api/participants/events/${slug}/votes`, {
+            const response = await fetch(`/api/participants/events/${slug}/votes${querySuffix}`, {
               method: voted ? "DELETE" : "POST",
               headers: { "content-type": "application/json" },
               body: JSON.stringify({ submissionId })
@@ -373,7 +377,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         return;
       }
       try {
-        const response = await fetch(`/api/participants/events/${slug}/votes`);
+        const response = await fetch(`/api/participants/events/${slug}/votes${querySuffix}`);
         if (!response.ok) {
           state.votedSubmissionIds = new Set();
           return;
@@ -447,9 +451,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const loadEvent = async () => {
       if (!slug) return;
       try {
-        const response = await fetch(`/api/events/${slug}`);
-        if (!response.ok) throw new Error("Event not found.");
-        const payload = await response.json();
+        const response = await fetch(`/api/events/${slug}${querySuffix}`);
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Event not found.");
         const { event, tracks, faqs, resultsPublished, gallery, winners } = payload;
         state.event = event;
         state.gallery = Array.isArray(gallery) ? gallery : [];
@@ -509,8 +513,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           }
         }
 
-        if (applyLink) applyLink.href = `/events/${slug}/apply`;
-        if (submitLink) submitLink.href = `/events/${slug}/submit`;
+        if (applyLink) applyLink.href = `${routeBase}/apply`;
+        if (submitLink) submitLink.href = `${routeBase}/submit`;
 
         renderTracks(tracks);
         renderFaqs(faqs);
@@ -537,7 +541,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }
       try {
         setStatus(participantStatusEl, "Generating link...", "!text-sky");
-        const response = await fetch(`/api/participants/events/${slug}/request-magic-link`, {
+        const response = await fetch(`/api/participants/events/${slug}/request-magic-link${querySuffix}`, {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ email })
