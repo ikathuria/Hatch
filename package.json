@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node -e \"require('fs').rmSync('.wrangler/deploy', { recursive: true, force: true })\"",
     "preview": "astro preview",
     "astro": "astro"
   },
