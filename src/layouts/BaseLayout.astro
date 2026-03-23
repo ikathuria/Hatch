@@ -1,15 +1,15 @@
 ---
 import { site } from "../content/site";
 import "../styles/global.css";
-import { getEnv } from "../lib/server/env";
+import { resolveEnv } from "../lib/server/env";
 import { getOrganizerFromRequest } from "../lib/server/auth";
 
 const { title, description } = Astro.props;
 const pageTitle = title ?? `${site.brand.name}`;
 const metaDescription = description ?? site.hero.description;
 
-const env = getEnv(Astro.locals);
-const organizer = await getOrganizerFromRequest(Astro.request, env);
+const env = resolveEnv(Astro.locals);
+const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null;
 ---
 
 <!doctype html>
@@ -137,11 +137,9 @@ const organizer = await getOrganizerFromRequest(Astro.request, env);
       const logoutBtn = document.querySelector("[data-logout-header]");
       logoutBtn?.addEventListener("click", async () => {
         try {
-          await fetch("/api/auth/logout", { method: "POST" });
-          window.location.href = "/";
-        } catch (error) {
-          console.error("Logout failed:", error);
-        }
+          const res = await fetch("/api/auth/logout", { method: "POST" });
+          if (res.ok) window.location.href = "/";
+        } catch {}
       });
     </script>
   </body>

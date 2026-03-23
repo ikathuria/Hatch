@@ -28,8 +28,14 @@ CREATE TABLE IF NOT EXISTS events (
   end_date TEXT,
   location TEXT,
   mode TEXT,
+  organization_name TEXT,
+  website_url TEXT,
+  twitter_url TEXT,
+  discord_url TEXT,
+  max_participants INTEGER,
   application_deadline TEXT,
   theme TEXT,
+  banner_url TEXT,
   is_published INTEGER NOT NULL DEFAULT 0,
   FOREIGN KEY (organizer_id) REFERENCES organizers(id)
 );

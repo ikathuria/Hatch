@@ -8,6 +8,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     <div class="site-glow opacity-30"></div>
     <div class="mx-auto max-w-6xl px-6 relative z-10">
       <div class="card !p-0 overflow-hidden border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
+        <div class="relative hidden max-h-64 w-full overflow-hidden border-b border-white/10 bg-white/[0.03]" data-event-banner-wrap>
+          <img class="h-full w-full max-h-64 object-cover" data-event-banner alt="" />
+          <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" aria-hidden="true"></div>
+        </div>
         <div class="bg-gradient-to-br from-violet/20 via-sky/10 to-transparent p-12 md:p-20">
             <div class="space-y-8 max-w-4xl">
                 <div class="flex flex-wrap items-center gap-4">
@@ -109,6 +113,26 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const orgEl = document.querySelector("[data-event-org]");
     const socialsCard = document.querySelector("[data-event-socials-card]");
     const socialsEl = document.querySelector("[data-event-socials]");
+    const bannerWrap = document.querySelector("[data-event-banner-wrap]");
+    const bannerImg = document.querySelector("[data-event-banner]");
+
+    const BANNER_PREFIX = "/api/media/banner/";
+    const BANNER_UUID =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+    const isBannerImageSrc = (value) => {
+      const s = String(value).trim();
+      if (!s) return false;
+      if (s.startsWith(BANNER_PREFIX)) {
+        return BANNER_UUID.test(s.slice(BANNER_PREFIX.length));
+      }
+      try {
+        const u = new URL(s);
+        return u.protocol === "http:" || u.protocol === "https:";
+      } catch {
+        return false;
+      }
+    };
 
     const formatDate = (value) => {
       if (!value) return "TBD";
@@ -130,6 +154,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
         if (titleEl) titleEl.textContent = event.title;
         if (taglineEl) taglineEl.textContent = event.tagline || "";
+        if (bannerWrap && bannerImg && event.bannerUrl && isBannerImageSrc(String(event.bannerUrl))) {
+          bannerImg.src = String(event.bannerUrl);
+          bannerImg.alt = `${event.title} banner`;
+          bannerWrap.classList.remove("hidden");
+        }
         if (descEl) descEl.textContent = event.description || "The organizer hasn't shared a full description yet.";
         if (modeEl) modeEl.textContent = event.mode || "Hackathon";
         

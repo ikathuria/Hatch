@@ -1,0 +1,11 @@
+name = "hatch"
+compatibility_date = "2026-03-17"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hatch"
+database_id = "5f3c909e-784a-428b-af7e-80bf7e4f4ca4"
+
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "hatch-uploads"

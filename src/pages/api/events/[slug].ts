@@ -13,7 +13,8 @@ export const GET: APIRoute = async (context) => {
       `SELECT id, slug, title, tagline, description, start_date as startDate, end_date as endDate,
         location, mode, organization_name as organizationName, website_url as websiteUrl,
         twitter_url as twitterUrl, discord_url as discordUrl, max_participants as maxParticipants,
-        application_deadline as applicationDeadline, theme
+        application_deadline as applicationDeadline, theme,
+        banner_url as bannerUrl
        FROM events WHERE slug = ? AND is_published = 1`
     )
       .bind(slug)

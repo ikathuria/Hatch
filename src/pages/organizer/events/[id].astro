@@ -51,6 +51,33 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
                 <label class="form-label">Full Description</label>
                 <textarea class="input-field !h-[calc(100%-2rem)]" name="description" placeholder="Tell the world about your mission..."></textarea>
             </div>
+            <div class="space-y-3 md:col-span-2">
+                <label class="form-label">Banner image</label>
+                <input
+                  class="input-field"
+                  name="bannerUrl"
+                  type="text"
+                  inputmode="url"
+                  autocomplete="off"
+                  placeholder="https://… or upload below"
+                  data-edit-banner-url
+                />
+                <p class="text-xs text-cream/35 leading-relaxed">
+                  HTTPS link or upload (JPEG, PNG, WebP, GIF, max 5&nbsp;MB). Shown on the public event page.
+                </p>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <label class="inline-flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.04] px-5 py-3 text-sm font-medium text-cream/80 transition-colors hover:border-lime/35 hover:bg-white/[0.07]">
+                    <input
+                      type="file"
+                      class="sr-only"
+                      accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
+                      data-edit-banner-file
+                    />
+                    <span>Choose image to upload</span>
+                  </label>
+                  <span class="text-xs text-cream/35" data-edit-banner-upload-status></span>
+                </div>
+            </div>
         </div>
       </section>
 
@@ -214,8 +241,34 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const applicationsLink = document.querySelector("[data-applications-link]");
     const submissionsLink = document.querySelector("[data-submissions-link]");
     const topSaveBtn = document.querySelector("#save-btn-top");
+    const editBannerUrl = form?.querySelector("[data-edit-banner-url]");
+    const editBannerFile = form?.querySelector("[data-edit-banner-file]");
+    const editBannerUploadStatus = form?.querySelector("[data-edit-banner-upload-status]");
 
     topSaveBtn?.addEventListener("click", () => form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true })));
+
+    editBannerFile?.addEventListener("change", async () => {
+      const file = editBannerFile.files?.[0];
+      if (!file || !editBannerUrl) return;
+      if (editBannerUploadStatus) {
+        editBannerUploadStatus.textContent = "";
+        editBannerUploadStatus.classList.remove("!text-coral");
+      }
+      const fd = new FormData();
+      fd.append("file", file);
+      try {
+        const res = await fetch("/api/organizer/upload/banner", { method: "POST", body: fd });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Upload failed");
+        editBannerUrl.value = typeof data.url === "string" ? data.url : "";
+      } catch (e) {
+        if (editBannerUploadStatus) {
+          editBannerUploadStatus.textContent = e instanceof Error ? e.message : "Upload failed";
+          editBannerUploadStatus.classList.add("!text-coral");
+        }
+        editBannerFile.value = "";
+      }
+    });
 
     const buildRow = (type, data = {}) => {
       const wrapper = document.createElement("div");
@@ -318,6 +371,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           form.maxParticipants.value = event.maxParticipants || "";
           form.applicationDeadline.value = formatForInput(event.applicationDeadline);
           form.isPublished.checked = !!event.isPublished;
+          if (form.bannerUrl) form.bannerUrl.value = event.bannerUrl || "";
         }
 
         if (publicLink) publicLink.href = `/events/${event.slug}`;
@@ -372,7 +426,14 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         endDate: form.endDate.value,
         location: form.location.value,
         mode: form.mode.value,
+        organizationName: form.organizationName.value,
+        websiteUrl: form.websiteUrl.value,
+        twitterUrl: form.twitterUrl.value,
+        discordUrl: form.discordUrl.value,
+        maxParticipants: form.maxParticipants.value ? parseInt(form.maxParticipants.value, 10) : null,
         applicationDeadline: form.applicationDeadline.value,
+        theme: "",
+        bannerUrl: form.bannerUrl ? form.bannerUrl.value : "",
         isPublished: form.querySelector('input[name="isPublished"]').checked,
         tracks: trackRows.filter((track) => track.name.trim()),
         faqs: faqRows.filter((faq) => faq.question.trim())

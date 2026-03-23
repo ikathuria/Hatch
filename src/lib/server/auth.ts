@@ -32,7 +32,7 @@ export const hashPassword = async (password: string, salt?: Uint8Array) => {
       name: "PBKDF2",
       hash: "SHA-256",
       iterations: 120000,
-      salt: actualSalt as any
+      salt: actualSalt
     },
     keyMaterial,
     256

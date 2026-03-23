@@ -8,7 +8,6 @@ export const POST: APIRoute = async (context) => {
   try {
     const env = getEnv(context.locals);
     const payload = await context.request.json();
-    console.log("Signup payload:", payload);
     const { name, email, password } = payload as any;
     if (!name || !email || !password) {
       return json({ error: "Name, email, and password are required." }, 400);
@@ -46,8 +45,7 @@ export const POST: APIRoute = async (context) => {
         "set-cookie": cookie
       }
     );
-  } catch (error) {
-    console.error("Signup error:", error);
+  } catch {
     return json({ error: "Unable to create account." }, 500);
   }
 };

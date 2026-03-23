@@ -3,6 +3,7 @@ import { requireOrganizer } from "../../../../lib/server/auth";
 import { json } from "../../../../lib/server/responses";
 import { getEnv } from "../../../../lib/server/env";
 import { normalizeSlug, slugPattern } from "../../../../lib/server/validation";
+import { isTrustedBannerReference } from "../../../../lib/server/upload-banner";
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -42,6 +43,22 @@ export const POST: APIRoute = async (context) => {
     const location = String(payload.location || "").trim();
     const applicationDeadline = String(payload.applicationDeadline || "").trim();
     const theme = String(payload.theme || "").trim();
+    const websiteUrl = String(payload.websiteUrl || "").trim();
+    const twitterUrl = String(payload.twitterUrl || "").trim();
+    const discordUrl = String(payload.discordUrl || "").trim();
+    const bannerUrl = String(payload.bannerUrl || "").trim();
+    if (bannerUrl && !isTrustedBannerReference(bannerUrl)) {
+      return json(
+        { error: "Banner must be a secure https URL or an image uploaded from the dashboard." },
+        400
+      );
+    }
+    const maxParticipantsRaw = payload.maxParticipants;
+    const maxParticipants =
+      maxParticipantsRaw === "" || maxParticipantsRaw === null || maxParticipantsRaw === undefined
+        ? null
+        : parseInt(String(maxParticipantsRaw), 10);
+    const isPublished = payload.isPublished ? 1 : 0;
 
     if (!title || !slug) {
       return json({ error: "Title and slug are required." }, 400);
@@ -63,8 +80,9 @@ export const POST: APIRoute = async (context) => {
       `INSERT INTO events (
         id, organizer_id, created_at, updated_at, slug, title, tagline, description,
         start_date, end_date, mode, organization_name, location,
-        application_deadline, theme, is_published
-      ) VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`
+        website_url, twitter_url, discord_url, max_participants,
+        application_deadline, theme, banner_url, is_published
+      ) VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
       .bind(
         eventId,
@@ -78,8 +96,14 @@ export const POST: APIRoute = async (context) => {
         mode,
         organizationName,
         location,
+        websiteUrl,
+        twitterUrl,
+        discordUrl,
+        Number.isFinite(maxParticipants) ? maxParticipants : null,
         applicationDeadline,
-        theme
+        theme,
+        bannerUrl,
+        isPublished
       )
       .run();
 
@@ -95,7 +119,7 @@ export const POST: APIRoute = async (context) => {
           location,
           mode,
           applicationDeadline,
-          isPublished: false
+          isPublished: Boolean(isPublished)
         }
       },
       201

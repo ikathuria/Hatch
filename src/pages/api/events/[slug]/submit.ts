@@ -44,6 +44,8 @@ export const POST: APIRoute = async (context) => {
       return json({ error: "Please provide a valid email." }, 400);
     }
 
+    const normalizedContactEmail = contactEmail.toLowerCase();
+
     const id = crypto.randomUUID();
     await env.DB.prepare(
       `INSERT INTO submissions
@@ -61,7 +63,7 @@ export const POST: APIRoute = async (context) => {
         deckUrl,
         track,
         members,
-        contactEmail
+        normalizedContactEmail
       )
       .run();
 

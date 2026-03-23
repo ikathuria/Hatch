@@ -3,6 +3,7 @@ import { requireOrganizer } from "../../../../lib/server/auth";
 import { json } from "../../../../lib/server/responses";
 import { getEnv } from "../../../../lib/server/env";
 import { normalizeSlug, slugPattern } from "../../../../lib/server/validation";
+import { isTrustedBannerReference } from "../../../../lib/server/upload-banner";
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -17,7 +18,8 @@ export const GET: APIRoute = async (context) => {
       `SELECT id, slug, title, tagline, description, start_date as startDate, end_date as endDate,
         location, mode, organization_name as organizationName, website_url as websiteUrl,
         twitter_url as twitterUrl, discord_url as discordUrl, max_participants as maxParticipants,
-        application_deadline as applicationDeadline, theme, is_published as isPublished
+        application_deadline as applicationDeadline, theme,
+        banner_url as bannerUrl, is_published as isPublished
        FROM events WHERE id = ? AND organizer_id = ?`
     )
       .bind(id, organizer?.id)
@@ -42,8 +44,7 @@ export const GET: APIRoute = async (context) => {
       tracks: tracks.results ?? [],
       faqs: faqs.results ?? []
     });
-  } catch (error) {
-    console.error("DEBUG: [GET events/[id]] Error:", error);
+  } catch {
     return json({ error: "Unable to load event." }, 500);
   }
 };
@@ -73,6 +74,13 @@ export const PUT: APIRoute = async (context) => {
     const maxParticipants = parseInt(payload.maxParticipants) || null;
     const applicationDeadline = String(payload.applicationDeadline || "").trim();
     const theme = String(payload.theme || "").trim();
+    const bannerUrl = String(payload.bannerUrl || "").trim();
+    if (bannerUrl && !isTrustedBannerReference(bannerUrl)) {
+      return json(
+        { error: "Banner must be a secure https URL or an image uploaded from the dashboard." },
+        400
+      );
+    }
     const isPublished = payload.isPublished ? 1 : 0;
 
     if (!title || !slug) {
@@ -96,8 +104,8 @@ export const PUT: APIRoute = async (context) => {
       `UPDATE events SET
         slug = ?, title = ?, tagline = ?, description = ?, start_date = ?, end_date = ?,
         location = ?, mode = ?, organization_name = ?, website_url = ?, twitter_url = ?,
-        discord_url = ?, max_participants = ?, application_deadline = ?, theme = ?, 
-        is_published = ?, updated_at = datetime('now')
+        discord_url = ?, max_participants = ?, application_deadline = ?, theme = ?,
+        banner_url = ?, is_published = ?, updated_at = datetime('now')
        WHERE id = ? AND organizer_id = ?`
     )
       .bind(
@@ -116,6 +124,7 @@ export const PUT: APIRoute = async (context) => {
         maxParticipants,
         applicationDeadline,
         theme,
+        bannerUrl,
         isPublished,
         id,
         organizer?.id
@@ -178,11 +187,11 @@ export const PUT: APIRoute = async (context) => {
         maxParticipants,
         applicationDeadline,
         theme,
+        bannerUrl,
         isPublished: Boolean(isPublished)
       }
     });
-  } catch (error) {
-    console.error("DEBUG: [PUT events/[id]] Error:", error);
+  } catch {
     return json({ error: "Unable to save event." }, 500);
   }
 };

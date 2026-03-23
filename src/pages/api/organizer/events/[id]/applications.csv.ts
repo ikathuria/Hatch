@@ -45,8 +45,7 @@ export const GET: APIRoute = async (context) => {
       "content-type": "text/csv",
       "content-disposition": `attachment; filename="applications-${id}.csv"`
     });
-  } catch (error) {
-    console.error("DEBUG: [GET applications.csv] Error:", error);
+  } catch {
     return text("Unable to export applications.", 500);
   }
 };

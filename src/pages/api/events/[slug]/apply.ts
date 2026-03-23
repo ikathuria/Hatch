@@ -44,6 +44,8 @@ export const POST: APIRoute = async (context) => {
       return json({ error: "Please provide a valid email." }, 400);
     }
 
+    const normalizedEmail = email.toLowerCase();
+
     const id = crypto.randomUUID();
     await env.DB.prepare(
       `INSERT INTO applications
@@ -54,7 +56,7 @@ export const POST: APIRoute = async (context) => {
         id,
         event.id,
         fullName,
-        email,
+        normalizedEmail,
         organization,
         role,
         location,

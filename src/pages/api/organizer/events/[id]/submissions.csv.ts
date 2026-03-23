@@ -45,8 +45,7 @@ export const GET: APIRoute = async (context) => {
       "content-type": "text/csv",
       "content-disposition": `attachment; filename="submissions-${id}.csv"`
     });
-  } catch (error) {
-    console.error("DEBUG: [GET submissions.csv] Error:", error);
+  } catch {
     return text("Unable to export submissions.", 500);
   }
 };
