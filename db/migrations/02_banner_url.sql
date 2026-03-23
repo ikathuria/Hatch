@@ -1,1 +1,1 @@
-ALTER TABLE events ADD COLUMN banner_url TEXT;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS banner_url TEXT;

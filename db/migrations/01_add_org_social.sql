@@ -1,5 +1,5 @@
-ALTER TABLE events ADD COLUMN organization_name TEXT;
-ALTER TABLE events ADD COLUMN website_url TEXT;
-ALTER TABLE events ADD COLUMN twitter_url TEXT;
-ALTER TABLE events ADD COLUMN discord_url TEXT;
-ALTER TABLE events ADD COLUMN max_participants INTEGER;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS organization_name TEXT;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS website_url TEXT;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS twitter_url TEXT;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS discord_url TEXT;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS max_participants INTEGER;
