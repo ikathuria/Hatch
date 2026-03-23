@@ -6,6 +6,7 @@ dist/
 # dependencies
 node_modules/
 .npm-cache/
+.wrangler/
 
 # logs
 npm-debug.log*
