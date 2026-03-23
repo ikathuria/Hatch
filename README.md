@@ -64,6 +64,21 @@ wrangler d1 execute hatch --file db/migrations/02_banner_url.sql --remote
 
 4. Ensure `wrangler.toml` has matching binding names (`DB`, `UPLOADS`).
 
+## Deploy on Cloudflare Workers
+
+This project is configured to deploy on Cloudflare Workers (not Pages).
+
+```sh
+npm run build
+npx wrangler deploy ./dist/_worker.js/index.js --assets ./dist
+```
+
+You can also run:
+
+```sh
+npm run deploy
+```
+
 ## Organizer flow
 
 1. Sign up at `/organizer/signup`
@@ -78,4 +93,5 @@ wrangler d1 execute hatch --file db/migrations/02_banner_url.sql --remote
 npm run dev       # local dev server
 npm run build     # production build
 npm run preview   # preview build output
+npm run deploy    # build + deploy to Cloudflare Workers
 ```
