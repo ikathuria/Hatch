@@ -31,10 +31,18 @@ jobs:
       - name: Check if org columns exist
         id: org_cols
         run: |
-          json=$(npx wrangler d1 execute hatch --remote \
-            --command "SELECT count(*) AS c FROM pragma_table_info('events') WHERE name IN ('organization_name','website_url','twitter_url','discord_url','max_participants');" \
-            --json)
-          present=$(node -e "const j=JSON.parse(process.argv[1]); const rows=Array.isArray(j.results)?j.results:[]; const c=rows[0]?.c ?? 0; process.stdout.write(Number(c) >= 5 ? 'true' : 'false')" "$json")
+          schema=$(npx wrangler d1 execute hatch --remote --command "PRAGMA table_info('events');")
+          missing=0
+          for col in organization_name website_url twitter_url discord_url max_participants; do
+            if ! echo "$schema" | grep -q "$col"; then
+              missing=1
+            fi
+          done
+          if [ "$missing" -eq 0 ]; then
+            present=true
+          else
+            present=false
+          fi
           echo "present=$present" >> "$GITHUB_OUTPUT"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -50,10 +58,12 @@ jobs:
       - name: Check if banner_url column exists
         id: banner_url_col
         run: |
-          json=$(npx wrangler d1 execute hatch --remote \
-            --command "SELECT count(*) AS c FROM pragma_table_info('events') WHERE name='banner_url';" \
-            --json)
-          present=$(node -e "const j=JSON.parse(process.argv[1]); const rows=Array.isArray(j.results)?j.results:[]; const c=rows[0]?.c ?? 0; process.stdout.write(Number(c) >= 1 ? 'true' : 'false')" "$json")
+          schema=$(npx wrangler d1 execute hatch --remote --command "PRAGMA table_info('events');")
+          if echo "$schema" | grep -q "banner_url"; then
+            present=true
+          else
+            present=false
+          fi
           echo "present=$present" >> "$GITHUB_OUTPUT"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
