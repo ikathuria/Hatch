@@ -74,6 +74,8 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
 
   <script define:vars={{ token }}>
     const apiBase = "/api/judge";
+    const tokenPattern = /^[a-f0-9]{64}$/i;
+    const normalizedToken = String(token || "").trim();
 
     const $ = (selector) => document.querySelector(selector);
     const toList = (value) => (Array.isArray(value) ? value : []);
@@ -95,6 +97,13 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
       el.textContent = message;
       el.classList.remove("hidden", "!text-lime", "!text-coral", "!text-sky");
       if (tone) el.classList.add(tone);
+    };
+    const friendlyError = (error, fallback) => {
+      const message = error instanceof Error ? error.message : "";
+      if (!message) return fallback;
+      return message.toLowerCase().includes("fetch failed")
+        ? "Unable to reach the judge service right now. Please refresh and try again."
+        : message;
     };
 
     const elements = {
@@ -176,6 +185,18 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
       if (!state.submissions.length) {
         elements.submissions.innerHTML =
           '<div class="card !p-8 text-cream/35 italic">No submissions loaded.</div>';
+        return;
+      }
+      if (!state.criteria.length) {
+        elements.submissions.innerHTML = `
+          <div class="card !p-8 border-sky/20 bg-sky/5">
+            <p class="text-xs uppercase tracking-widest font-bold text-sky mb-2">Scoring unavailable</p>
+            <p class="text-sm text-cream/70">
+              This event has submissions, but the organizer has not configured rubric criteria yet.
+              Ask them to add criteria in the organizer judging workspace, then refresh.
+            </p>
+          </div>
+        `;
         return;
       }
 
@@ -310,13 +331,17 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
         if (elements.logoutButton) elements.logoutButton.classList.remove("hidden");
         renderWorkspace();
       } catch (error) {
-        setStatus(elements.loginStatus, error.message, "!text-coral");
+        setStatus(elements.loginStatus, friendlyError(error, "Unable to load workspace."), "!text-coral");
       }
     };
 
     const login = async (pin = "") => {
-      if (!token) {
+      if (!normalizedToken) {
         setStatus(elements.loginStatus, "Missing judge token.", "!text-coral");
+        return;
+      }
+      if (!tokenPattern.test(normalizedToken)) {
+        setStatus(elements.loginStatus, "Invalid judge token format.", "!text-coral");
         return;
       }
       try {
@@ -324,7 +349,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
         const response = await fetch(`${apiBase}/login`, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ token, pin })
+          body: JSON.stringify({ token: normalizedToken, pin })
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(payload.error || "Unable to open judge workspace.");
@@ -333,7 +358,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
         setStatus(elements.loginStatus, "Access granted", "!text-lime");
         await loadWorkspace();
       } catch (error) {
-        setStatus(elements.loginStatus, error.message, "!text-coral");
+        setStatus(elements.loginStatus, friendlyError(error, "Unable to open judge workspace."), "!text-coral");
       }
     };
 
@@ -355,10 +380,14 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
       renderWorkspace();
     });
 
-    if (token) {
-      login("");
-    } else {
+    if (!normalizedToken) {
       setStatus(elements.loginStatus, "Missing judge token.", "!text-coral");
+      renderWorkspace();
+    } else if (!tokenPattern.test(normalizedToken)) {
+      setStatus(elements.loginStatus, "Invalid judge token format.", "!text-coral");
+      renderWorkspace();
+    } else {
+      login("");
     }
   </script>
 </BaseLayout>

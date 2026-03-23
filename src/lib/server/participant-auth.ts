@@ -1,7 +1,7 @@
 import { json } from "./responses";
 import type { Env } from "./types";
 import { buildCookie, clearCookie, parseCookies } from "./cookies";
-import { hashSecret, randomToken, sha256Hex } from "./crypto";
+import { randomToken, sha256Hex } from "./crypto";
 
 const PARTICIPANT_SESSION_COOKIE = "hatch_participant_session";
 const PARTICIPANT_SESSION_TTL_DAYS = 7;
@@ -14,7 +14,7 @@ export interface ParticipantSession {
   expiresAt: string;
 }
 
-export const hashParticipantSecret = hashSecret;
+export const hashParticipantSecret = sha256Hex;
 
 export const createParticipantSessionCookie = (request: Request, token: string) =>
   buildCookie(
