@@ -10,6 +10,8 @@ Organizers can create branded event pages, collect applications, receive project
 - Organizer authentication and dashboard
 - Event creation and editing (schedule, details, banner, links, tracks, FAQ)
 - Application and submission forms per event
+- Organizer judging workflows (rubrics, judge links, winner selection, result publish)
+- Participant magic-link auth and People’s Choice voting (separate from judge rankings)
 - CSV exports for organizer-side applications and submissions
 - File upload support for event banners
 
@@ -54,15 +56,22 @@ wrangler d1 create hatch
 wrangler r2 bucket create hatch-uploads
 ```
 
-3. Apply schema/migrations:
+3. Apply schema:
 
 ```sh
 wrangler d1 execute hatch --file db/schema.sql --remote
-wrangler d1 execute hatch --file db/migrations/01_add_org_social.sql --remote
-wrangler d1 execute hatch --file db/migrations/02_banner_url.sql --remote
 ```
 
-4. Ensure `wrangler.toml` has matching binding names (`DB`, `UPLOADS`).
+4. If you are upgrading an existing Hatch database, run pending migrations in order:
+
+```sh
+wrangler d1 execute hatch --file db/migrations/01_add_org_social.sql --remote
+wrangler d1 execute hatch --file db/migrations/02_banner_url.sql --remote
+wrangler d1 execute hatch --file db/migrations/03_judging_and_participants.sql --remote
+wrangler d1 execute hatch --file db/migrations/04_participant_vote_identity.sql --remote
+```
+
+5. Ensure `wrangler.toml` has matching binding names (`DB`, `UPLOADS`).
 
 ## Deploy on Cloudflare Workers
 

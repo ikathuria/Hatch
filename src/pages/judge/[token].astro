@@ -1,0 +1,364 @@
+﻿---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const token = Astro.params.token ? String(Astro.params.token) : '';
+---
+
+<BaseLayout title="Judge Portal | Hatch">
+  <div class="mx-auto max-w-7xl px-6 py-12">
+    <div class="grid gap-8 xl:grid-cols-[380px_1fr]">
+      <section class="card !p-8 space-y-6 h-fit sticky top-36">
+        <div class="space-y-3">
+          <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Judge Portal</span>
+          <h1 class="text-4xl font-bold tracking-tighter">Secure scoring access</h1>
+          <p class="text-sm text-cream/50 leading-relaxed">
+            Use the shared link token and optional PIN to review submissions and enter rubric scores.
+          </p>
+        </div>
+
+        <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-5 space-y-3">
+          <p class="text-xs uppercase tracking-widest text-cream/35 font-bold">Token</p>
+          <p class="font-mono text-xs break-all text-cream/80" data-token-display>{token || 'Missing token'}</p>
+        </div>
+
+        <form class="space-y-5" data-login-form>
+          <div class="space-y-2">
+            <label class="form-label" for="judge-pin">Optional PIN</label>
+            <input class="input-field" id="judge-pin" name="pin" inputmode="numeric" autocomplete="off" placeholder="1234" />
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="btn-primary !px-6" type="submit" data-login-button>Open workspace</button>
+            <button class="btn-ghost !px-4 !py-3 !text-sm hidden" type="button" data-logout-button>Sign out</button>
+          </div>
+        </form>
+
+        <div class="status-pill hidden !bg-transparent !border-none !p-0" data-login-status></div>
+        <div class="rounded-3xl border border-white/10 bg-sky/5 p-5 hidden" data-lock-banner>
+          <p class="text-xs uppercase tracking-widest font-bold text-sky mb-2">Access state</p>
+          <p class="text-sm text-cream/70 leading-relaxed" data-lock-message></p>
+        </div>
+      </section>
+
+      <section class="space-y-6">
+        <div class="card !p-8 space-y-6">
+          <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Workspace</span>
+              <h2 class="section-title !mb-0 mt-4 text-4xl" data-event-title>Waiting for access...</h2>
+              <p class="text-cream/50 mt-3" data-event-meta>Enter the workspace to begin scoring.</p>
+            </div>
+            <span class="status-pill hidden" data-workspace-status></span>
+          </div>
+          <div class="grid gap-4 md:grid-cols-3">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p class="text-xs uppercase tracking-widest text-cream/35 font-bold mb-2">Submissions</p>
+              <p class="text-3xl font-bold" data-count-submissions>0</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p class="text-xs uppercase tracking-widest text-cream/35 font-bold mb-2">Criteria</p>
+              <p class="text-3xl font-bold" data-count-criteria>0</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <p class="text-xs uppercase tracking-widest text-cream/35 font-bold mb-2">Scale</p>
+              <p class="text-3xl font-bold" data-count-scale>1-10</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-6" data-submissions>
+          <div class="card !p-8 text-cream/35 italic">Judge submissions will appear here after login.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script define:vars={{ token }}>
+    const apiBase = "/api/judge";
+
+    const $ = (selector) => document.querySelector(selector);
+    const toList = (value) => (Array.isArray(value) ? value : []);
+    const escapeHtml = (value) =>
+      String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    const setStatus = (el, message, tone = "") => {
+      if (!el) return;
+      if (!message) {
+        el.textContent = "";
+        el.classList.add("hidden");
+        el.classList.remove("!text-lime", "!text-coral", "!text-sky");
+        return;
+      }
+      el.textContent = message;
+      el.classList.remove("hidden", "!text-lime", "!text-coral", "!text-sky");
+      if (tone) el.classList.add(tone);
+    };
+
+    const elements = {
+      loginForm: $("[data-login-form]"),
+      loginButton: $("[data-login-button]"),
+      logoutButton: $("[data-logout-button]"),
+      loginStatus: $("[data-login-status]"),
+      lockBanner: $("[data-lock-banner]"),
+      lockMessage: $("[data-lock-message]"),
+      eventTitle: $("[data-event-title]"),
+      eventMeta: $("[data-event-meta]"),
+      workspaceStatus: $("[data-workspace-status]"),
+      countSubmissions: $("[data-count-submissions]"),
+      countCriteria: $("[data-count-criteria]"),
+      countScale: $("[data-count-scale]"),
+      submissions: $("[data-submissions]")
+    };
+
+    const state = {
+      eventId: "",
+      loggedIn: false,
+      locked: false,
+      lockMessage: "",
+      event: null,
+      rubric: null,
+      criteria: [],
+      submissions: [],
+      judgeScores: []
+    };
+
+    const renderCounts = () => {
+      if (elements.countSubmissions) elements.countSubmissions.textContent = String(state.submissions.length);
+      if (elements.countCriteria) elements.countCriteria.textContent = String(state.criteria.length);
+      const min = Number(state.rubric?.minScore ?? 1);
+      const max = Number(state.rubric?.maxScore ?? 10);
+      if (elements.countScale) elements.countScale.textContent = `${min}-${max}`;
+    };
+
+    const renderBanner = () => {
+      if (!elements.lockBanner || !elements.lockMessage) return;
+      if (!state.locked) {
+        elements.lockBanner.classList.add("hidden");
+        return;
+      }
+      elements.lockBanner.classList.remove("hidden");
+      elements.lockMessage.textContent =
+        state.lockMessage || "This judge link is not currently available.";
+    };
+
+    const scoreLookup = () => {
+      const map = new Map();
+      for (const row of toList(state.judgeScores)) {
+        const key = `${row.submissionId}::${row.rubricCriterionId}`;
+        map.set(key, row);
+      }
+      return map;
+    };
+
+    const renderWorkspace = () => {
+      if (elements.eventTitle) elements.eventTitle.textContent = state.event?.title || "Judge workspace";
+      if (elements.eventMeta) {
+        const status = state.locked ? "Locked" : "Scoring in progress";
+        elements.eventMeta.textContent = status;
+      }
+      setStatus(
+        elements.workspaceStatus,
+        state.locked ? "Read only" : "Ready",
+        state.locked ? "!text-coral" : "!text-lime"
+      );
+      renderCounts();
+      renderBanner();
+
+      if (!elements.submissions) return;
+      if (!state.loggedIn) {
+        elements.submissions.innerHTML =
+          '<div class="card !p-8 text-cream/40">Sign in to view submissions.</div>';
+        return;
+      }
+      if (!state.submissions.length) {
+        elements.submissions.innerHTML =
+          '<div class="card !p-8 text-cream/35 italic">No submissions loaded.</div>';
+        return;
+      }
+
+      const lookup = scoreLookup();
+      const min = Number(state.rubric?.minScore ?? 1);
+      const max = Number(state.rubric?.maxScore ?? 10);
+
+      elements.submissions.innerHTML = state.submissions
+        .map((submission) => {
+          const comment =
+            state.criteria.length > 0
+              ? lookup.get(`${submission.id}::${state.criteria[0].id}`)?.comment ?? ""
+              : "";
+
+          return `
+            <form class="card !p-8 space-y-6" data-score-form data-submission-id="${escapeHtml(submission.id)}">
+              <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">${escapeHtml(submission.track || "All tracks")}</span>
+                  <h3 class="text-3xl font-bold tracking-tight mt-4">${escapeHtml(submission.projectName || "Untitled project")}</h3>
+                  <p class="text-cream/50 mt-2">${escapeHtml(submission.teamName || "")}</p>
+                </div>
+                <span class="status-pill !bg-white/5 !border-white/10">${escapeHtml(submission.totalScore ?? 0)}</span>
+              </div>
+              <p class="text-sm text-cream/45 leading-relaxed">${escapeHtml(submission.description || "")}</p>
+              <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                ${state.criteria
+                  .map((criterion) => {
+                    const existing = lookup.get(`${submission.id}::${criterion.id}`);
+                    return `
+                      <div class="space-y-2">
+                        <label class="form-label">${escapeHtml(criterion.name)}</label>
+                        <input
+                          class="input-field"
+                          type="number"
+                          min="${min}"
+                          max="${max}"
+                          step="1"
+                          data-criterion-id="${escapeHtml(criterion.id)}"
+                          value="${escapeHtml(existing?.score ?? "")}"
+                          placeholder="${min}-${max}"
+                          ${state.locked ? "disabled" : ""}
+                        />
+                      </div>
+                    `;
+                  })
+                  .join("")}
+              </div>
+              <div class="space-y-2">
+                <label class="form-label">Judge comments</label>
+                <textarea class="input-field" name="comment" rows="3" placeholder="Optional notes for this submission" ${state.locked ? "disabled" : ""}>${escapeHtml(comment)}</textarea>
+              </div>
+              <div class="flex items-center justify-between gap-4">
+                <span class="status-pill hidden !bg-transparent !border-none !p-0" data-score-status></span>
+                <button class="btn-primary !px-6" type="submit" ${state.locked ? "disabled" : ""}>Save scores</button>
+              </div>
+            </form>
+          `;
+        })
+        .join("");
+
+      elements.submissions.querySelectorAll("[data-score-form]").forEach((form) => {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (state.locked || !state.eventId) return;
+
+          const submissionId = form.getAttribute("data-submission-id");
+          const comment = form.querySelector('[name="comment"]')?.value?.trim() || "";
+          const statusEl = form.querySelector("[data-score-status]");
+
+          const entries = [];
+          form.querySelectorAll("[data-criterion-id]").forEach((input) => {
+            const criterionId = input.getAttribute("data-criterion-id");
+            const raw = input.value.trim();
+            if (!criterionId || raw === "") return;
+            entries.push({
+              submissionId,
+              criterionId,
+              score: Number.parseInt(raw, 10),
+              comment
+            });
+          });
+
+          if (!entries.length) {
+            setStatus(statusEl, "Enter at least one score.", "!text-coral");
+            return;
+          }
+
+          try {
+            const response = await fetch(`${apiBase}/events/${state.eventId}/scores`, {
+              method: "PUT",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ entries })
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(payload.error || "Unable to save scores.");
+            setStatus(statusEl, "Saved", "!text-lime");
+            await loadWorkspace();
+          } catch (error) {
+            setStatus(statusEl, error.message, "!text-coral");
+          }
+        });
+      });
+    };
+
+    const loadWorkspace = async () => {
+      if (!state.eventId) return;
+      try {
+        const response = await fetch(`${apiBase}/events/${state.eventId}`);
+        const payload = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          state.loggedIn = false;
+          state.locked = false;
+          state.lockMessage = "Enter the PIN if required, then open the workspace.";
+          renderWorkspace();
+          return;
+        }
+        if (!response.ok) throw new Error(payload.error || "Unable to load workspace.");
+
+        state.loggedIn = true;
+        state.event = payload.event || null;
+        state.rubric = payload.rubric || null;
+        state.criteria = toList(payload.criteria);
+        state.submissions = toList(payload.submissions);
+        state.judgeScores = toList(payload.judgeScores);
+        state.locked = payload.event?.resultsStatus === "published";
+        state.lockMessage = state.locked
+          ? "Results are published. Scores are locked."
+          : "Workspace is open.";
+
+        if (elements.loginButton) elements.loginButton.textContent = "Refresh workspace";
+        if (elements.logoutButton) elements.logoutButton.classList.remove("hidden");
+        renderWorkspace();
+      } catch (error) {
+        setStatus(elements.loginStatus, error.message, "!text-coral");
+      }
+    };
+
+    const login = async (pin = "") => {
+      if (!token) {
+        setStatus(elements.loginStatus, "Missing judge token.", "!text-coral");
+        return;
+      }
+      try {
+        setStatus(elements.loginStatus, "Verifying link...", "!text-sky");
+        const response = await fetch(`${apiBase}/login`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ token, pin })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Unable to open judge workspace.");
+        state.eventId = payload.judge?.eventId || "";
+        state.loggedIn = true;
+        setStatus(elements.loginStatus, "Access granted", "!text-lime");
+        await loadWorkspace();
+      } catch (error) {
+        setStatus(elements.loginStatus, error.message, "!text-coral");
+      }
+    };
+
+    elements.loginForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const pin = elements.loginForm.querySelector('[name="pin"]')?.value || "";
+      await login(pin);
+    });
+
+    elements.logoutButton?.addEventListener("click", async () => {
+      await fetch(`${apiBase}/logout`, { method: "POST" });
+      state.loggedIn = false;
+      state.eventId = "";
+      state.submissions = [];
+      state.criteria = [];
+      state.judgeScores = [];
+      if (elements.logoutButton) elements.logoutButton.classList.add("hidden");
+      setStatus(elements.loginStatus, "Signed out", "!text-lime");
+      renderWorkspace();
+    });
+
+    if (token) {
+      login("");
+    } else {
+      setStatus(elements.loginStatus, "Missing judge token.", "!text-coral");
+    }
+  </script>
+</BaseLayout>

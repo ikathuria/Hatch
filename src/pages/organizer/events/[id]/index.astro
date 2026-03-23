@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../../../layouts/BaseLayout.astro";
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="Manage Event | Hatch">
@@ -14,9 +14,13 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
             <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Mission Control</span>
         </div>
         <h1 class="text-4xl md:text-5xl font-bold tracking-tighter" data-event-title>Loading Event...</h1>
-        <p class="text-cream/50 max-w-2xl leading-relaxed">Update your event's configuration in real-time. All changes synchronize instantly with the global grid once saved.</p>
+        <p class="text-cream/50 max-w-2xl leading-relaxed" data-page-subtitle>Update your event's configuration in real-time. All changes synchronize instantly with the global grid once saved.</p>
       </div>
       <div class="flex items-center gap-4">
+          <a class="btn-ghost !px-6" data-judging-link data-existing-only href="#">
+             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2 opacity-60"><path d="M12 2l3 7h7l-5.5 4.1 2.1 6.9L12 16l-6.6 4 2.1-6.9L2 9h7z"/></svg>
+             Judging
+          </a>
           <a class="btn-ghost !px-6" data-public-link href="#" target="_blank">
              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2 opacity-60"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
              Live View
@@ -87,7 +91,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
             <span class="w-8 h-8 rounded-lg bg-sky/10 text-sky flex items-center justify-center font-bold text-xs border border-sky/20">02</span>
             <h2 class="text-2xl font-bold tracking-tight">Logistics & Parameters</h2>
         </div>
-        <div class="card !p-10 grid md:grid-cols-3 gap-10 border-white/5 bg-white/[0.02]">
+        <div class="card !p-10 grid md:grid-cols-2 lg:grid-cols-3 gap-10 border-white/5 bg-white/[0.02]">
             <div class="space-y-6">
                 <div class="space-y-2">
                     <label class="form-label">Start Horizon</label>
@@ -111,7 +115,6 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
                         <option>Online</option>
                     </select>
                 </div>
-            </div>
             </div>
             <div class="space-y-6">
                 <div class="space-y-2">
@@ -156,7 +159,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       </section>
 
       {/* 3. Specialized Tracks */}
-      <section class="space-y-8">
+      <section class="space-y-8" data-existing-only>
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <span class="w-8 h-8 rounded-lg bg-lime/10 text-lime flex items-center justify-center font-bold text-xs border border-lime/20">03</span>
@@ -217,8 +220,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       {/* Footer Save Action */}
       <div class="pt-20 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-10">
           <div class="space-y-1">
-              <p class="text-sm font-bold text-cream">Unsaved changes detected.</p>
-              <p class="text-xs text-cream/40">Remember to persist your mission parameters.</p>
+              <p class="text-sm font-bold text-cream" data-footer-title>Unsaved changes detected.</p>
+              <p class="text-xs text-cream/40" data-footer-subtitle>Remember to persist your mission parameters.</p>
           </div>
           <div class="flex items-center gap-6 w-full md:w-auto">
               <span class="status-pill !bg-transparent !border-none hidden" data-status></span>
@@ -229,23 +232,93 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
   </div>
 
   <script>
-    const eventId = window.location.pathname.split("/").filter(Boolean).pop();
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const eventId = pathParts[pathParts.length - 1] || "";
+    const isCreateMode = eventId === "new";
+
     const form = document.querySelector("[data-event-form]");
     const status = document.querySelector("[data-status]");
     const titleEl = document.querySelector("[data-event-title]");
+    const subtitleEl = document.querySelector("[data-page-subtitle]");
+    const footerTitleEl = document.querySelector("[data-footer-title]");
+    const footerSubtitleEl = document.querySelector("[data-footer-subtitle]");
     const tracksContainer = document.querySelector("[data-tracks]");
     const faqsContainer = document.querySelector("[data-faqs]");
     const addTrack = document.querySelector("[data-add-track]");
     const addFaq = document.querySelector("[data-add-faq]");
     const publicLink = document.querySelector("[data-public-link]");
+    const judgingLink = document.querySelector("[data-judging-link]");
     const applicationsLink = document.querySelector("[data-applications-link]");
     const submissionsLink = document.querySelector("[data-submissions-link]");
     const topSaveBtn = document.querySelector("#save-btn-top");
+    const existingOnlyEls = document.querySelectorAll("[data-existing-only]");
+
     const editBannerUrl = form?.querySelector("[data-edit-banner-url]");
     const editBannerFile = form?.querySelector("[data-edit-banner-file]");
     const editBannerUploadStatus = form?.querySelector("[data-edit-banner-upload-status]");
 
-    topSaveBtn?.addEventListener("click", () => form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true })));
+    const titleInput = form?.querySelector("input[name='title']");
+    const slugInput = form?.querySelector("input[name='slug']");
+
+    const defaultTopLabel = isCreateMode ? "Create Mission" : "Save Mission";
+    const defaultSubmitLabel = isCreateMode ? "Create Mission" : "Persist Mission Changes";
+    const submitBtn = form?.querySelector('button[type="submit"]');
+
+    const slugify = (raw) =>
+      String(raw || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+    const formatForInput = (val) => {
+      if (!val) return "";
+      const d = new Date(val);
+      if (Number.isNaN(d.getTime())) return String(val);
+      const offset = d.getTimezoneOffset() * 60000;
+      return new Date(d.getTime() - offset).toISOString().slice(0, 16);
+    };
+
+    const setStatus = (message, isError = false) => {
+      if (!status) return;
+      status.textContent = message;
+      status.classList.remove("hidden", "!text-coral");
+      if (isError) status.classList.add("!text-coral");
+    };
+
+    const clearStatus = () => {
+      if (!status) return;
+      status.textContent = "";
+      status.classList.add("hidden");
+      status.classList.remove("!text-coral");
+    };
+
+    const setButtonsState = (disabled, topLabel, bottomLabel) => {
+      if (topSaveBtn) {
+        topSaveBtn.disabled = disabled;
+        topSaveBtn.textContent = topLabel;
+      }
+      if (submitBtn) {
+        submitBtn.disabled = disabled;
+        submitBtn.textContent = bottomLabel;
+      }
+    };
+
+    const setPublicLink = (slug) => {
+      if (!publicLink) return;
+      const normalized = String(slug || "").trim();
+      if (!normalized) {
+        publicLink.href = "#";
+        publicLink.classList.add("pointer-events-none", "opacity-50");
+        return;
+      }
+      publicLink.href = `/events/${normalized}`;
+      publicLink.classList.remove("pointer-events-none", "opacity-50");
+    };
+
+    topSaveBtn?.addEventListener("click", () => {
+      form?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+    });
 
     editBannerFile?.addEventListener("change", async () => {
       const file = editBannerFile.files?.[0];
@@ -273,7 +346,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const buildRow = (type, data = {}) => {
       const wrapper = document.createElement("div");
       wrapper.className = "card !p-8 grid md:grid-cols-[1fr_auto] items-start gap-10 animate-in fade-in slide-in-from-bottom-2 duration-300";
-      
+
       if (type === "track") {
         wrapper.innerHTML = `
           <div class="grid md:grid-cols-2 gap-8 flex-1">
@@ -297,7 +370,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           </button>
         `;
       }
-      
+
       if (type === "faq") {
         wrapper.innerHTML = `
           <div class="grid md:grid-cols-2 gap-8 flex-1">
@@ -317,9 +390,9 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       }
 
       wrapper.querySelector("[data-remove]")?.addEventListener("click", () => {
-          wrapper.style.opacity = "0";
-          wrapper.style.transform = "scale(0.95)";
-          setTimeout(() => wrapper.remove(), 300);
+        wrapper.style.opacity = "0";
+        wrapper.style.transform = "scale(0.95)";
+        setTimeout(() => wrapper.remove(), 300);
       });
       return wrapper;
     };
@@ -331,6 +404,43 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     addFaq?.addEventListener("click", () => {
       faqsContainer?.appendChild(buildRow("faq"));
     });
+
+    const collectPayload = () => {
+      const trackRows = Array.from(tracksContainer?.children || []).map((row) => ({
+        name: row.querySelector("input[name='trackName']")?.value || "",
+        description: row.querySelector("textarea[name='trackDescription']")?.value || "",
+        prize: row.querySelector("input[name='trackPrize']")?.value || ""
+      }));
+      const faqRows = Array.from(faqsContainer?.children || []).map((row) => ({
+        question: row.querySelector("input[name='faqQuestion']")?.value || "",
+        answer: row.querySelector("textarea[name='faqAnswer']")?.value || ""
+      }));
+
+      const maxParticipantsRaw = form.maxParticipants?.value?.trim() || "";
+      const parsedMaxParticipants = Number.parseInt(maxParticipantsRaw, 10);
+
+      return {
+        title: form.title.value,
+        slug: form.slug.value,
+        tagline: form.tagline.value,
+        description: form.description.value,
+        startDate: form.startDate.value,
+        endDate: form.endDate.value,
+        location: form.location.value,
+        mode: form.mode.value,
+        organizationName: form.organizationName.value,
+        websiteUrl: form.websiteUrl.value,
+        twitterUrl: form.twitterUrl.value,
+        discordUrl: form.discordUrl.value,
+        maxParticipants: Number.isFinite(parsedMaxParticipants) ? parsedMaxParticipants : null,
+        applicationDeadline: form.applicationDeadline.value,
+        theme: "",
+        bannerUrl: form.bannerUrl ? form.bannerUrl.value : "",
+        isPublished: form.querySelector('input[name="isPublished"]').checked,
+        tracks: trackRows.filter((track) => track.name.trim()),
+        faqs: faqRows.filter((faq) => faq.question.trim() && faq.answer.trim())
+      };
+    };
 
     const loadEvent = async () => {
       try {
@@ -345,17 +455,6 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
         if (titleEl) titleEl.textContent = event.title;
         if (form) {
-          const formatForInput = (val) => {
-            if (!val) return "";
-            const d = new Date(val);
-            if (isNaN(d.getTime())) return val;
-            // Native inputs expect YYYY-MM-DDTHH:mm (local to the machine usually, or UTC if we slice)
-            // We'll use local ISO to preserve what the user sees
-            const offset = d.getTimezoneOffset() * 60000;
-            const localISOTime = new Date(d.getTime() - offset).toISOString().slice(0, 16);
-            return localISOTime;
-          };
-
           form.title.value = event.title || "";
           form.slug.value = event.slug || "";
           form.tagline.value = event.tagline || "";
@@ -374,7 +473,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           if (form.bannerUrl) form.bannerUrl.value = event.bannerUrl || "";
         }
 
-        if (publicLink) publicLink.href = `/events/${event.slug}`;
+        setPublicLink(event.slug);
+        if (judgingLink) judgingLink.href = `/organizer/events/${eventId}/judging`;
         if (applicationsLink) applicationsLink.href = `/api/organizer/events/${eventId}/applications.csv`;
         if (submissionsLink) submissionsLink.href = `/api/organizer/events/${eventId}/submissions.csv`;
 
@@ -388,87 +488,126 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           faqsContainer.appendChild(buildRow("faq", faq));
         });
       } catch (error) {
-        if (status) {
-          status.textContent = "Signal failure: " + error.message;
-          status.classList.remove("hidden");
-          status.classList.add("!text-coral");
-        }
+        setStatus("Signal failure: " + (error instanceof Error ? error.message : "Unable to load event."), true);
       }
     };
 
+    let slugTouched = false;
+
+    titleInput?.addEventListener("input", () => {
+      if (!isCreateMode || !slugInput) return;
+      if (!slugTouched) {
+        slugInput.value = slugify(titleInput.value);
+      }
+      setPublicLink(slugInput.value);
+    });
+
+    slugInput?.addEventListener("input", () => {
+      if (!isCreateMode) return;
+      slugTouched = true;
+      setPublicLink(slugInput.value);
+    });
+
     form?.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (!form || !status) return;
+      if (!form || !submitBtn) return;
 
-      const submitBtn = form.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Persisting...";
-      
-      status.textContent = "";
-      status.classList.add("hidden");
+      setButtonsState(true, isCreateMode ? "Creating..." : "Saving...", isCreateMode ? "Creating..." : "Persisting...");
+      clearStatus();
 
-      const trackRows = Array.from(tracksContainer?.children || []).map((row) => ({
-        name: row.querySelector("input[name='trackName']")?.value || "",
-        description: row.querySelector("textarea[name='trackDescription']")?.value || "",
-        prize: row.querySelector("input[name='trackPrize']")?.value || ""
-      }));
-      const faqRows = Array.from(faqsContainer?.children || []).map((row) => ({
-        question: row.querySelector("input[name='faqQuestion']")?.value || "",
-        answer: row.querySelector("textarea[name='faqAnswer']")?.value || ""
-      }));
-
-      const payload = {
-        title: form.title.value,
-        slug: form.slug.value,
-        tagline: form.tagline.value,
-        description: form.description.value,
-        startDate: form.startDate.value,
-        endDate: form.endDate.value,
-        location: form.location.value,
-        mode: form.mode.value,
-        organizationName: form.organizationName.value,
-        websiteUrl: form.websiteUrl.value,
-        twitterUrl: form.twitterUrl.value,
-        discordUrl: form.discordUrl.value,
-        maxParticipants: form.maxParticipants.value ? parseInt(form.maxParticipants.value, 10) : null,
-        applicationDeadline: form.applicationDeadline.value,
-        theme: "",
-        bannerUrl: form.bannerUrl ? form.bannerUrl.value : "",
-        isPublished: form.querySelector('input[name="isPublished"]').checked,
-        tracks: trackRows.filter((track) => track.name.trim()),
-        faqs: faqRows.filter((faq) => faq.question.trim())
-      };
+      const payload = collectPayload();
 
       try {
+        if (isCreateMode) {
+          const createResponse = await fetch("/api/organizer/events", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (createResponse.status === 401) {
+            window.location.href = "/organizer/login";
+            return;
+          }
+
+          const createResult = await createResponse.json().catch(() => ({}));
+          if (!createResponse.ok) {
+            throw new Error(createResult.error || "Unable to create event.");
+          }
+
+          const createdId = createResult?.event?.id;
+          if (!createdId) {
+            throw new Error("Event created but no event id was returned.");
+          }
+
+          if (payload.tracks.length > 0 || payload.faqs.length > 0) {
+            const enrichResponse = await fetch(`/api/organizer/events/${createdId}`, {
+              method: "PUT",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+            if (!enrichResponse.ok) {
+              const enrichResult = await enrichResponse.json().catch(() => ({}));
+              setStatus(
+                `Event created, but tracks/FAQs were not saved yet (${enrichResult.error || "follow-up save failed"}). Opening editor...`,
+                true
+              );
+              setTimeout(() => {
+                window.location.href = `/organizer/events/${createdId}`;
+              }, 1200);
+              return;
+            }
+          }
+
+          window.location.href = `/organizer/events/${createdId}`;
+          return;
+        }
+
         const response = await fetch(`/api/organizer/events/${eventId}`, {
           method: "PUT",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(payload)
         });
+        if (response.status === 401) {
+          window.location.href = "/organizer/login";
+          return;
+        }
+
         const result = await response.json().catch(() => ({}));
         if (!response.ok) {
           throw new Error(result.error || "Persistence failed.");
         }
+
         submitBtn.textContent = "Success";
         submitBtn.style.background = "#d8ff3f";
-        
+        if (topSaveBtn) topSaveBtn.textContent = "Saved";
+
         if (titleEl) titleEl.textContent = result.event.title;
-        if (publicLink) publicLink.href = `/events/${result.event.slug}`;
-        
+        setPublicLink(result.event.slug);
+        if (judgingLink) judgingLink.href = `/organizer/events/${eventId}/judging`;
+
         setTimeout(() => {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Persist Mission Changes";
-            submitBtn.style.background = "";
-        }, 2000);
+          submitBtn.style.background = "";
+          setButtonsState(false, defaultTopLabel, defaultSubmitLabel);
+        }, 1600);
       } catch (error) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Retry Persistence";
-        status.textContent = error.message;
-        status.classList.remove("hidden");
-        status.classList.add("!text-coral");
+        setButtonsState(false, defaultTopLabel, isCreateMode ? "Create Mission" : "Retry Persistence");
+        setStatus(error instanceof Error ? error.message : "Unable to save event.", true);
       }
     });
 
-    loadEvent();
+    if (isCreateMode) {
+      if (titleEl) titleEl.textContent = "Create Event";
+      if (subtitleEl) subtitleEl.textContent = "Use the same mission-control workflow to launch a brand-new event. You can tune every detail before publishing.";
+      if (footerTitleEl) footerTitleEl.textContent = "Ready to launch your event?";
+      if (footerSubtitleEl) footerSubtitleEl.textContent = "Create it now, then continue refining submissions, judging, and exports from the editor.";
+      existingOnlyEls.forEach((el) => el.classList.add("hidden"));
+      setButtonsState(false, defaultTopLabel, defaultSubmitLabel);
+      if (form?.mode) form.mode.value = "Hybrid";
+      setPublicLink(form?.slug?.value || "");
+    } else {
+      setButtonsState(false, defaultTopLabel, defaultSubmitLabel);
+      loadEvent();
+    }
   </script>
+
 </BaseLayout>
