@@ -1,6 +1,11 @@
 name = "hatch"
+main = "./dist/_worker.js/index.js"
 compatibility_date = "2026-03-17"
-pages_build_output_dir = "dist"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+binding = "ASSETS"
+directory = "./dist"
 
 [[d1_databases]]
 binding = "DB"
