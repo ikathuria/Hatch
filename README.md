@@ -70,7 +70,7 @@ This project is configured to deploy on Cloudflare Workers (not Pages).
 
 ```sh
 npm run build
-npx wrangler deploy ./dist/_worker.js/index.js --assets ./dist
+npx wrangler deploy
 ```
 
 You can also run:

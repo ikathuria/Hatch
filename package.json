@@ -7,10 +7,10 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node -e \"require('fs').rmSync('.wrangler/deploy', { recursive: true, force: true })\"",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "deploy": "npm run build && wrangler deploy ./dist/_worker.js/index.js --assets ./dist"
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.1.2",
