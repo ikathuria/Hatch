@@ -3,26 +3,41 @@
 
 @layer base {
   :root {
-    color-scheme: dark only;
+    color-scheme: dark;
     /* Premium HSL Tokens */
-    --ink: 250 35% 8%;
-    --ink-muted: 245 40% 12%;
-    --cream: 38 90% 95%;
-    --lime: 72 100% 62%;
+    /* Primary (Glow) Electric Indigo + Accent (Spark) Cyber Cyan */
+    --ink: 222 47% 11%;
+    --ink-muted: 223 51% 14%;
+    --cream: 210 40% 98%;
+    --lime: 188 86% 53%;
     --coral: 0 100% 74%;
-    --sky: 197 100% 69%;
-    --violet: 255 100% 71%;
-    
-    /* Semantic Colors derived from HSL */
-    --color-ink: hsl(var(--ink));
-    --color-ink-muted: hsl(var(--ink-muted));
-    --color-cream: hsl(var(--cream));
-    --color-lime: hsl(var(--lime));
-    --color-coral: hsl(var(--coral));
-    --color-sky: hsl(var(--sky));
-    --color-violet: hsl(var(--violet));
+    --sky: 188 86% 53%;
+    --violet: 239 84% 67%;
   }
 
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --ink: 210 40% 98.04%;       /* Background: Ghost White #F8FAFC */
+    --ink-muted: 0 0% 100%;      /* Surface/Cards: Pure White #FFFFFF */
+    --cream: 217.24 32.58% 17.45%; /* Secondary/Text: Slate Blue #1E293B */
+    --lime: 243.4 75.36% 58.63%; /* Primary/The Glow: Electric Indigo #4F46E5 */
+    --sky: 226.45 100% 93.92%;  /* Accent: Soft Sky #E0E7FF */
+    --violet: 243.4 75.36% 58.63%; /* Keep violet accents aligned with glow */
+  }
+}
+
+/* Brand palette for Tailwind utilities (text-lime, bg-lime/10, …) — tracks :root / data-theme above */
+@theme inline {
+  --color-ink: hsl(var(--ink));
+  --color-ink-muted: hsl(var(--ink-muted));
+  --color-cream: hsl(var(--cream));
+  --color-lime: hsl(var(--lime));
+  --color-coral: hsl(var(--coral));
+  --color-sky: hsl(var(--sky));
+  --color-violet: hsl(var(--violet));
+}
+
+@layer base {
   * {
     box-sizing: border-box;
     cursor: default;
@@ -74,6 +89,240 @@
     pointer-events: none;
     z-index: -1;
     filter: blur(100px);
+  }
+
+  .hatch-shell {
+    position: fixed;
+    right: -6rem;
+    bottom: -8rem;
+    width: 18rem;
+    height: 18rem;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 35% 30%, hsla(var(--cream), 0.65), hsla(var(--cream), 0.25) 40%, transparent 70%),
+      radial-gradient(circle at 65% 55%, hsla(var(--lime), 0.2), transparent 65%);
+    border: 1px solid hsla(var(--cream), 0.18);
+    filter: blur(1px);
+    opacity: 0.38;
+    pointer-events: none;
+    z-index: -1;
+    transform: rotate(-16deg);
+  }
+
+  .hatch-toast {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 999;
+    max-width: 22rem;
+    border-radius: 0.9rem;
+    border: 1px solid hsla(var(--lime), 0.3);
+    background: hsla(var(--ink-muted), 0.9);
+    color: var(--color-cream);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 0.7rem 0.9rem;
+    box-shadow: 0 12px 35px -18px hsla(var(--lime), 0.7);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .hatch-toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hatch-banner {
+    position: fixed;
+    left: 50%;
+    top: 1rem;
+    transform: translateX(-50%) translateY(-8px);
+    z-index: 1001;
+    border-radius: 999px;
+    border: 1px solid hsla(var(--lime), 0.45);
+    background: linear-gradient(90deg, hsla(var(--lime), 0.95), hsla(var(--sky), 0.92));
+    color: hsl(var(--ink));
+    font-weight: 800;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 0.55rem 0.95rem;
+    opacity: 0;
+    transition: opacity 160ms ease, transform 160ms ease;
+    box-shadow: 0 12px 35px -14px hsla(var(--lime), 0.7);
+  }
+
+  .hatch-banner.is-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .hatch-flash {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1000;
+    background: radial-gradient(circle at 50% 40%, hsla(var(--lime), 0.28), transparent 58%);
+    opacity: 0;
+    display: none;
+  }
+
+  .hatch-flash.is-active {
+    animation: hatch-flash 300ms ease-out forwards;
+  }
+
+  .hatch-trigger {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 1001;
+    border-radius: 999px;
+    border: 1px solid hsla(var(--cream), 0.28);
+    background: hsla(var(--ink-muted), 0.82);
+    color: hsla(var(--cream), 0.9);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.5rem 0.75rem;
+    transition: all 170ms ease;
+    opacity: 0.75;
+  }
+
+  .hatch-trigger:hover {
+    opacity: 1;
+    border-color: hsla(var(--lime), 0.45);
+    color: hsl(var(--lime));
+    transform: translateY(-1px);
+  }
+
+  .hatch-boom {
+    position: fixed;
+    inset: 0;
+    z-index: 1002;
+    display: none;
+    place-items: center;
+    pointer-events: none;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(2.8rem, 12vw, 8rem);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: hsl(var(--lime));
+    text-shadow: 0 0 45px hsla(var(--lime), 0.9), 0 10px 45px hsla(var(--ink), 0.7);
+    opacity: 0;
+    transform: scale(0.7);
+  }
+
+  .hatch-boom.is-active {
+    animation: hatch-boom 680ms cubic-bezier(0.16, 0.84, 0.44, 1) forwards;
+  }
+
+  body.hatch-shake {
+    animation: hatch-shake 420ms ease;
+  }
+
+  @keyframes hatch-flash {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes hatch-boom {
+    0% {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    18% {
+      opacity: 1;
+      transform: scale(1.08);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.45);
+    }
+  }
+
+  @keyframes hatch-shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+    100% { transform: translateX(0); }
+  }
+
+  .hatch-confetti {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 998;
+    display: none;
+  }
+
+  .hatch-confetti .egg {
+    position: absolute;
+    top: -2rem;
+    width: 0.8rem;
+    height: 1.1rem;
+    border-radius: 50% 50% 46% 46%;
+    background: linear-gradient(180deg, hsla(var(--cream), 0.95), hsla(var(--lime), 0.6));
+    box-shadow: 0 6px 20px hsla(var(--lime), 0.35);
+    opacity: 0;
+  }
+
+  .hatch-confetti .egg:nth-child(1) { left: 8%; }
+  .hatch-confetti .egg:nth-child(2) { left: 20%; }
+  .hatch-confetti .egg:nth-child(3) { left: 31%; }
+  .hatch-confetti .egg:nth-child(4) { left: 43%; }
+  .hatch-confetti .egg:nth-child(5) { left: 56%; }
+  .hatch-confetti .egg:nth-child(6) { left: 68%; }
+  .hatch-confetti .egg:nth-child(7) { left: 79%; }
+  .hatch-confetti .egg:nth-child(8) { left: 90%; }
+
+  .hatch-confetti.is-active .egg {
+    animation: hatch-fall 1100ms cubic-bezier(0.2, 0.7, 0.25, 1) forwards;
+  }
+
+  .hatch-confetti.is-active .egg:nth-child(odd) {
+    animation-delay: 40ms;
+  }
+
+  @keyframes hatch-fall {
+    0% {
+      opacity: 0;
+      transform: translateY(-2rem) rotate(0deg) scale(0.85);
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(85vh) rotate(280deg) scale(1);
+    }
+  }
+
+  body.hatch-mode .site-glow {
+    filter: blur(90px) saturate(1.2);
+  }
+
+  body.hatch-mode .badge {
+    transform: rotate(-6deg) scale(1.06);
+    box-shadow: 0 8px 28px hsla(var(--lime), 0.55);
+  }
+
+  body.hatch-mode main {
+    animation: hatch-breathe 1.8s ease-in-out infinite alternate;
+  }
+
+  @keyframes hatch-breathe {
+    from {
+      filter: saturate(1);
+    }
+    to {
+      filter: saturate(1.14);
+    }
   }
 
   .badge {
@@ -141,6 +390,16 @@
 
   .btn-primary:active {
     transform: translateY(-2px);
+  }
+
+  /* Theme-aware success flash (replaces hardcoded #d8ff3f so text stays readable in light mode) */
+  .btn-primary.btn-primary--success,
+  .btn-primary.btn-primary--success:hover {
+    background: var(--color-lime) !important;
+    color: var(--color-ink) !important;
+    box-shadow: 0 10px 40px -10px hsla(var(--lime), 0.45);
+    filter: none;
+    transform: none;
   }
 
   .btn-ghost {
@@ -279,11 +538,49 @@
   .text-glow-lime {
     text-shadow: 0 0 20px hsla(var(--lime), 0.3);
   }
+
+  :root[data-theme="light"] .text-glow-lime {
+    text-shadow: 0 2px 14px hsla(var(--lime), 0.35);
+  }
   
   .glass-panel {
     background: hsla(var(--cream), 0.02);
     backdrop-filter: blur(20px);
     border: 1px solid hsla(var(--cream), 0.05);
     border-radius: 24px;
+  }
+
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid hsla(var(--cream), 0.18);
+    background: hsla(var(--cream), 0.04);
+    color: hsla(var(--cream), 0.8);
+    transition: all 200ms ease;
+  }
+
+  .theme-toggle:hover {
+    background: hsla(var(--cream), 0.1);
+    color: var(--color-cream);
+    border-color: hsla(var(--cream), 0.3);
+  }
+
+  /* Light theme: `text-sky` refers to Soft Sky (#E0E7FF) which is too pale for text.
+     Keep `bg-sky`/`border-sky` as accents, but make `text-sky` readable. */
+  :root[data-theme="light"] .text-sky {
+    color: var(--color-cream) !important;
+  }
+  :root[data-theme="light"] .\!text-sky {
+    color: var(--color-cream) !important;
+  }
+  :root[data-theme="light"] .text-sky\/60 {
+    color: var(--color-cream) !important;
+  }
+  :root[data-theme="light"] .group:hover .group-hover\:text-sky {
+    color: var(--color-cream) !important;
   }
 }

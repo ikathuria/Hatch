@@ -39,7 +39,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           </div>
         </form>
 
-        <div class="pt-8 border-t border-white/5 text-center">
+        <div class="pt-8 border-t border-cream/10 text-center">
             <p class="text-sm text-cream/40">
                 Already registered? 
                 <a class="text-lime font-bold hover:underline ml-1" href="/organizer/login">Return to portal &rarr;</a>
@@ -78,12 +78,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           throw new Error(result.error || "Origination failed.");
         }
         submitBtn.textContent = "Account Active";
-        submitBtn.style.background = "#d8ff3f";
+        submitBtn.classList.add("btn-primary--success");
         setTimeout(() => {
             window.location.href = "/organizer/dashboard";
         }, 500);
       } catch (error) {
         submitBtn.disabled = false;
+        submitBtn.classList.remove("btn-primary--success");
         submitBtn.textContent = originalText;
         status.textContent = error.message;
         status.classList.remove("hidden");

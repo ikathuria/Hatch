@@ -12,6 +12,47 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       </p>
     </div>
 
+    <div class="card !p-6 md:!p-8 space-y-6">
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <label class="space-y-2">
+          <span class="text-xs uppercase tracking-widest text-cream/45">Search</span>
+          <input
+            class="input-field !py-3 !px-4 !text-sm"
+            type="search"
+            placeholder="Title, tagline, location..."
+            data-events-search
+          />
+        </label>
+        <label class="space-y-2">
+          <span class="text-xs uppercase tracking-widest text-cream/45">Mode</span>
+          <select class="input-field !py-3 !px-4 !text-sm" data-events-mode>
+            <option value="">All modes</option>
+          </select>
+        </label>
+        <label class="space-y-2">
+          <span class="text-xs uppercase tracking-widest text-cream/45">Timeline</span>
+          <select class="input-field !py-3 !px-4 !text-sm" data-events-status>
+            <option value="">All timelines</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="live">Live now</option>
+            <option value="past">Past</option>
+          </select>
+        </label>
+        <label class="space-y-2">
+          <span class="text-xs uppercase tracking-widest text-cream/45">Sort</span>
+          <select class="input-field !py-3 !px-4 !text-sm" data-events-sort>
+            <option value="soonest">Start date (soonest)</option>
+            <option value="latest">Start date (latest)</option>
+            <option value="title">Title (A-Z)</option>
+          </select>
+        </label>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-widest">
+        <span class="text-cream/40" data-events-count></span>
+        <button class="btn-ghost !px-4 !py-2 !text-xs" type="button" data-events-reset>Reset filters</button>
+      </div>
+    </div>
+
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-events-grid>
       <div class="card !p-10 text-cream/35 italic border-dashed col-span-full">
         Loading events...
@@ -21,6 +62,15 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
   <script>
     const grid = document.querySelector("[data-events-grid]");
+    const searchInput = document.querySelector("[data-events-search]");
+    const modeSelect = document.querySelector("[data-events-mode]");
+    const statusSelect = document.querySelector("[data-events-status]");
+    const sortSelect = document.querySelector("[data-events-sort]");
+    const countEl = document.querySelector("[data-events-count]");
+    const resetBtn = document.querySelector("[data-events-reset]");
+    const state = {
+      events: []
+    };
 
     const escapeHtml = (value) =>
       String(value ?? "")
@@ -41,12 +91,72 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }).format(date);
     };
 
+    const toDateValue = (value) => {
+      const date = new Date(value);
+      const time = date.getTime();
+      return Number.isNaN(time) ? null : time;
+    };
+
+    const classifyTimeline = (event) => {
+      const now = Date.now();
+      const start = toDateValue(event.startDate);
+      const end = toDateValue(event.endDate);
+      if (start !== null && now < start) return "upcoming";
+      if (start !== null && end !== null && now >= start && now <= end) return "live";
+      if (end !== null && now > end) return "past";
+      if (start !== null && end === null) return now >= start ? "live" : "upcoming";
+      return "";
+    };
+
+    const getFilteredEvents = () => {
+      const search = String(searchInput?.value || "").trim().toLowerCase();
+      const mode = String(modeSelect?.value || "").trim().toLowerCase();
+      const status = String(statusSelect?.value || "").trim();
+      const sort = String(sortSelect?.value || "soonest");
+
+      let items = [...state.events];
+      if (search) {
+        items = items.filter((event) => {
+          const haystack = [event.title, event.tagline, event.location, event.organizationName]
+            .map((value) => String(value || "").toLowerCase())
+            .join(" ");
+          return haystack.includes(search);
+        });
+      }
+      if (mode) {
+        items = items.filter((event) => String(event.mode || "").toLowerCase() === mode);
+      }
+      if (status) {
+        items = items.filter((event) => classifyTimeline(event) === status);
+      }
+
+      items.sort((a, b) => {
+        if (sort === "title") {
+          return String(a.title || "").localeCompare(String(b.title || ""), undefined, {
+            sensitivity: "base"
+          });
+        }
+        const aStart = toDateValue(a.startDate);
+        const bStart = toDateValue(b.startDate);
+        const fallbackA = aStart === null ? Number.MAX_SAFE_INTEGER : aStart;
+        const fallbackB = bStart === null ? Number.MAX_SAFE_INTEGER : bStart;
+        if (sort === "latest") return fallbackB - fallbackA;
+        return fallbackA - fallbackB;
+      });
+
+      return items;
+    };
+
     const renderEvents = (events) => {
       if (!grid) return;
+      if (countEl) {
+        const total = state.events.length;
+        countEl.textContent = `${events.length} of ${total} event${total === 1 ? "" : "s"} shown`;
+      }
       if (!Array.isArray(events) || events.length === 0) {
         grid.innerHTML = `
           <div class="card !p-10 text-cream/35 italic border-dashed col-span-full">
-            No published events yet. Check back soon.
+            No events match this filter yet.
           </div>
         `;
         return;
@@ -85,13 +195,31 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         .join("");
     };
 
+    const populateModeFilter = (events) => {
+      if (!modeSelect) return;
+      const selected = String(modeSelect.value || "");
+      const uniqueModes = [...new Set(events.map((event) => String(event.mode || "").trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+      modeSelect.innerHTML = `
+        <option value="">All modes</option>
+        ${uniqueModes.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}
+      `;
+      modeSelect.value = uniqueModes.includes(selected) ? selected : "";
+    };
+
+    const rerender = () => {
+      renderEvents(getFilteredEvents());
+    };
+
     const loadEvents = async () => {
       if (!grid) return;
       try {
         const response = await fetch("/api/events");
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(payload.error || "Unable to load events.");
-        renderEvents(payload.events || []);
+        state.events = Array.isArray(payload.events) ? payload.events : [];
+        populateModeFilter(state.events);
+        rerender();
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to load events.";
         grid.innerHTML = `
@@ -101,6 +229,18 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         `;
       }
     };
+
+    searchInput?.addEventListener("input", rerender);
+    modeSelect?.addEventListener("change", rerender);
+    statusSelect?.addEventListener("change", rerender);
+    sortSelect?.addEventListener("change", rerender);
+    resetBtn?.addEventListener("click", () => {
+      if (searchInput) searchInput.value = "";
+      if (modeSelect) modeSelect.value = "";
+      if (statusSelect) statusSelect.value = "";
+      if (sortSelect) sortSelect.value = "soonest";
+      rerender();
+    });
 
     loadEvents();
   </script>

@@ -1,5 +1,9 @@
 ---
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import EventJudgingPanel from "../../../../components/organizer/EventJudgingPanel.astro";
+
+const rawEditorId = Astro.params.id;
+const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId) : "";
 ---
 
 <BaseLayout title="Manage Event | Hatch">
@@ -8,43 +12,76 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
       <div class="space-y-4">
         <div class="flex items-center gap-3">
-            <a href="/organizer/dashboard" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <a href="/organizer/dashboard" class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             </a>
-            <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Mission Control</span>
+            <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">The Hatchery</span>
         </div>
         <h1 class="text-4xl md:text-5xl font-bold tracking-tighter" data-event-title>Loading Event...</h1>
-        <p class="text-cream/50 max-w-2xl leading-relaxed" data-page-subtitle>Update your event's configuration in real-time. All changes synchronize instantly with the global grid once saved.</p>
+        <p class="text-cream/50 max-w-2xl leading-relaxed" data-page-subtitle>Tune your event details in real-time. Updates sync to your public event nest when saved.</p>
       </div>
       <div class="flex items-center gap-4">
-          <a class="btn-ghost !px-6" data-judging-link data-existing-only href="#">
-             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2 opacity-60"><path d="M12 2l3 7h7l-5.5 4.1 2.1 6.9L12 16l-6.6 4 2.1-6.9L2 9h7z"/></svg>
-             Judging
-          </a>
           <a class="btn-ghost !px-6" data-public-link href="#" target="_blank">
              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2 opacity-60"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
              Live View
           </a>
           <span class="status-pill hidden !bg-transparent !border-none !p-0" data-status></span>
-          <button class="btn-primary !px-10" id="save-btn-top">Save Mission</button>
+          <button class="btn-primary !px-10" id="save-btn-top">Save Changes</button>
       </div>
     </div>
 
     <form class="space-y-12" data-event-form>
+      <div class="card !p-0 overflow-hidden border-cream/10 bg-cream/[0.02]" data-tabs>
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-cream/10 px-5 py-4">
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="status-pill !text-[10px] !py-1 !px-3 !uppercase !tracking-[0.2em] !bg-coral/10 !text-coral !border-coral/20" data-editor-status>
+              Draft
+            </span>
+            <span class="text-xs uppercase tracking-widest text-cream/45" data-editor-health>Checking sections...</span>
+          </div>
+          <div class="text-[11px] uppercase tracking-widest text-cream/40">
+            <span class="inline-flex items-center gap-2">
+              <span class="h-2 w-2 rounded-full bg-coral" aria-hidden="true"></span>
+              red dot = needs work
+            </span>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2 px-4 py-3">
+          <button class="btn-ghost !px-4 !py-2 !text-xs uppercase tracking-widest" type="button" data-tab-btn data-tab-id="core">
+            <span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-coral/90" data-tab-dot data-tab-dot-id="core"></span>Core</span>
+          </button>
+          <button class="btn-ghost !px-4 !py-2 !text-xs uppercase tracking-widest" type="button" data-tab-btn data-tab-id="logistics">
+            <span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-coral/90" data-tab-dot data-tab-dot-id="logistics"></span>Logistics</span>
+          </button>
+          <button class="btn-ghost !px-4 !py-2 !text-xs uppercase tracking-widest" type="button" data-tab-btn data-tab-id="tracks">
+            <span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-coral/90" data-tab-dot data-tab-dot-id="tracks"></span>Tracks</span>
+          </button>
+          <button class="btn-ghost !px-4 !py-2 !text-xs uppercase tracking-widest" type="button" data-tab-btn data-tab-id="faq">
+            <span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-coral/90" data-tab-dot data-tab-dot-id="faq"></span>FAQ</span>
+          </button>
+          <button class="btn-ghost !px-4 !py-2 !text-xs uppercase tracking-widest" type="button" data-tab-btn data-tab-id="judging" data-existing-only>
+            <span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-coral/90" data-tab-dot data-tab-dot-id="judging"></span>Judging</span>
+          </button>
+          <button class="btn-ghost !px-4 !py-2 !text-xs uppercase tracking-widest" type="button" data-tab-btn data-tab-id="exports">
+            <span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-coral/90" data-tab-dot data-tab-dot-id="exports"></span>Exports</span>
+          </button>
+        </div>
+      </div>
+
       {/* 1. Core Identity */}
-      <section class="space-y-8" data-existing-only>
+      <section class="space-y-8" data-tab-section data-tab-id="core">
         <div class="flex items-center gap-4 mb-2">
             <span class="w-8 h-8 rounded-lg bg-violet/10 text-violet flex items-center justify-center font-bold text-xs border border-violet/20">01</span>
             <h2 class="text-2xl font-bold tracking-tight">Core Identity</h2>
         </div>
-        <div class="card !p-10 grid md:grid-cols-2 gap-10 border-white/5 bg-white/[0.02]">
+        <div class="card !p-10 grid md:grid-cols-2 gap-10 border-cream/10 bg-cream/[0.02]">
             <div class="space-y-6">
                 <div class="space-y-2">
-                    <label class="form-label">Event Title</label>
+                    <label class="form-label">Event Title *</label>
                     <input class="input-field" name="title" required placeholder="Technosphere 2026" />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">Global Slug</label>
+                    <label class="form-label">Global Slug *</label>
                     <input class="input-field" name="slug" required placeholder="technosphere-2026" />
                 </div>
                 <div class="space-y-2">
@@ -71,7 +108,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
                   HTTPS link or upload (JPEG, PNG, WebP, GIF, max 5&nbsp;MB). Shown on the public event page.
                 </p>
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <label class="inline-flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.04] px-5 py-3 text-sm font-medium text-cream/80 transition-colors hover:border-lime/35 hover:bg-white/[0.07]">
+                  <label class="inline-flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-cream/20 bg-cream/[0.04] px-5 py-3 text-sm font-medium text-cream/80 transition-colors hover:border-lime/35 hover:bg-cream/[0.07]">
                     <input
                       type="file"
                       class="sr-only"
@@ -87,19 +124,19 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
       </section>
 
       {/* 2. Logistics & Parameters */}
-      <section class="space-y-8">
+      <section class="space-y-8" data-tab-section data-tab-id="logistics">
         <div class="flex items-center gap-4 mb-2">
             <span class="w-8 h-8 rounded-lg bg-sky/10 text-sky flex items-center justify-center font-bold text-xs border border-sky/20">02</span>
             <h2 class="text-2xl font-bold tracking-tight">Logistics & Parameters</h2>
         </div>
-        <div class="card !p-10 grid md:grid-cols-2 lg:grid-cols-3 gap-10 border-white/5 bg-white/[0.02]">
+        <div class="card !p-10 grid md:grid-cols-2 lg:grid-cols-3 gap-10 border-cream/10 bg-cream/[0.02]">
             <div class="space-y-6">
                 <div class="space-y-2">
-                    <label class="form-label">Start Horizon</label>
+                    <label class="form-label">Start Horizon *</label>
                     <input class="input-field" name="startDate" type="datetime-local" required />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">End Horizon</label>
+                    <label class="form-label">End Horizon *</label>
                     <input class="input-field" name="endDate" type="datetime-local" required />
                 </div>
             </div>
@@ -149,7 +186,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
                 <div class="space-y-3 pt-8">
                     <p class="form-label text-center">Publish Status</p>
                     <label class="mx-auto inline-flex cursor-pointer items-center gap-3 select-none" for="isPublishedSwitch">
-                        <span class="relative inline-flex h-7 w-12 items-center rounded-full border border-white/10 bg-white/5 transition-colors hover:border-lime/30">
+                        <span class="relative inline-flex h-7 w-12 items-center rounded-full border border-cream/10 bg-cream/5 transition-colors hover:border-lime/30">
                             <input
                               id="isPublishedSwitch"
                               type="checkbox"
@@ -166,7 +203,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
       </section>
 
       {/* 3. Specialized Tracks */}
-      <section class="space-y-8" data-existing-only>
+      <section class="space-y-8" data-tab-section data-tab-id="tracks">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <span class="w-8 h-8 rounded-lg bg-lime/10 text-lime flex items-center justify-center font-bold text-xs border border-lime/20">03</span>
@@ -180,7 +217,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
       </section>
 
       {/* 4. Knowledge Base (FAQ) */}
-      <section class="space-y-8">
+      <section class="space-y-8" data-tab-section data-tab-id="faq">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <span class="w-8 h-8 rounded-lg bg-coral/10 text-coral flex items-center justify-center font-bold text-xs border border-coral/20">04</span>
@@ -193,14 +230,25 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
         <div class="grid gap-4" data-faqs></div>
       </section>
 
+      {/* Judging workspace (full panel; only rendered for existing events) */}
+      {editorEventId ? (
+        <section class="space-y-8" data-existing-only data-tab-section data-tab-id="judging">
+          <div class="flex items-center gap-4 mb-2">
+            <span class="w-8 h-8 rounded-lg bg-violet/10 text-violet flex items-center justify-center font-bold text-xs border border-violet/20">05</span>
+            <h2 class="text-2xl font-bold tracking-tight">Judging</h2>
+          </div>
+          <EventJudgingPanel eventId={editorEventId} />
+        </section>
+      ) : null}
+
       {/* 5. Data Export */}
-      <section class="space-y-8">
+      <section class="space-y-8" data-existing-only data-tab-section data-tab-id="exports">
         <div class="flex items-center gap-4 mb-2">
-            <span class="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center font-bold text-xs border border-white/20">05</span>
+            <span class="w-8 h-8 rounded-lg bg-cream/10 text-cream flex items-center justify-center font-bold text-xs border border-cream/20">06</span>
             <h2 class="text-2xl font-bold tracking-tight">Data Integrity</h2>
         </div>
         <div class="grid md:grid-cols-2 gap-8">
-            <div class="card !p-10 border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all">
+            <div class="card !p-10 border-cream/10 bg-cream/[0.01] hover:bg-cream/[0.03] transition-all">
                 <div class="flex justify-between items-start mb-6">
                     <h3 class="text-xl font-bold">Applications</h3>
                     <div class="w-10 h-10 rounded-full bg-sky/10 flex items-center justify-center text-sky">
@@ -211,7 +259,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
                 <a class="btn-ghost !w-full justify-center !py-4 text-xs font-bold uppercase tracking-widest" data-applications-link href="#">Fetch .CSV Dataset</a>
             </div>
 
-            <div class="card !p-10 border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all">
+            <div class="card !p-10 border-cream/10 bg-cream/[0.01] hover:bg-cream/[0.03] transition-all">
                 <div class="flex justify-between items-start mb-6">
                     <h3 class="text-xl font-bold">Submissions</h3>
                     <div class="w-10 h-10 rounded-full bg-violet/10 flex items-center justify-center text-violet">
@@ -242,11 +290,15 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
     const addTrack = document.querySelector("[data-add-track]");
     const addFaq = document.querySelector("[data-add-faq]");
     const publicLink = document.querySelector("[data-public-link]");
-    const judgingLink = document.querySelector("[data-judging-link]");
     const applicationsLink = document.querySelector("[data-applications-link]");
     const submissionsLink = document.querySelector("[data-submissions-link]");
     const topSaveBtn = document.querySelector("#save-btn-top");
     const existingOnlyEls = document.querySelectorAll("[data-existing-only]");
+    const tabButtons = Array.from(document.querySelectorAll("[data-tab-btn]"));
+    const tabSections = Array.from(document.querySelectorAll("[data-tab-section]"));
+    const tabDots = Array.from(document.querySelectorAll("[data-tab-dot]"));
+    const editorHealth = document.querySelector("[data-editor-health]");
+    const editorStatus = document.querySelector("[data-editor-status]");
 
     const editBannerUrl = form?.querySelector("[data-edit-banner-url]");
     const editBannerFile = form?.querySelector("[data-edit-banner-file]");
@@ -255,8 +307,8 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
     const titleInput = form?.querySelector("input[name='title']");
     const slugInput = form?.querySelector("input[name='slug']");
 
-    const defaultTopLabel = isCreateMode ? "Create Mission" : "Save Mission";
-    const defaultSubmitLabel = isCreateMode ? "Create Mission" : "Persist Mission Changes";
+    const defaultTopLabel = isCreateMode ? "Create Event" : "Save Changes";
+    const defaultSubmitLabel = isCreateMode ? "Create Event" : "Save Event Changes";
     const submitBtn = form?.querySelector("[data-hidden-submit]");
     let currentOrganizerId = "";
 
@@ -314,6 +366,98 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
       publicLink.classList.remove("pointer-events-none", "opacity-50");
     };
 
+    const getAvailableSections = () =>
+      tabSections.filter((section) => !(isCreateMode && section.hasAttribute("data-existing-only")));
+
+    const activateTab = (tabId) => {
+      const availableSections = getAvailableSections();
+      if (!availableSections.length) return;
+      const nextTabId = availableSections.some((section) => section.getAttribute("data-tab-id") === tabId)
+        ? tabId
+        : availableSections[0].getAttribute("data-tab-id");
+
+      tabSections.forEach((section) => {
+        const isAvailable = availableSections.includes(section);
+        const matches = section.getAttribute("data-tab-id") === nextTabId;
+        section.classList.toggle("hidden", !isAvailable || !matches);
+      });
+
+      tabButtons.forEach((button) => {
+        const thisTabId = button.getAttribute("data-tab-id");
+        const isVisibleTab = availableSections.some(
+          (section) => section.getAttribute("data-tab-id") === thisTabId
+        );
+        button.classList.toggle("hidden", !isVisibleTab);
+        const isActive = isVisibleTab && thisTabId === nextTabId;
+        button.classList.toggle("!bg-lime", isActive);
+        button.classList.toggle("!text-ink", isActive);
+        button.classList.toggle("!border-lime", isActive);
+        button.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+    };
+
+    const sectionChecks = {
+      core: () => {
+        const title = String(form?.title?.value || "").trim();
+        const slug = String(form?.slug?.value || "").trim();
+        return Boolean(title && slug);
+      },
+      logistics: () => {
+        const start = String(form?.startDate?.value || "").trim();
+        const end = String(form?.endDate?.value || "").trim();
+        return Boolean(start && end);
+      },
+      tracks: () => true,
+      faq: () => true,
+      judging: () => true,
+      exports: () => true
+    };
+
+    const refreshSectionHealth = () => {
+      const availableSectionIds = getAvailableSections()
+        .map((section) => section.getAttribute("data-tab-id"))
+        .filter(Boolean);
+
+      let needsWorkCount = 0;
+      tabDots.forEach((dot) => {
+        const id = dot.getAttribute("data-tab-dot-id");
+        const isAvailable = availableSectionIds.includes(id);
+        dot.classList.toggle("hidden", !isAvailable);
+        if (!isAvailable) return;
+        const passed = sectionChecks[id]?.() ?? true;
+        dot.classList.toggle("bg-coral", !passed);
+        dot.classList.toggle("bg-lime", passed);
+        if (!passed) needsWorkCount += 1;
+      });
+
+      if (editorHealth) {
+        editorHealth.textContent =
+          needsWorkCount > 0
+            ? `${needsWorkCount} section${needsWorkCount === 1 ? "" : "s"} still need work`
+            : "All core sections look ready";
+      }
+      if (editorStatus) {
+        editorStatus.textContent = needsWorkCount > 0 ? "Draft" : "Ready";
+        editorStatus.classList.toggle("!bg-coral/10", needsWorkCount > 0);
+        editorStatus.classList.toggle("!text-coral", needsWorkCount > 0);
+        editorStatus.classList.toggle("!border-coral/20", needsWorkCount > 0);
+        editorStatus.classList.toggle("!bg-lime/10", needsWorkCount === 0);
+        editorStatus.classList.toggle("!text-lime", needsWorkCount === 0);
+        editorStatus.classList.toggle("!border-lime/20", needsWorkCount === 0);
+      }
+    };
+
+    tabButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const tabId = button.getAttribute("data-tab-id");
+        if (!tabId) return;
+        activateTab(tabId);
+      });
+    });
+
+    form?.addEventListener("input", refreshSectionHealth);
+    form?.addEventListener("change", refreshSectionHealth);
+
     topSaveBtn?.addEventListener("click", () => {
       form?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
     });
@@ -363,7 +507,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
                 <textarea class="input-field !h-[calc(100%-2rem)]" name="trackDescription" rows="3" placeholder="Define the goals of this specific track...">${data.description || ""}</textarea>
              </div>
           </div>
-          <button class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-coral/20 hover:text-coral transition-all" type="button" data-remove>
+          <button class="w-10 h-10 rounded-full bg-cream/5 flex items-center justify-center hover:bg-coral/20 hover:text-coral transition-all" type="button" data-remove>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         `;
@@ -381,7 +525,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
                 <textarea class="input-field" name="faqAnswer" rows="2" placeholder="Provide clarity on the subject...">${data.answer || ""}</textarea>
              </div>
           </div>
-          <button class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-coral/20 hover:text-coral transition-all" type="button" data-remove>
+          <button class="w-10 h-10 rounded-full bg-cream/5 flex items-center justify-center hover:bg-coral/20 hover:text-coral transition-all" type="button" data-remove>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         `;
@@ -473,7 +617,6 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
         }
 
         setPublicLink(event.slug);
-        if (judgingLink) judgingLink.href = `/organizer/events/${eventId}/judging`;
         if (applicationsLink) applicationsLink.href = `/api/organizer/events/${eventId}/applications.csv`;
         if (submissionsLink) submissionsLink.href = `/api/organizer/events/${eventId}/submissions.csv`;
 
@@ -486,8 +629,9 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
         (payload.faqs || []).forEach((faq) => {
           faqsContainer.appendChild(buildRow("faq", faq));
         });
+        refreshSectionHealth();
       } catch (error) {
-        setStatus("Signal failure: " + (error instanceof Error ? error.message : "Unable to load event."), true);
+        setStatus("Unable to load event: " + (error instanceof Error ? error.message : "Unknown error."), true);
       }
     };
 
@@ -577,35 +721,47 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
           throw new Error(result.error || "Persistence failed.");
         }
 
-        submitBtn.textContent = "Success";
-        submitBtn.style.background = "#d8ff3f";
+        submitBtn.textContent = "Saved";
+        submitBtn.classList.add("btn-primary--success");
         if (topSaveBtn) topSaveBtn.textContent = "Saved";
 
         if (titleEl) titleEl.textContent = result.event.title;
         setPublicLink(result.event.slug);
-        if (judgingLink) judgingLink.href = `/organizer/events/${eventId}/judging`;
 
         setTimeout(() => {
-          submitBtn.style.background = "";
+          submitBtn.classList.remove("btn-primary--success");
           setButtonsState(false, defaultTopLabel, defaultSubmitLabel);
         }, 1600);
       } catch (error) {
-        setButtonsState(false, defaultTopLabel, isCreateMode ? "Create Mission" : "Retry Persistence");
+        submitBtn?.classList.remove("btn-primary--success");
+        setButtonsState(false, defaultTopLabel, isCreateMode ? "Create Event" : "Retry Save");
         setStatus(error instanceof Error ? error.message : "Unable to save event.", true);
       }
     });
 
     if (isCreateMode) {
       if (titleEl) titleEl.textContent = "Create Event";
-      if (subtitleEl) subtitleEl.textContent = "Use the same mission-control workflow to launch a brand-new event. You can tune every detail before publishing.";
+      if (subtitleEl) subtitleEl.textContent = "Set up a brand-new event, then fine-tune details before you publish.";
       existingOnlyEls.forEach((el) => el.classList.add("hidden"));
       setButtonsState(false, defaultTopLabel, defaultSubmitLabel);
       if (form?.mode) form.mode.value = "Hybrid";
       setPublicLink(form?.slug?.value || "");
+      activateTab("core");
+      refreshSectionHealth();
     } else {
       setButtonsState(false, defaultTopLabel, defaultSubmitLabel);
+      activateTab("core");
       loadEvent();
     }
   </script>
 
+  <script>
+    import { initJudgingWorkspace } from "../../../../lib/client/judging-workspace";
+
+    const judgingRoot = document.querySelector("[data-judging-root]");
+    const judgingEventId = judgingRoot?.getAttribute("data-judging-event-id")?.trim() || "";
+    if (judgingRoot && judgingEventId) {
+      initJudgingWorkspace(judgingRoot, judgingEventId);
+    }
+  </script>
 </BaseLayout>

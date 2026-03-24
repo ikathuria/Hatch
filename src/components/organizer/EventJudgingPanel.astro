@@ -1,0 +1,205 @@
+---
+interface Props {
+  eventId: string;
+  /** Show link to standalone /judging page (hide when already on that page). */
+  showStandaloneLink?: boolean;
+}
+const { eventId, showStandaloneLink = true } = Astro.props;
+const id = (suffix: string) => `judging-${eventId}-${suffix}`;
+---
+
+<div class="judging-workspace space-y-8" data-judging-root data-judging-event-id={eventId}>
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="card !p-5">
+      <p class="text-xs font-bold uppercase tracking-widest text-cream/35 mb-2">Rubric</p>
+      <p class="text-2xl font-bold" data-stat-criteria>0</p>
+      <p class="text-sm text-cream/45 mt-1">Criteria configured</p>
+    </div>
+    <div class="card !p-5">
+      <p class="text-xs font-bold uppercase tracking-widest text-cream/35 mb-2">Judge links</p>
+      <p class="text-2xl font-bold" data-stat-judge-links>0</p>
+      <p class="text-sm text-cream/45 mt-1">Active or revoked</p>
+    </div>
+    <div class="card !p-5">
+      <p class="text-xs font-bold uppercase tracking-widest text-cream/35 mb-2">Tie warnings</p>
+      <p class="text-2xl font-bold" data-stat-ties>0</p>
+      <p class="text-sm text-cream/45 mt-1">Need review</p>
+    </div>
+    <div class="card !p-5">
+      <p class="text-xs font-bold uppercase tracking-widest text-cream/35 mb-2">Results</p>
+      <p class="text-2xl font-bold" data-stat-results>Draft</p>
+      <p class="text-sm text-cream/45 mt-1">Reveal state</p>
+    </div>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+    <section class="card !p-6 md:!p-8 space-y-6">
+      <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Rubric builder</span>
+          <h3 class="text-2xl font-bold tracking-tight mt-3">Custom scoring</h3>
+        </div>
+        <div class="flex items-center gap-3">
+          <label class="text-xs font-bold uppercase tracking-widest text-cream/40" for={id("score-scale")}>Score scale</label>
+          <select class="input-field !w-auto !py-3 !px-4" id={id("score-scale")} data-score-scale>
+            <option value="5">1-5</option>
+            <option value="10" selected>1-10</option>
+            <option value="20">1-20</option>
+            <option value="100">1-100</option>
+          </select>
+        </div>
+      </div>
+
+      <form class="space-y-4" data-rubric-form>
+        <div class="space-y-4" data-rubric-rows></div>
+        <div class="flex flex-col gap-4 pt-2 md:flex-row md:items-center md:justify-between">
+          <button class="btn-ghost !px-5 !py-3 !text-sm" type="button" data-add-criterion>+ Add criterion</button>
+          <div class="flex items-center gap-4">
+            <span class="status-pill hidden !bg-transparent !border-none !p-0" data-rubric-status></span>
+            <button class="btn-primary !px-6" type="submit">Save rubric</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="card !p-6 md:!p-8 space-y-6">
+      <div class="space-y-2">
+        <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Judge access</span>
+        <h3 class="text-2xl font-bold tracking-tight mt-3">Shared links</h3>
+        <p class="text-sm text-cream/50 leading-relaxed">
+          Revocable links, optional PIN, expiry.
+        </p>
+      </div>
+
+      <form class="space-y-4" data-judge-link-form>
+        <div class="space-y-2">
+          <label class="form-label" for={id("judge-label")}>Label</label>
+          <input class="input-field" id={id("judge-label")} name="label" placeholder="Design judge / sponsor reviewer" />
+        </div>
+        <div class="space-y-2">
+          <label class="form-label" for={id("judge-expires")}>Expires at</label>
+          <input class="input-field" id={id("judge-expires")} name="expiresAt" type="datetime-local" required />
+        </div>
+        <div class="space-y-2">
+          <label class="form-label" for={id("judge-pin")}>Optional PIN</label>
+          <input class="input-field" id={id("judge-pin")} name="pin" type="text" inputmode="numeric" autocomplete="off" placeholder="1234" />
+        </div>
+        <div class="flex items-center justify-between gap-4">
+          <span class="status-pill hidden !bg-transparent !border-none !p-0" data-link-status></span>
+          <button class="btn-primary !px-6" type="submit">Generate link</button>
+        </div>
+      </form>
+
+      <div class="hidden space-y-3 rounded-2xl border border-lime/20 bg-lime/5 p-4" data-generated-link-wrap>
+        <p class="text-xs font-bold uppercase tracking-widest text-lime">New judge link</p>
+        <div class="flex flex-col gap-3 md:flex-row md:items-center">
+          <input class="input-field flex-1 font-mono text-xs" readonly data-generated-link />
+          <button class="btn-ghost !px-4 !py-3 !text-sm" type="button" data-copy-link>Copy</button>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold uppercase tracking-widest text-cream/40">Existing links</h4>
+        <div class="space-y-3" data-judge-links>
+          <div class="text-sm text-cream/35 italic">No judge links loaded yet.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card !p-6 md:!p-8 space-y-4">
+    <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <div>
+        <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Scoreboard</span>
+        <h3 class="text-2xl font-bold tracking-tight mt-3">Ranked submissions</h3>
+      </div>
+      <span class="status-pill hidden" data-overview-status></span>
+    </div>
+    <div class="overflow-x-auto -mx-2 px-2">
+      <table class="min-w-full text-left text-sm">
+        <thead class="text-xs uppercase tracking-widest text-cream/35">
+          <tr>
+            <th class="pb-3 pr-3">Rank</th>
+            <th class="pb-3 pr-3">Project</th>
+            <th class="pb-3 pr-3">Track</th>
+            <th class="pb-3 pr-3">Team</th>
+            <th class="pb-3 pr-3">Score</th>
+            <th class="pb-3 pr-3">Votes</th>
+            <th class="pb-3">Status</th>
+          </tr>
+        </thead>
+        <tbody class="align-top divide-y divide-cream/5" data-overview-rows>
+          <tr>
+            <td colspan="7" class="py-6 text-cream/35 italic">Waiting for judging data…</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid gap-6 xl:grid-cols-2">
+    <section class="card !p-6 md:!p-8 space-y-4">
+      <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <span class="eyebrow !text-coral !bg-coral/10 !border-coral/20">Tie breaks</span>
+          <h3 class="text-2xl font-bold tracking-tight mt-3">Manual resolution</h3>
+        </div>
+        <span class="status-pill hidden" data-tie-status></span>
+      </div>
+      <div class="space-y-4" data-tie-breaks>
+        <div class="text-sm text-cream/35 italic">No unresolved ties yet.</div>
+      </div>
+    </section>
+
+    <section class="card !p-6 md:!p-8 space-y-4">
+      <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Winners</span>
+          <h3 class="text-2xl font-bold tracking-tight mt-3">Publishable results</h3>
+        </div>
+        <span class="status-pill hidden" data-winner-status></span>
+      </div>
+
+      <form class="space-y-5" data-winners-form>
+        <div class="space-y-2">
+          <label class="form-label" for={id("overall-winner")}>Overall winner</label>
+          <select class="input-field" id={id("overall-winner")} name="overallWinnerId" data-overall-winner>
+            <option value="">Select a submission</option>
+          </select>
+        </div>
+        <div class="space-y-4" data-track-winners>
+          <div class="text-sm text-cream/35 italic">Track winner selectors appear when tracks load.</div>
+        </div>
+        <div class="space-y-2">
+          <label class="form-label" for={id("winner-notes")}>Tie-break notes</label>
+          <textarea
+            class="input-field"
+            id={id("winner-notes")}
+            name="notes"
+            rows="4"
+            placeholder="Record any manual tie-break rationale before publishing."
+          ></textarea>
+        </div>
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <p class="text-sm text-cream/40">Select winners before publishing results.</p>
+          <button class="btn-primary !px-6" type="submit">Save winners</button>
+        </div>
+      </form>
+    </section>
+  </section>
+
+  <div class="flex justify-end">
+    <button class="btn-primary !px-6 !py-2.5 !text-xs" type="button" data-publish-results>
+      Publish results
+    </button>
+  </div>
+
+  {showStandaloneLink && (
+    <p class="text-center text-xs text-cream/35">
+      <a class="text-lime font-semibold hover:underline" href={`/organizer/events/${eventId}/judging`}>
+        Open full-page judging
+      </a>
+      · same data, more room
+    </p>
+  )}
+</div>

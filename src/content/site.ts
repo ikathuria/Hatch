@@ -1,12 +1,12 @@
 export const site = {
   brand: {
     name: "Hatch",
-    byline: "Launch hackathons without the overhead."
+    byline: "Incubate your next hackathon, then let it hatch."
   },
   hero: {
-    title: "Host a hackathon in days, not weeks.",
+    title: "Build a nest for your next hackathon.",
     description:
-      "Hatch gives organizers a clean event hub, registration pipeline, and submission flow — all on a free stack.",
+      "Hatch gives organizers a playful event home, smooth registration flow, and judging-ready submissions on a free stack.",
     primaryCta: {
       label: "Create an event",
       href: "/organizer/signup"
@@ -25,7 +25,7 @@ export const site = {
   features: [
     {
       title: "Self-serve organizer onboarding",
-      description: "Create an account, launch an event, and publish in minutes."
+      description: "Create an account, hatch an event, and publish in minutes."
     },
     {
       title: "Custom branded event pages",

@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const token = Astro.params.token ? String(Astro.params.token) : '';
@@ -16,7 +16,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
           </p>
         </div>
 
-        <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-5 space-y-3">
+        <div class="rounded-3xl border border-cream/10 bg-cream/[0.03] p-5 space-y-3">
           <p class="text-xs uppercase tracking-widest text-cream/35 font-bold">Token</p>
           <p class="font-mono text-xs break-all text-cream/80" data-token-display>{token || 'Missing token'}</p>
         </div>
@@ -33,7 +33,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
         </form>
 
         <div class="status-pill hidden !bg-transparent !border-none !p-0" data-login-status></div>
-        <div class="rounded-3xl border border-white/10 bg-sky/5 p-5 hidden" data-lock-banner>
+        <div class="rounded-3xl border border-cream/10 bg-sky/5 p-5 hidden" data-lock-banner>
           <p class="text-xs uppercase tracking-widest font-bold text-sky mb-2">Access state</p>
           <p class="text-sm text-cream/70 leading-relaxed" data-lock-message></p>
         </div>
@@ -50,15 +50,15 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
             <span class="status-pill hidden" data-workspace-status></span>
           </div>
           <div class="grid gap-4 md:grid-cols-3">
-            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div class="rounded-2xl border border-cream/10 bg-cream/[0.03] p-4">
               <p class="text-xs uppercase tracking-widest text-cream/35 font-bold mb-2">Submissions</p>
               <p class="text-3xl font-bold" data-count-submissions>0</p>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div class="rounded-2xl border border-cream/10 bg-cream/[0.03] p-4">
               <p class="text-xs uppercase tracking-widest text-cream/35 font-bold mb-2">Criteria</p>
               <p class="text-3xl font-bold" data-count-criteria>0</p>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div class="rounded-2xl border border-cream/10 bg-cream/[0.03] p-4">
               <p class="text-xs uppercase tracking-widest text-cream/35 font-bold mb-2">Scale</p>
               <p class="text-3xl font-bold" data-count-scale>1-10</p>
             </div>
@@ -219,7 +219,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
                   <h3 class="text-3xl font-bold tracking-tight mt-4">${escapeHtml(submission.projectName || "Untitled project")}</h3>
                   <p class="text-cream/50 mt-2">${escapeHtml(submission.teamName || "")}</p>
                 </div>
-                <span class="status-pill !bg-white/5 !border-white/10">${escapeHtml(submission.totalScore ?? 0)}</span>
+                <span class="status-pill !bg-cream/5 !border-cream/10">${escapeHtml(submission.totalScore ?? 0)}</span>
               </div>
               <p class="text-sm text-cream/45 leading-relaxed">${escapeHtml(submission.description || "")}</p>
               <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

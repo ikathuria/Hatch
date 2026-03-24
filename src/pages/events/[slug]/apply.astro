@@ -10,7 +10,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <div class="relative z-10 space-y-12">
         <div class="space-y-4">
           <div class="flex items-center gap-3">
-              <a href=".." class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+              <a href=".." class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
               </a>
               <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Mission Entry</span>
@@ -61,7 +61,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
             </div>
           </div>
 
-          <div class="space-y-6 pt-6 border-t border-white/5">
+          <div class="space-y-6 pt-6 border-t border-cream/5">
             <div class="grid md:grid-cols-2 gap-8">
                 <div class="space-y-2">
                     <label class="form-label">Squad Configuration</label>
@@ -74,7 +74,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
                 </div>
                 <div class="flex items-center h-full pt-8">
                     <label class="flex items-start gap-4 cursor-pointer group">
-                        <input type="checkbox" name="consent" required class="w-6 h-6 rounded-lg bg-white/5 border border-white/10 accent-lime cursor-pointer mt-1" />
+                        <input type="checkbox" name="consent" required class="w-6 h-6 rounded-lg bg-cream/5 border border-cream/10 accent-lime cursor-pointer mt-1" />
                         <span class="text-sm text-cream/40 group-hover:text-cream/60 transition-colors pt-1">
                             I verify compliance with the <a class="text-lime font-bold hover:underline" href="/code-of-conduct">Protocol of Conduct</a>.
                         </span>
@@ -143,6 +143,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
       if (button) {
           button.disabled = true;
+          button.classList.remove("btn-primary--success");
           button.textContent = "Synchronizing...";
       }
       status.textContent = "";
@@ -163,7 +164,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         form.reset();
         if (button) {
             button.textContent = "Success";
-            button.style.background = "#d8ff3f";
+            button.classList.add("btn-primary--success");
         }
       } catch (error) {
         status.textContent = error.message;
@@ -171,6 +172,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         status.classList.add("!text-coral", "font-bold");
         if (button) {
             button.disabled = false;
+            button.classList.remove("btn-primary--success");
             button.textContent = defaultLabel;
         }
       }

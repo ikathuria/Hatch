@@ -7,8 +7,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   <section class="relative pt-12 pb-24 overflow-hidden">
     <div class="site-glow opacity-30"></div>
     <div class="mx-auto max-w-6xl px-6 relative z-10">
-      <div class="card !p-0 overflow-hidden border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
-        <div class="relative hidden max-h-64 w-full overflow-hidden border-b border-white/10 bg-white/[0.03]" data-event-banner-wrap>
+      <div class="card !p-0 overflow-hidden border-cream/10 shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
+        <div class="relative hidden max-h-64 w-full overflow-hidden border-b border-cream/10 bg-cream/[0.03]" data-event-banner-wrap>
           <img class="h-full w-full max-h-64 object-cover" data-event-banner alt="" />
           <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" aria-hidden="true"></div>
         </div>
@@ -16,14 +16,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             <div class="space-y-8 max-w-4xl">
                 <div class="flex flex-wrap items-center gap-4">
                   <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20" data-event-mode>Loading...</span>
-                  <span class="text-xs uppercase tracking-widest text-cream/40 font-bold border-l border-white/10 pl-4 hidden" data-event-org></span>
+                  <span class="text-xs uppercase tracking-widest text-cream/40 font-bold border-l border-cream/10 pl-4 hidden" data-event-org></span>
                 </div>
                 <h1 class="text-5xl md:text-7xl font-bold tracking-tighter leading-tight" data-event-title>
                     Synchronizing...
                 </h1>
                 <p class="text-xl text-cream/60 leading-relaxed font-medium" data-event-tagline></p>
                 
-                <div class="flex flex-wrap gap-8 text-sm font-bold uppercase tracking-widest text-cream/40 py-6 border-y border-white/5" data-event-meta>
+                <div class="flex flex-wrap gap-8 text-sm font-bold uppercase tracking-widest text-cream/40 py-6 border-y border-cream/5" data-event-meta>
                     {/* Hydrated by JS */}
                 </div>
 
@@ -31,6 +31,18 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     <a class="btn-primary !px-12 !py-4" data-apply-link href="#">Apply to Participate</a>
                     <a class="btn-ghost !px-12 !py-4" data-submit-link href="#">Submit Project</a>
                 </div>
+                <div class="flex flex-wrap items-center gap-3">
+                  <button class="btn-ghost !px-5 !py-2 !text-xs" type="button" data-copy-link>
+                    Copy event link
+                  </button>
+                  <a class="btn-ghost !px-5 !py-2 !text-xs" href="#" data-google-calendar target="_blank" rel="noreferrer">
+                    Add to Google Calendar
+                  </a>
+                  <a class="btn-ghost !px-5 !py-2 !text-xs" href="#" data-ics-download>
+                    Download .ics
+                  </a>
+                </div>
+                <span class="text-xs text-cream/45 hidden" data-share-status></span>
             </div>
         </div>
         
@@ -97,9 +109,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 <div class="space-y-6">
                     <div class="flex items-center gap-4">
                         <div class="w-2 h-2 rounded-full bg-lime animate-pulse"></div>
-                        <span class="text-sm font-medium text-cream">Applications Open</span>
+                        <span class="text-sm font-medium text-cream" data-event-status-label>Loading status...</span>
                     </div>
-                    <p class="text-xs text-cream/40 leading-relaxed">Join a community of builders and manifest your vision into reality.</p>
+                    <p class="text-xs text-cream/40 leading-relaxed" data-event-status-copy>Join a community of builders and manifest your vision into reality.</p>
+                    <p class="text-xs uppercase tracking-widest text-cream/45" data-event-countdown></p>
                 </div>
             </div>
 
@@ -154,6 +167,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const participantLinkWrap = document.querySelector("[data-participant-link-wrap]");
     const participantLinkEl = document.querySelector("[data-participant-link]");
     const participantStatusEl = document.querySelector("[data-participant-status]");
+    const eventStatusLabel = document.querySelector("[data-event-status-label]");
+    const eventStatusCopy = document.querySelector("[data-event-status-copy]");
+    const eventCountdownEl = document.querySelector("[data-event-countdown]");
+    const copyLinkBtn = document.querySelector("[data-copy-link]");
+    const shareStatusEl = document.querySelector("[data-share-status]");
+    const googleCalendarLink = document.querySelector("[data-google-calendar]");
+    const icsDownloadLink = document.querySelector("[data-ics-download]");
 
     const BANNER_PREFIX = "/api/media/banner/";
     const BANNER_UUID =
@@ -213,6 +233,117 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         day: "numeric",
         year: "numeric"
       }).format(date);
+    };
+
+    const formatDateTimeForCalendar = (value) => {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "";
+      const pad = (input) => String(input).padStart(2, "0");
+      return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}T${pad(
+        date.getUTCHours()
+      )}${pad(date.getUTCMinutes())}${pad(date.getUTCSeconds())}Z`;
+    };
+
+    const asDateValue = (value) => {
+      const date = new Date(value);
+      const time = date.getTime();
+      return Number.isNaN(time) ? null : time;
+    };
+
+    const formatDuration = (ms) => {
+      const totalHours = Math.max(0, Math.floor(ms / (1000 * 60 * 60)));
+      const days = Math.floor(totalHours / 24);
+      const hours = totalHours % 24;
+      if (days > 0) return `${days}d ${hours}h`;
+      return `${hours}h`;
+    };
+
+    const updateEventStatus = () => {
+      if (!state.event) return;
+      const now = Date.now();
+      const applicationDeadline = asDateValue(state.event.applicationDeadline);
+      const startDate = asDateValue(state.event.startDate);
+      const endDate = asDateValue(state.event.endDate);
+
+      let label = "Open";
+      let copy = "Event details are live. Plan your project and timelines.";
+      let countdown = "";
+
+      if (applicationDeadline !== null && now <= applicationDeadline) {
+        label = "Applications Open";
+        copy = "Applications are currently open for participants.";
+        countdown = `Deadline in ${formatDuration(applicationDeadline - now)}`;
+      } else if (startDate !== null && now < startDate) {
+        label = "Starting Soon";
+        copy = "Application window may be closed. Event kickoff is approaching.";
+        countdown = `Starts in ${formatDuration(startDate - now)}`;
+      } else if (startDate !== null && endDate !== null && now >= startDate && now <= endDate) {
+        label = "Live Now";
+        copy = "Build phase is active. Submit before the event closes.";
+        countdown = `Ends in ${formatDuration(endDate - now)}`;
+      } else if (endDate !== null && now > endDate) {
+        label = "Ended";
+        copy = "This event has ended. Check results and project gallery.";
+      }
+
+      if (eventStatusLabel) eventStatusLabel.textContent = label;
+      if (eventStatusCopy) eventStatusCopy.textContent = copy;
+      if (eventCountdownEl) {
+        eventCountdownEl.textContent = countdown;
+        eventCountdownEl.classList.toggle("hidden", !countdown);
+      }
+    };
+
+    const updateCalendarLinks = () => {
+      if (!state.event) return;
+      const title = String(state.event.title || "Hatch Event");
+      const details = String(state.event.description || state.event.tagline || "");
+      const location = String(state.event.location || "");
+      const startDate = new Date(state.event.startDate || "");
+      const endDate = new Date(state.event.endDate || "");
+      if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+        if (googleCalendarLink) googleCalendarLink.classList.add("hidden");
+        if (icsDownloadLink) icsDownloadLink.classList.add("hidden");
+        return;
+      }
+
+      const googleDates = `${formatDateTimeForCalendar(startDate.toISOString())}/${formatDateTimeForCalendar(
+        endDate.toISOString()
+      )}`;
+      const googleUrl = new URL("https://calendar.google.com/calendar/render");
+      googleUrl.searchParams.set("action", "TEMPLATE");
+      googleUrl.searchParams.set("text", title);
+      googleUrl.searchParams.set("details", details);
+      googleUrl.searchParams.set("location", location);
+      googleUrl.searchParams.set("dates", googleDates);
+
+      if (googleCalendarLink) {
+        googleCalendarLink.href = googleUrl.toString();
+        googleCalendarLink.classList.remove("hidden");
+      }
+
+      const icsContent = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Hatch//Hackathon//EN",
+        "BEGIN:VEVENT",
+        `UID:${String(state.event.id || slug)}@hatch`,
+        `DTSTAMP:${formatDateTimeForCalendar(new Date().toISOString())}`,
+        `DTSTART:${formatDateTimeForCalendar(startDate.toISOString())}`,
+        `DTEND:${formatDateTimeForCalendar(endDate.toISOString())}`,
+        `SUMMARY:${title.replace(/\n/g, " ")}`,
+        `DESCRIPTION:${details.replace(/\n/g, " ")}`,
+        `LOCATION:${location.replace(/\n/g, " ")}`,
+        "END:VEVENT",
+        "END:VCALENDAR"
+      ].join("\r\n");
+      const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+      const objectUrl = URL.createObjectURL(blob);
+      if (icsDownloadLink) {
+        icsDownloadLink.href = objectUrl;
+        icsDownloadLink.download = `${String(state.event.slug || slug || "event")}.ics`;
+        icsDownloadLink.classList.remove("hidden");
+      }
     };
 
     const winnerBadges = (project) => {
@@ -283,7 +414,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   <h3 class="text-2xl font-bold">${escapeHtml(project.projectName || "Untitled project")}</h3>
                   <p class="text-sm text-cream/45 mt-1">${escapeHtml(project.teamName || "")}</p>
                 </div>
-                <span class="status-pill !bg-white/5 !border-white/10">${escapeHtml(project.voteCount ?? 0)} votes</span>
+                <span class="status-pill !bg-cream/5 !border-cream/10">${escapeHtml(project.voteCount ?? 0)} votes</span>
               </div>
               <p class="text-sm text-cream/60 leading-relaxed">${escapeHtml(project.description || "")}</p>
               <div class="flex flex-wrap gap-2">
@@ -406,7 +537,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     ? `
                   <div class="shrink-0 bg-lime/10 border border-lime/20 px-6 py-4 rounded-2xl">
                     <span class="text-xs font-bold uppercase tracking-widest text-lime block mb-1">Prize pool</span>
-                    <span class="text-xl font-bold text-white">${escapeHtml(track.prize)}</span>
+                    <span class="text-xl font-bold text-cream">${escapeHtml(track.prize)}</span>
                   </div>
                 `
                     : ""
@@ -428,14 +559,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         faqsEl.innerHTML = faqs
           .map(
             (faq) => `
-            <details class="card group !p-0 overflow-hidden border-white/5 bg-white/[0.02]">
+            <details class="card group !p-0 overflow-hidden border-cream/5 bg-cream/[0.02]">
               <summary class="flex items-center justify-between p-8 cursor-pointer list-none">
                 <span class="text-lg font-bold group-hover:text-violet transition-colors">${escapeHtml(
                   faq.question
                 )}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-cream/30 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </summary>
-              <div class="px-8 pb-8 text-cream/50 leading-relaxed border-t border-white/5 pt-6">
+              <div class="px-8 pb-8 text-cream/50 leading-relaxed border-t border-cream/5 pt-6">
                 ${escapeHtml(faq.answer)}
               </div>
             </details>
@@ -519,6 +650,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         renderTracks(tracks);
         renderFaqs(faqs);
         renderGallery();
+        updateEventStatus();
+        updateCalendarLinks();
       } catch (error) {
         if (titleEl) titleEl.textContent = "Signal Lost";
         if (descEl)
@@ -569,8 +702,25 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       setStatus(participantStatusEl, "Signed out", "!text-lime");
     });
 
+    copyLinkBtn?.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        if (shareStatusEl) {
+          shareStatusEl.textContent = "Copied event link.";
+          shareStatusEl.classList.remove("hidden");
+        }
+      } catch {
+        if (shareStatusEl) {
+          shareStatusEl.textContent = "Unable to copy automatically. Copy from your address bar.";
+          shareStatusEl.classList.remove("hidden");
+        }
+      }
+    });
+
     const init = async () => {
       await loadEvent();
+      updateEventStatus();
+      window.setInterval(updateEventStatus, 60_000);
       if (state.resultsPublished) {
         await loadParticipant();
       } else {

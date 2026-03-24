@@ -23,7 +23,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             <div class="space-y-2">
               <div class="flex justify-between items-end">
                 <label class="form-label">Security Key</label>
-                <a href="#" class="text-[10px] font-bold uppercase tracking-widest text-violet hover:text-white transition-colors">Forgot?</a>
+                <a href="#" class="text-[10px] font-bold uppercase tracking-widest text-violet hover:text-cream transition-colors">Forgot?</a>
               </div>
               <input class="input-field" name="password" type="password" required placeholder="••••••••" />
             </div>
@@ -38,7 +38,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           </div>
         </form>
 
-        <div class="pt-8 border-t border-white/5 text-center">
+        <div class="pt-8 border-t border-cream/10 text-center">
             <p class="text-sm text-cream/40">
                 New to the platform? 
                 <a class="text-violet font-bold hover:underline ml-1" href="/organizer/signup">Create an orbit &rarr;</a>
@@ -77,12 +77,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           throw new Error(result.error || "Verification failed.");
         }
         submitBtn.textContent = "Access Granted";
-        submitBtn.style.background = "#d8ff3f";
+        submitBtn.classList.add("btn-primary--success");
         setTimeout(() => {
             window.location.href = "/organizer/dashboard";
         }, 500);
       } catch (error) {
         submitBtn.disabled = false;
+        submitBtn.classList.remove("btn-primary--success");
         submitBtn.textContent = originalText;
         status.textContent = error.message;
         status.classList.remove("hidden");
