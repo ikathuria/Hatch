@@ -134,6 +134,181 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
       judgeScores: []
     };
 
+    const AUTOSAVE_MS = 750;
+    const autosaveTimers = new Map();
+    let submissionsDelegationBound = false;
+    let saveRequestsInFlight = 0;
+    let batchFlushActive = false;
+
+    const clearAutosaveTimers = () => {
+      for (const t of autosaveTimers.values()) clearTimeout(t);
+      autosaveTimers.clear();
+    };
+
+    const applyJudgeScoresFromServer = (rows) => {
+      if (!Array.isArray(rows)) return;
+      state.judgeScores = rows;
+    };
+
+    const computeWeightedTotal = (submissionId) => {
+      let total = 0;
+      for (const c of state.criteria) {
+        const row = state.judgeScores.find(
+          (s) => s.submissionId === submissionId && s.rubricCriterionId === c.id
+        );
+        if (row) total += Number(row.score) * Number(c.weight ?? 1);
+      }
+      return Number(total.toFixed(4));
+    };
+
+    const updateSubmissionTotalDisplay = (submissionId) => {
+      const total = computeWeightedTotal(submissionId);
+      const sub = state.submissions.find((s) => s.id === submissionId);
+      if (sub) sub.totalScore = total;
+      const pill = elements.submissions?.querySelector(
+        `[data-score-card][data-submission-id="${CSS.escape(submissionId)}"] [data-submission-total]`
+      );
+      if (pill) pill.textContent = String(total);
+    };
+
+    const setCardSaveStatus = (submissionId, message, tone = "") => {
+      const el = elements.submissions?.querySelector(
+        `[data-score-card][data-submission-id="${CSS.escape(submissionId)}"] [data-card-save-status]`
+      );
+      setStatus(el, message, tone);
+    };
+
+    const setGlobalSaveStatus = (message, tone = "") => {
+      const el = elements.submissions?.querySelector("[data-global-save-status]");
+      setStatus(el, message, tone);
+    };
+
+    const globalSaveIdleMessage = () => {
+      const time = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date());
+      setGlobalSaveStatus(`All changes saved · ${time}`, "!text-lime");
+    };
+
+    const bumpSaveFlight = (delta) => {
+      saveRequestsInFlight += delta;
+      if (saveRequestsInFlight < 0) saveRequestsInFlight = 0;
+      if (!batchFlushActive && saveRequestsInFlight > 0) {
+        setGlobalSaveStatus("Saving your scores…", "!text-sky");
+      }
+    };
+
+    const collectScoreEntries = (submissionId) => {
+      const card = elements.submissions?.querySelector(
+        `[data-score-card][data-submission-id="${CSS.escape(submissionId)}"]`
+      );
+      if (!card) return [];
+      const comment = card.querySelector('[name="comment"]')?.value?.trim() || "";
+      const entries = [];
+      card.querySelectorAll("[data-criterion-id]").forEach((input) => {
+        const criterionId = input.getAttribute("data-criterion-id");
+        const raw = input.value.trim();
+        if (!criterionId || raw === "") return;
+        entries.push({
+          submissionId,
+          criterionId,
+          score: Number.parseInt(raw, 10),
+          comment
+        });
+      });
+      return entries;
+    };
+
+    const saveSubmissionScores = async (submissionId, { silent = false } = {}) => {
+      if (state.locked || !state.eventId || !submissionId) return { ok: false };
+      const entries = collectScoreEntries(submissionId);
+      if (!entries.length) {
+        if (!silent) setCardSaveStatus(submissionId, "Enter at least one score to save.", "!text-coral");
+        else setCardSaveStatus(submissionId, "", "");
+        return { ok: false };
+      }
+
+      bumpSaveFlight(1);
+      if (!silent) setCardSaveStatus(submissionId, "Saving…", "!text-sky");
+
+      try {
+        const response = await fetch(`${apiBase}/events/${state.eventId}/scores`, {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ entries })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Unable to save scores.");
+        applyJudgeScoresFromServer(payload.judgeScores);
+        updateSubmissionTotalDisplay(submissionId);
+        const time = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date());
+        setCardSaveStatus(submissionId, `Saved · ${time}`, "!text-lime");
+        return { ok: true };
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : "Unable to save scores.";
+        setCardSaveStatus(submissionId, msg, "!text-coral");
+        return { ok: false };
+      } finally {
+        bumpSaveFlight(-1);
+        if (!batchFlushActive && saveRequestsInFlight === 0) globalSaveIdleMessage();
+      }
+    };
+
+    const scheduleAutosave = (submissionId) => {
+      const prev = autosaveTimers.get(submissionId);
+      if (prev) clearTimeout(prev);
+      setCardSaveStatus(submissionId, "Will save shortly…", "!text-cream/45");
+      autosaveTimers.set(
+        submissionId,
+        setTimeout(() => {
+          autosaveTimers.delete(submissionId);
+          void saveSubmissionScores(submissionId, { silent: true });
+        }, AUTOSAVE_MS)
+      );
+    };
+
+    const flushAllPendingSaves = async () => {
+      clearAutosaveTimers();
+      const ids = Array.from(elements.submissions?.querySelectorAll("[data-score-card][data-submission-id]") || [])
+        .map((el) => el.getAttribute("data-submission-id"))
+        .filter(Boolean);
+      const toSave = ids.filter((id) => collectScoreEntries(id).length > 0);
+      if (!toSave.length) {
+        setGlobalSaveStatus("Enter scores on each submission first, then confirm here.", "!text-sky");
+        return;
+      }
+      batchFlushActive = true;
+      setGlobalSaveStatus("Saving all submissions…", "!text-sky");
+      const results = [];
+      for (const id of toSave) {
+        results.push(await saveSubmissionScores(id, { silent: true }));
+      }
+      batchFlushActive = false;
+      const allOk = results.every((r) => r.ok);
+      if (allOk) {
+        setGlobalSaveStatus("All set — every scored submission is saved to the server.", "!text-lime");
+      } else {
+        setGlobalSaveStatus("Some saves failed. Fix the highlighted cards and try again.", "!text-coral");
+      }
+    };
+
+    const bindSubmissionsDelegation = () => {
+      if (submissionsDelegationBound || !elements.submissions) return;
+      submissionsDelegationBound = true;
+
+      elements.submissions.addEventListener("input", (e) => {
+        const card = e.target?.closest?.("[data-score-card]");
+        if (!card || state.locked) return;
+        const submissionId = card.getAttribute("data-submission-id");
+        if (!submissionId) return;
+        scheduleAutosave(submissionId);
+      });
+
+      elements.submissions.addEventListener("click", (e) => {
+        if (!e.target?.closest?.("[data-save-all-scores]")) return;
+        e.preventDefault();
+        void flushAllPendingSaves();
+      });
+    };
+
     const renderCounts = () => {
       if (elements.countSubmissions) elements.countSubmissions.textContent = String(state.submissions.length);
       if (elements.countCriteria) elements.countCriteria.textContent = String(state.criteria.length);
@@ -204,7 +379,9 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
       const min = Number(state.rubric?.minScore ?? 1);
       const max = Number(state.rubric?.maxScore ?? 10);
 
-      elements.submissions.innerHTML = state.submissions
+      clearAutosaveTimers();
+
+      const cardsHtml = state.submissions
         .map((submission) => {
           const comment =
             state.criteria.length > 0
@@ -212,14 +389,14 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
               : "";
 
           return `
-            <form class="card !p-8 space-y-6" data-score-form data-submission-id="${escapeHtml(submission.id)}">
+            <div class="card !p-8 space-y-6" data-score-card data-submission-id="${escapeHtml(submission.id)}">
               <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                   <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">${escapeHtml(submission.track || "All tracks")}</span>
                   <h3 class="text-3xl font-bold tracking-tight mt-4">${escapeHtml(submission.projectName || "Untitled project")}</h3>
                   <p class="text-cream/50 mt-2">${escapeHtml(submission.teamName || "")}</p>
                 </div>
-                <span class="status-pill !bg-cream/5 !border-cream/10">${escapeHtml(submission.totalScore ?? 0)}</span>
+                <span class="status-pill !bg-cream/5 !border-cream/10" data-submission-total>${escapeHtml(submission.totalScore ?? 0)}</span>
               </div>
               <p class="text-sm text-cream/45 leading-relaxed">${escapeHtml(submission.description || "")}</p>
               <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -249,57 +426,39 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
                 <label class="form-label">Judge comments</label>
                 <textarea class="input-field" name="comment" rows="3" placeholder="Optional notes for this submission" ${state.locked ? "disabled" : ""}>${escapeHtml(comment)}</textarea>
               </div>
-              <div class="flex items-center justify-between gap-4">
-                <span class="status-pill hidden !bg-transparent !border-none !p-0" data-score-status></span>
-                <button class="btn-primary !px-6" type="submit" ${state.locked ? "disabled" : ""}>Save scores</button>
-              </div>
-            </form>
+              <p class="text-xs text-cream/40 min-h-[1.25rem]" data-card-save-status aria-live="polite"></p>
+            </div>
           `;
         })
         .join("");
 
-      elements.submissions.querySelectorAll("[data-score-form]").forEach((form) => {
-        form.addEventListener("submit", async (event) => {
-          event.preventDefault();
-          if (state.locked || !state.eventId) return;
+      const footerHtml = state.locked
+        ? ""
+        : `
+        <div class="card !p-6 border-lime/20 bg-lime/[0.04] space-y-4" data-judge-review-footer>
+          <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p class="font-semibold text-cream/90">Review &amp; confirm</p>
+              <p class="text-sm text-cream/45 mt-1" data-global-save-hint>
+                Scores autosave as you go. Use the button below when you are finished with all submissions.
+              </p>
+            </div>
+            <button class="btn-primary !px-8 shrink-0" type="button" data-save-all-scores>
+              Save all &amp; confirm
+            </button>
+          </div>
+          <p class="text-sm font-medium min-h-[1.25rem]" data-global-save-status aria-live="polite"></p>
+        </div>
+      `;
 
-          const submissionId = form.getAttribute("data-submission-id");
-          const comment = form.querySelector('[name="comment"]')?.value?.trim() || "";
-          const statusEl = form.querySelector("[data-score-status]");
+      elements.submissions.innerHTML = cardsHtml + footerHtml;
 
-          const entries = [];
-          form.querySelectorAll("[data-criterion-id]").forEach((input) => {
-            const criterionId = input.getAttribute("data-criterion-id");
-            const raw = input.value.trim();
-            if (!criterionId || raw === "") return;
-            entries.push({
-              submissionId,
-              criterionId,
-              score: Number.parseInt(raw, 10),
-              comment
-            });
-          });
-
-          if (!entries.length) {
-            setStatus(statusEl, "Enter at least one score.", "!text-coral");
-            return;
-          }
-
-          try {
-            const response = await fetch(`${apiBase}/events/${state.eventId}/scores`, {
-              method: "PUT",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({ entries })
-            });
-            const payload = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error(payload.error || "Unable to save scores.");
-            setStatus(statusEl, "Saved", "!text-lime");
-            await loadWorkspace();
-          } catch (error) {
-            setStatus(statusEl, error.message, "!text-coral");
-          }
-        });
-      });
+      if (footerHtml) {
+        setGlobalSaveStatus("Edits save automatically after you pause typing.", "!text-cream/45");
+      } else {
+        setGlobalSaveStatus("", "");
+      }
+      bindSubmissionsDelegation();
     };
 
     const loadWorkspace = async () => {

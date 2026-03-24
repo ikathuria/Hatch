@@ -140,7 +140,7 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
           <div class="space-y-6">
             <h4 class="text-xs font-bold uppercase tracking-widest text-violet">Resources</h4>
             <ul class="space-y-4 text-sm text-cream/70">
-              <li><a href="/code-of-conduct" class="hover:text-lime transition-colors">Community</a></li>
+              <li><a href="https://github.com/ikathuria/Hatch/blob/main/CONTRIBUTING.md" class="hover:text-lime transition-colors" target="_blank" rel="noreferrer">Contributing</a></li>
               <li><a href="/privacy" class="hover:text-lime transition-colors">Privacy Policy</a></li>
               <li><a href="/terms" class="hover:text-lime transition-colors">Terms of Service</a></li>
             </ul>
@@ -150,7 +150,7 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
             <h4 class="text-xs font-bold uppercase tracking-widest text-coral">Support</h4>
             <ul class="space-y-4 text-sm text-cream/70">
               <li><a href={`mailto:${site.links.email}`} class="hover:text-lime transition-colors lowercase">{site.links.email}</a></li>
-              <li><a href="#" class="hover:text-lime transition-colors">Documentation</a></li>
+              <li><a href="https://github.com/ikathuria/Hatch" class="hover:text-lime transition-colors">Documentation</a></li>
               <li><a href="#" class="hover:text-lime transition-colors">Help Center</a></li>
             </ul>
           </div>

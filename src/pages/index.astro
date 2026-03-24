@@ -5,7 +5,7 @@ import { site } from "../content/site";
 
 <BaseLayout title={`${site.brand.name} | Hackathon hosting platform`}>
   {/* Hero Section */}
-  <section class="relative pt-20 pb-32 overflow-hidden">
+  <section class="hero-nest relative pt-20 pb-32 overflow-hidden">
     <div class="site-glow opacity-50"></div>
     <div class="mx-auto max-w-6xl px-6 relative z-10">
       <div class="flex flex-col lg:flex-row items-center gap-20">
@@ -31,15 +31,41 @@ import { site } from "../content/site";
         </div>
 
         <div class="flex-1 w-full max-w-md lg:max-w-none">
-          <div class="grid grid-cols-2 gap-6">
+          <div class="hatching-grid grid grid-cols-2 gap-6">
             {site.stats.map((stat, i) => (
-              <div class={`card group hover:border-lime/30 transition-all ${i % 2 === 1 ? 'mt-8' : ''}`}>
+              <div class={`card hatch-card group transition-all ${i % 2 === 1 ? 'mt-8' : ''} ${(stat.label.toLowerCase().includes("free") || stat.value.toLowerCase().includes("built-in")) ? "spark-card" : ""}`}>
+                <div class="hatch-card-wireframe" aria-hidden="true">
+                  <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M40 94 C40 132 63 160 90 160 C117 160 140 132 140 94 C140 56 117 28 90 28 C63 28 40 56 40 94 Z" />
+                    <path d="M58 104 L90 72 L122 104" />
+                    <path d="M54 86 L90 120 L126 86" />
+                  </svg>
+                </div>
+                {(stat.label.toLowerCase().includes("free") || stat.value.toLowerCase().includes("built-in")) && <div class="spark-pulse" aria-hidden="true"></div>}
                 <div class="flex flex-col gap-2">
                   <span class="text-sm font-bold uppercase tracking-widest text-sky/60 group-hover:text-sky transition-colors">{stat.label}</span>
                   <span class="text-4xl font-bold tracking-tighter counter-value">{stat.value}</span>
                 </div>
               </div>
             ))}
+          </div>
+          <div class="project-growth mt-8">
+            <div class="project-growth__header">
+              <span class="text-xs font-bold uppercase tracking-[0.2em] text-sky/70">Project Growth</span>
+              <span class="text-sm text-cream/60">Sprouting this week</span>
+            </div>
+            <svg class="project-growth__chart" viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="growth-stroke" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="var(--hatch-cyan)" />
+                  <stop offset="100%" stop-color="var(--hatch-indigo)" />
+                </linearGradient>
+              </defs>
+              <path class="project-growth__line" d="M10 106 C45 98, 72 70, 95 74 C120 78, 130 102, 150 98 C170 94, 188 58, 210 52 C230 47, 246 62, 265 54 C285 46, 300 20, 310 14" />
+              <circle cx="95" cy="74" r="4" />
+              <circle cx="210" cy="52" r="4" />
+              <circle cx="310" cy="14" r="5" />
+            </svg>
           </div>
         </div>
       </div>
@@ -61,9 +87,16 @@ import { site } from "../content/site";
         <div class="h-px bg-cream/5 flex-1 hidden md:block mb-6 mx-12"></div>
       </div>
 
-      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <div class="grid gap-8 md:grid-cols-2">
         {site.features.map((feature) => (
-          <div class="card !p-8 group hover:-translate-y-2">
+          <div class="card hatch-card !p-8 group hover:-translate-y-2">
+            <div class="hatch-card-wireframe" aria-hidden="true">
+              <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+                <path d="M40 94 C40 132 63 160 90 160 C117 160 140 132 140 94 C140 56 117 28 90 28 C63 28 40 56 40 94 Z" />
+                <path d="M58 104 L90 72 L122 104" />
+                <path d="M54 86 L90 120 L126 86" />
+              </svg>
+            </div>
             <div class="w-12 h-12 rounded-2xl bg-cream/5 flex items-center justify-center mb-6 group-hover:bg-lime group-hover:text-ink transition-all">
                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
             </div>

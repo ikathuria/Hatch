@@ -12,7 +12,7 @@ const uid = idPrefix ?? `hatch-egg-${Math.random().toString(36).slice(2)}`;
 ---
 
 <svg
-  class={className}
+  class={`hatch-egg-mark ${className}`}
   viewBox="0 0 200 200"
   preserveAspectRatio="xMidYMid meet"
   fill="none"
@@ -39,8 +39,6 @@ const uid = idPrefix ?? `hatch-egg-${Math.random().toString(36).slice(2)}`;
     </filter>
   </defs>
 
-  <rect width="200" height="200" fill="#0F172A" rx="20" />
-
   <circle
     cx="100"
     cy="100"
@@ -60,9 +58,10 @@ const uid = idPrefix ?? `hatch-egg-${Math.random().toString(36).slice(2)}`;
 
   <path
     d="M40,90 C40,50 70,20 100,20 C130,20 160,50 160,90 L145,95 L115,75 L100,95 L85,75 L55,95 Z"
+    class="hatch-egg-mark__top-shell"
     fill={`url(#${uid}-cyberShell)`}
     stroke="#cbd5e1"
     stroke-width="1.5"
-    transform="translate(0, -10) rotate(-3, 100, 55)"
+    transform="translate(0, -8) rotate(-2, 100, 55)"
   />
 </svg>

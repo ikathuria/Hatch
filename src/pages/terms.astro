@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../content/site";
+---
+
+<BaseLayout title={`Terms of Service | ${site.brand.name}`}>
+  <section class="mx-auto w-full max-w-3xl px-6 py-16">
+    <div class="card space-y-6">
+      <h1 class="text-3xl font-semibold md:text-4xl">Terms of Service</h1>
+      <p class="text-cream-70">
+        By using {site.brand.name}, you agree to these terms. If you do not
+        agree, do not use the service.
+      </p>
+      <div class="space-y-4 text-cream-75">
+        <p>
+          <strong class="text-cream">Use of the platform.</strong> You may use
+          {site.brand.name} only for lawful purposes and in line with our{" "}
+          <a class="underline" href="/code-of-conduct">Code of Conduct</a>.
+          Organizers are responsible for their events, content, and how they
+          treat participants.
+        </p>
+        <p>
+          <strong class="text-cream">Accounts and content.</strong> You are
+          responsible for your account and any content you submit. You grant
+          {site.brand.name} and event organizers the rights needed to run
+          events you join (for example, displaying submissions for judging or
+          showcase).
+        </p>
+        <p>
+          <strong class="text-cream">Service changes.</strong> We may change or
+          discontinue features. We will try to give reasonable notice for
+          material changes where practical.
+        </p>
+        <p>
+          <strong class="text-cream">Limitation of liability.</strong> The
+          service is provided &ldquo;as is.&rdquo; To the fullest extent allowed
+          by law, {site.brand.name} is not liable for indirect or consequential
+          damages arising from your use of the platform or any event run on it.
+        </p>
+        <p>
+          Questions? Contact us at{" "}
+          <a class="underline" href={`mailto:${site.links.email}`}>{site.links.email}</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

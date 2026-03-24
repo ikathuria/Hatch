@@ -26,11 +26,11 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
              Live View
           </a>
           <span class="status-pill hidden !bg-transparent !border-none !p-0" data-status></span>
-          <button class="btn-primary !px-10" id="save-btn-top">Save Changes</button>
+          <button class="btn-primary !px-10" id="save-btn-top" type="submit" form="event-config-form">Save Changes</button>
       </div>
     </div>
 
-    <form class="space-y-12" data-event-form>
+    <form class="space-y-12" data-event-form id="event-config-form">
       <div class="card !p-0 overflow-hidden border-cream/10 bg-cream/[0.02]" data-tabs>
         <div class="flex flex-wrap items-center justify-between gap-4 border-b border-cream/10 px-5 py-4">
           <div class="flex flex-wrap items-center gap-3">
@@ -230,7 +230,10 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         <div class="grid gap-4" data-faqs></div>
       </section>
 
-      {/* Judging workspace (full panel; only rendered for existing events) */}
+      <button class="hidden" type="submit" data-hidden-submit aria-hidden="true" tabindex="-1">Submit</button>
+    </form>
+
+      {/* Judging workspace: must stay outside the main event form — nested <form> tags would implicitly close it in the browser. */}
       {editorEventId ? (
         <section class="space-y-8" data-existing-only data-tab-section data-tab-id="judging">
           <div class="flex items-center gap-4 mb-2">
@@ -271,9 +274,6 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
             </div>
         </div>
       </section>
-
-      <button class="hidden" type="submit" data-hidden-submit aria-hidden="true" tabindex="-1">Submit</button>
-    </form>
   </div>
 
   <script>
@@ -457,10 +457,6 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
 
     form?.addEventListener("input", refreshSectionHealth);
     form?.addEventListener("change", refreshSectionHealth);
-
-    topSaveBtn?.addEventListener("click", () => {
-      form?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-    });
 
     editBannerFile?.addEventListener("change", async () => {
       const file = editBannerFile.files?.[0];
@@ -653,7 +649,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
 
     form?.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (!form || !submitBtn) return;
+      if (!form) return;
 
       setButtonsState(true, isCreateMode ? "Creating..." : "Saving...", isCreateMode ? "Creating..." : "Persisting...");
       clearStatus();
@@ -702,7 +698,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
             }
           }
 
-          window.location.href = `/organizer/events/${createdId}`;
+          window.location.href = "/organizer/dashboard";
           return;
         }
 
@@ -721,17 +717,8 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
           throw new Error(result.error || "Persistence failed.");
         }
 
-        submitBtn.textContent = "Saved";
-        submitBtn.classList.add("btn-primary--success");
-        if (topSaveBtn) topSaveBtn.textContent = "Saved";
-
-        if (titleEl) titleEl.textContent = result.event.title;
-        setPublicLink(result.event.slug);
-
-        setTimeout(() => {
-          submitBtn.classList.remove("btn-primary--success");
-          setButtonsState(false, defaultTopLabel, defaultSubmitLabel);
-        }, 1600);
+        window.location.href = "/organizer/dashboard";
+        return;
       } catch (error) {
         submitBtn?.classList.remove("btn-primary--success");
         setButtonsState(false, defaultTopLabel, isCreateMode ? "Create Event" : "Retry Save");
