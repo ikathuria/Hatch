@@ -3,7 +3,34 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
   root.dataset.judgingReady = "1";
 
   const baseApi = `/api/organizer/events/${eventId}`;
+  const manualOverrideKey = `hatch-judging-manual-${eventId}`;
   const $ = (selector: string) => root.querySelector(selector);
+
+  const winnersMatchSuggested = (
+    winners: Array<{ scope: string; trackName?: string; submissionId: string }>,
+    suggested: { overall: string | null; tracks: Record<string, string | null> }
+  ): boolean => {
+    if (!suggested.overall) return false;
+    const overallRow = winners.find((w) => w.scope === "overall");
+    if (!overallRow || overallRow.submissionId !== suggested.overall) return false;
+    for (const [trackName, sid] of Object.entries(suggested.tracks)) {
+      if (!sid) return false;
+      const row = winners.find((w) => w.scope === "track" && w.trackName === trackName);
+      if (!row || row.submissionId !== sid) return false;
+    }
+    return true;
+  };
+
+  const buildSuggestedWinnerPayload = (suggested: {
+    overall: string | null;
+    tracks: Record<string, string | null>;
+  }) => ({
+    overallWinnerSubmissionId: suggested.overall || "",
+    trackWinners: Object.entries(suggested.tracks)
+      .map(([trackName, submissionId]) => ({ trackName, submissionId: submissionId || "" }))
+      .filter((row) => row.submissionId),
+    note: ""
+  });
 
   const escapeHtml = (value: unknown) =>
     String(value ?? "")
@@ -71,7 +98,10 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     winnersForm: $("[data-winners-form]"),
     overallWinner: $("[data-overall-winner]"),
     trackWinners: $("[data-track-winners]"),
-    winnerStatus: $("[data-winner-status]")
+    winnerStatus: $("[data-winner-status]"),
+    manualWinnerOverride: $("[data-manual-winner-override]") as HTMLInputElement | null,
+    scoreBasedWinnersHint: $("[data-score-based-winners-hint]"),
+    winnersHint: $("[data-winners-hint]")
   };
 
   const state: {
@@ -86,6 +116,9 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     unresolvedTies: unknown[];
     winners: { overallWinnerId: string; trackWinners: Record<string, string> };
     published: boolean;
+    suggestedWinners: { overall: string | null; tracks: Record<string, string | null> } | null;
+    scoreBasedWinnersApply: boolean;
+    manualOverride: boolean;
   } = {
     event: null,
     rubricMeta: null,
@@ -100,7 +133,54 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
       overallWinnerId: "",
       trackWinners: {}
     },
-    published: false
+    published: false,
+    suggestedWinners: null,
+    scoreBasedWinnersApply: false,
+    manualOverride: false
+  };
+
+  const applyJudgingOverviewPayload = (overviewPayload: Record<string, unknown>) => {
+    state.submissions = toList(overviewPayload.submissions);
+    state.overallRanking = toList(
+      (overviewPayload.rankings as { overall?: { ranking?: unknown[] } } | undefined)?.overall?.ranking
+    ).map((row, index) => ({
+      ...(row as object),
+      rank: index + 1
+    }));
+    state.rankingByTrack = new Map(
+      toList(
+        (overviewPayload.rankings as { tracks?: Array<{ trackName: string; ranking: unknown[] }> } | undefined)?.tracks
+      ).map((track: { trackName: string; ranking: unknown[] }) => [track.trackName, toList(track.ranking)])
+    );
+    state.unresolvedTies = toList(overviewPayload.unresolvedTies);
+    state.published = (overviewPayload.event as { resultsStatus?: string } | undefined)?.resultsStatus === "published";
+    state.suggestedWinners =
+      (overviewPayload.suggestedWinners as {
+        overall: string | null;
+        tracks: Record<string, string | null>;
+      } | null) ?? null;
+    state.scoreBasedWinnersApply = Boolean(overviewPayload.scoreBasedWinnersApply);
+
+    const winners = toList(overviewPayload.winners) as Array<{
+      scope: string;
+      trackName?: string;
+      submissionId: string;
+    }>;
+    const overallWinner = winners.find((winner) => winner.scope === "overall");
+    const trackWinners = winners.filter((winner) => winner.scope === "track");
+    state.winners = {
+      overallWinnerId: overallWinner?.submissionId || "",
+      trackWinners: Object.fromEntries(trackWinners.map((winner) => [winner.trackName, winner.submissionId]))
+    };
+
+    const winnerIds = new Set(winners.map((winner) => winner.submissionId));
+    state.overallRanking = state.overallRanking.map((row) => ({
+      ...(row as object),
+      isWinner: winnerIds.has((row as { id: string }).id),
+      hasTie: state.unresolvedTies.some((tie) =>
+        toList((tie as { tiedSubmissionIds?: unknown[] }).tiedSubmissionIds).includes((row as { id: string }).id)
+      )
+    }));
   };
 
   const criterionRow = (criterion: { name?: string; weight?: number } = {}) => `
@@ -227,7 +307,9 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
             <div class="font-bold">${escapeHtml((row.projectName || row.project_name || "Untitled project") as string)}</div>
             <div class="text-xs text-cream/40">${escapeHtml((row.description || "") as string)}</div>
           </td>
-          <td class="py-4 pr-4">${escapeHtml((row.track || "All tracks") as string)}</td>
+          <td class="py-4 pr-4">${escapeHtml(
+            (row.track && String(row.track).trim()) || "Not specified"
+          )}</td>
           <td class="py-4 pr-4">${escapeHtml((row.teamName || row.team_name || "") as string)}</td>
           <td class="py-4 pr-4"><span class="status-pill !bg-cream/5 !border-cream/10">${escapeHtml(
             (row.totalScore ?? row.score ?? "0") as string
@@ -344,6 +426,10 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     if (!tracks.length) {
       elements.trackWinners.innerHTML =
         '<div class="text-sm text-cream/35 italic">No tracks configured for this event.</div>';
+      const lockWinners =
+        state.published || (state.scoreBasedWinnersApply && !state.manualOverride && !state.published);
+      if (elements.overallWinner) (elements.overallWinner as HTMLSelectElement).disabled = lockWinners;
+      if (elements.manualWinnerOverride) elements.manualWinnerOverride.disabled = state.published;
       return;
     }
     elements.trackWinners.innerHTML = tracks
@@ -371,6 +457,36 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
       const winnerId = trackName ? state.winners.trackWinners?.[trackName] : undefined;
       if (winnerId) (select as HTMLSelectElement).value = String(winnerId);
     });
+
+    const lockWinners =
+      state.published || (state.scoreBasedWinnersApply && !state.manualOverride && !state.published);
+    if (elements.overallWinner) (elements.overallWinner as HTMLSelectElement).disabled = lockWinners;
+    elements.trackWinners?.querySelectorAll("[data-track-winner]").forEach((select) => {
+      (select as HTMLSelectElement).disabled = lockWinners;
+    });
+    if (elements.manualWinnerOverride) {
+      elements.manualWinnerOverride.disabled = state.published;
+    }
+  };
+
+  const updateWinnerHints = () => {
+    if (elements.scoreBasedWinnersHint) {
+      if (state.scoreBasedWinnersApply && !state.published) {
+        elements.scoreBasedWinnersHint.classList.remove("hidden");
+      } else {
+        elements.scoreBasedWinnersHint.classList.add("hidden");
+      }
+    }
+    if (elements.winnersHint) {
+      if (state.published) {
+        elements.winnersHint.textContent = "Results are published.";
+      } else if (state.scoreBasedWinnersApply && !state.manualOverride) {
+        elements.winnersHint.textContent =
+          "Winners follow the leaderboard when there are no ties. Use manual override to pick someone else, then save.";
+      } else {
+        elements.winnersHint.textContent = "Select winners before publishing results.";
+      }
+    }
   };
 
   const syncStats = () => {
@@ -399,6 +515,7 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     renderOverview();
     renderTieBreaks();
     renderWinnerControls();
+    updateWinnerHints();
     syncStats();
   };
 
@@ -452,37 +569,47 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
       state.rubricMeta = (rubricPayload as { rubric: Record<string, unknown> }).rubric || null;
       state.rubric = toList((rubricPayload as { criteria?: unknown[] }).criteria);
       state.judgeLinks = toList((linksPayload as { links?: unknown[] }).links);
-      state.submissions = toList((overviewPayload as { submissions?: unknown[] }).submissions);
-      state.overallRanking = toList((overviewPayload as { rankings?: { overall?: { ranking?: unknown[] } } }).rankings?.overall?.ranking).map(
-        (row, index) => ({
-          ...(row as object),
-          rank: index + 1
-        })
-      );
-      state.rankingByTrack = new Map(
-        toList((overviewPayload as { rankings?: { tracks?: Array<{ trackName: string; ranking: unknown[] }> } }).rankings?.tracks).map(
-          (track: { trackName: string; ranking: unknown[] }) => [track.trackName, toList(track.ranking)]
-        )
-      );
-      state.unresolvedTies = toList((overviewPayload as { unresolvedTies?: unknown[] }).unresolvedTies);
-      state.published = (overviewPayload as { event?: { resultsStatus?: string } }).event?.resultsStatus === "published";
 
-      const winners = toList((overviewPayload as { winners?: Array<{ scope: string; trackName?: string; submissionId: string }> }).winners);
-      const overallWinner = winners.find((winner) => winner.scope === "overall");
-      const trackWinners = winners.filter((winner) => winner.scope === "track");
-      state.winners = {
-        overallWinnerId: overallWinner?.submissionId || "",
-        trackWinners: Object.fromEntries(trackWinners.map((winner) => [winner.trackName, winner.submissionId]))
-      };
+      applyJudgingOverviewPayload(overviewPayload as Record<string, unknown>);
 
-      const winnerIds = new Set(winners.map((winner) => winner.submissionId));
-      state.overallRanking = state.overallRanking.map((row) => ({
-        ...(row as object),
-        isWinner: winnerIds.has((row as { id: string }).id),
-        hasTie: state.unresolvedTies.some((tie) =>
-          toList((tie as { tiedSubmissionIds?: unknown[] }).tiedSubmissionIds).includes((row as { id: string }).id)
-        )
-      }));
+      state.manualOverride = sessionStorage.getItem(manualOverrideKey) === "1";
+      if (elements.manualWinnerOverride) elements.manualWinnerOverride.checked = state.manualOverride;
+
+      const winnersAfterApply = toList(
+        (overviewPayload as { winners?: Array<{ scope: string; trackName?: string; submissionId: string }> }).winners
+      );
+      const suggested = state.suggestedWinners;
+      if (
+        !state.published &&
+        !state.manualOverride &&
+        state.scoreBasedWinnersApply &&
+        suggested &&
+        !winnersMatchSuggested(winnersAfterApply, suggested)
+      ) {
+        try {
+          const response = await fetch(`${baseApi}/winners`, {
+            method: "PUT",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(buildSuggestedWinnerPayload(suggested))
+          });
+          const syncPayload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            throw new Error((syncPayload as { error?: string }).error || "Unable to sync score-based winners.");
+          }
+          const overviewRes2 = await fetch(`${baseApi}/judging-overview`);
+          const overviewPayload2 = await overviewRes2.json().catch(() => ({}));
+          if (!overviewRes2.ok) {
+            throw new Error((overviewPayload2 as { error?: string }).error || "Unable to reload judging overview.");
+          }
+          applyJudgingOverviewPayload(overviewPayload2 as Record<string, unknown>);
+        } catch (error) {
+          setStatus(
+            elements.winnerStatus,
+            error instanceof Error ? error.message : "Unable to sync winners.",
+            "!text-coral"
+          );
+        }
+      }
 
       if (elements.rubricScale) {
         elements.rubricScale.value = String((rubricPayload as { rubric?: { maxScore?: number } }).rubric?.maxScore || 10);
@@ -536,8 +663,32 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
 
   elements.winnersForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    await apiJson(`${baseApi}/winners`, { method: "PUT", body: JSON.stringify(readWinnerPayload()) }, elements.winnerStatus);
-    await loadWorkspace();
+    const locked =
+      state.published || (state.scoreBasedWinnersApply && !state.manualOverride && !state.published);
+    if (locked) {
+      if (elements.overallWinner) (elements.overallWinner as HTMLSelectElement).disabled = false;
+      elements.trackWinners?.querySelectorAll("[data-track-winner]").forEach((select) => {
+        (select as HTMLSelectElement).disabled = false;
+      });
+    }
+    try {
+      await apiJson(`${baseApi}/winners`, { method: "PUT", body: JSON.stringify(readWinnerPayload()) }, elements.winnerStatus);
+      await loadWorkspace();
+    } catch {
+      if (locked) renderWinnerControls();
+    }
+  });
+
+  elements.manualWinnerOverride?.addEventListener("change", async () => {
+    const on = Boolean(elements.manualWinnerOverride?.checked);
+    sessionStorage.setItem(manualOverrideKey, on ? "1" : "");
+    state.manualOverride = on;
+    if (!on) {
+      await loadWorkspace();
+    } else {
+      renderWinnerControls();
+      updateWinnerHints();
+    }
   });
 
   elements.publishBtn?.addEventListener("click", async () => {

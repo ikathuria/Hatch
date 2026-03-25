@@ -161,6 +161,26 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
       </div>
 
       <form class="space-y-5" data-winners-form>
+        <div
+          class="rounded-2xl border border-cream/10 bg-cream/[0.03] p-4 space-y-2 hidden"
+          data-score-based-winners-hint
+        >
+          <label class="flex items-start gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              class="mt-1 accent-lime"
+              data-manual-winner-override
+              aria-describedby={id("manual-override-help")}
+            />
+            <span>
+              <span class="text-sm font-semibold text-cream/90">Manual override</span>
+              <span id={id("manual-override-help")} class="block text-sm text-cream/45 mt-1 leading-relaxed">
+                Winners follow the highest total score when there are no ties. Check this to pick different winners
+                yourself, then save.
+              </span>
+            </span>
+          </label>
+        </div>
         <div class="space-y-2">
           <label class="form-label" for={id("overall-winner")}>Overall winner</label>
           <select class="input-field" id={id("overall-winner")} name="overallWinnerId" data-overall-winner>
@@ -181,7 +201,9 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
           ></textarea>
         </div>
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <p class="text-sm text-cream/40">Select winners before publishing results.</p>
+          <p class="text-sm text-cream/40" data-winners-hint>
+            Select winners before publishing results.
+          </p>
           <button class="btn-primary !px-6" type="submit">Save winners</button>
         </div>
       </form>

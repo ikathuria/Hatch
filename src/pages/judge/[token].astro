@@ -392,7 +392,9 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
             <div class="card !p-8 space-y-6" data-score-card data-submission-id="${escapeHtml(submission.id)}">
               <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
-                  <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">${escapeHtml(submission.track || "All tracks")}</span>
+                  <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Track: ${escapeHtml(
+                    submission.track && String(submission.track).trim() ? String(submission.track).trim() : "Not specified"
+                  )}</span>
                   <h3 class="text-3xl font-bold tracking-tight mt-4">${escapeHtml(submission.projectName || "Untitled project")}</h3>
                   <p class="text-cream/50 mt-2">${escapeHtml(submission.teamName || "")}</p>
                 </div>

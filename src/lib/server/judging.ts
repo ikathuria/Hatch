@@ -247,3 +247,38 @@ export const findSubmissionById = (submissions: SubmissionSummary[], submissionI
   submissions.find((submission) => submission.id === submissionId) ?? null;
 
 export const hasWinnerScopeTie = (scope: RankedScopeSummary) => scope.tiedSubmissionIds.length > 1;
+
+export interface SuggestedWinners {
+  overall: string | null;
+  /** Track name → submission id when there is a single top score; null when tied or empty track. */
+  tracks: Record<string, string | null>;
+}
+
+export const computeSuggestedWinners = (overview: JudgingOverview): SuggestedWinners => {
+  const overall =
+    overview.overall.tiedSubmissionIds.length === 1 ? overview.overall.tiedSubmissionIds[0]! : null;
+  const tracks: Record<string, string | null> = {};
+  for (const t of overview.tracks) {
+    tracks[t.trackName] = t.tiedSubmissionIds.length === 1 ? t.tiedSubmissionIds[0]! : null;
+  }
+  return { overall, tracks };
+};
+
+/** True when every scope has a unique top score so winners can follow the leaderboard without a tie-break. */
+export const scoreBasedWinnersCanApply = (overview: JudgingOverview, suggested: SuggestedWinners): boolean =>
+  Boolean(suggested.overall) && overview.tracks.every((t) => t.tiedSubmissionIds.length === 1);
+
+export const winnersMatchSuggested = (
+  winners: Array<{ scope: string; trackName?: string; submissionId: string }>,
+  suggested: SuggestedWinners
+): boolean => {
+  if (!suggested.overall) return false;
+  const overallRow = winners.find((w) => w.scope === "overall");
+  if (!overallRow || overallRow.submissionId !== suggested.overall) return false;
+  for (const [trackName, sid] of Object.entries(suggested.tracks)) {
+    if (!sid) return false;
+    const row = winners.find((w) => w.scope === "track" && w.trackName === trackName);
+    if (!row || row.submissionId !== sid) return false;
+  }
+  return true;
+};

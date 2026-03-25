@@ -2,7 +2,18 @@ import type { APIRoute } from "astro";
 import { requireOrganizer } from "../../../../../lib/server/auth";
 import { json } from "../../../../../lib/server/responses";
 import { getEnv } from "../../../../../lib/server/env";
-import { buildJudgingOverview, type JudgeScoreRow, type RubricCriterionRow, type RubricRow, type SubmissionRow, type VoteCountRow, type EventWinnerRow, type EventTieBreakRow } from "../../../../../lib/server/judging";
+import {
+  buildJudgingOverview,
+  computeSuggestedWinners,
+  scoreBasedWinnersCanApply,
+  type JudgeScoreRow,
+  type RubricCriterionRow,
+  type RubricRow,
+  type SubmissionRow,
+  type VoteCountRow,
+  type EventWinnerRow,
+  type EventTieBreakRow
+} from "../../../../../lib/server/judging";
 
 const loadEvent = async (env: ReturnType<typeof getEnv>, eventId: string, organizerId: string) =>
   env.DB.prepare(
@@ -114,6 +125,9 @@ export const GET: APIRoute = async (context) => {
         }))
     ];
 
+    const suggestedWinners = computeSuggestedWinners(overview);
+    const scoreBasedWinnersApply = scoreBasedWinnersCanApply(overview, suggestedWinners);
+
     return json({
       event,
       rubric: overview.rubric,
@@ -125,7 +139,9 @@ export const GET: APIRoute = async (context) => {
       },
       winners: winners.results ?? [],
       tieBreaks: tieBreaks.results ?? [],
-      unresolvedTies
+      unresolvedTies,
+      suggestedWinners,
+      scoreBasedWinnersApply
     });
   } catch {
     return json({ error: "Unable to load scoring overview." }, 500);

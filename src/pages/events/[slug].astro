@@ -413,6 +413,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 <div>
                   <h3 class="text-2xl font-bold">${escapeHtml(project.projectName || "Untitled project")}</h3>
                   <p class="text-sm text-cream/45 mt-1">${escapeHtml(project.teamName || "")}</p>
+                  ${
+                    project.track && String(project.track).trim()
+                      ? `<p class="text-xs font-bold uppercase tracking-widest text-cream/35 mt-2">Track · ${escapeHtml(
+                          String(project.track).trim()
+                        )}</p>`
+                      : ""
+                  }
                 </div>
                 <span class="status-pill !bg-cream/5 !border-cream/10">${escapeHtml(project.voteCount ?? 0)} votes</span>
               </div>
