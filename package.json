@@ -10,7 +10,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "d1:migrate": "node scripts/apply-d1-migrations.mjs --database hatch --remote",
+    "d1:migrate:status": "node scripts/apply-d1-migrations.mjs --database hatch --remote --dry-run",
+    "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.1.2",

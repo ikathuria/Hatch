@@ -4,6 +4,18 @@ import { getEnv } from "../../../../../lib/server/env";
 import { requireParticipantSession } from "../../../../../lib/server/participant-auth";
 import { extractEmails, normalizeEmail } from "../../../../../lib/server/email";
 
+type VoteEmailColumn = "participant_email" | "normalized_email";
+
+const detectVoteEmailColumn = async (
+  env: ReturnType<typeof getEnv>
+): Promise<VoteEmailColumn | null> => {
+  const columns = await env.DB.prepare("PRAGMA table_info('submission_votes')").all<{ name: string }>();
+  const names = new Set((columns.results ?? []).map((row) => String(row.name || "").toLowerCase()));
+  if (names.has("participant_email")) return "participant_email";
+  if (names.has("normalized_email")) return "normalized_email";
+  return null;
+};
+
 const loadEvent = async (
   env: ReturnType<typeof getEnv>,
   slug: string,
@@ -117,10 +129,15 @@ export const POST: APIRoute = async (context) => {
       return json({ error: "You cannot vote for your own project." }, 400);
     }
 
+    const voteEmailColumn = await detectVoteEmailColumn(env);
+    if (!voteEmailColumn) {
+      return json({ error: "Vote identity column is misconfigured." }, 500);
+    }
+
     await env.DB.prepare(
-      `INSERT INTO submission_votes (id, event_id, submission_id, participant_session_id, participant_email, created_at)
+      `INSERT INTO submission_votes (id, event_id, submission_id, participant_session_id, ${voteEmailColumn}, created_at)
        VALUES (?, ?, ?, ?, ?, datetime('now'))
-       ON CONFLICT(event_id, submission_id, participant_email) DO NOTHING`
+       ON CONFLICT(event_id, submission_id, ${voteEmailColumn}) DO NOTHING`
     )
       .bind(crypto.randomUUID(), event.id, submissionId, participant!.id, participantEmail)
       .run();
@@ -155,12 +172,17 @@ export const GET: APIRoute = async (context) => {
     if (response) return response;
 
     const participantEmail = normalizeEmail(participant!.email);
+    const voteEmailColumn = await detectVoteEmailColumn(env);
+    if (!voteEmailColumn) {
+      return json({ error: "Vote identity column is misconfigured." }, 500);
+    }
+
     const { results } = await env.DB.prepare(
       `SELECT submission_id as submissionId
        FROM submission_votes
        WHERE event_id = ?
          AND (
-           participant_email = ?
+           ${voteEmailColumn} = ?
            OR participant_session_id = ?
          )`
     )
@@ -206,12 +228,17 @@ export const DELETE: APIRoute = async (context) => {
     if (!submissionId) return json({ error: "Missing submission id." }, 400);
 
     const participantEmail = normalizeEmail(participant!.email);
+    const voteEmailColumn = await detectVoteEmailColumn(env);
+    if (!voteEmailColumn) {
+      return json({ error: "Vote identity column is misconfigured." }, 500);
+    }
+
     await env.DB.prepare(
       `DELETE FROM submission_votes
        WHERE event_id = ?
          AND submission_id = ?
          AND (
-           participant_email = ?
+           ${voteEmailColumn} = ?
            OR participant_session_id = ?
          )`
     )

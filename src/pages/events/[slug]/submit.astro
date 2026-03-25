@@ -122,6 +122,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const participantEmailInput = document.querySelector("[data-participant-email-input]");
     const participantLoginWrap = document.querySelector("[data-participant-login-wrap]");
     const participantLoginBtn = document.querySelector("[data-participant-login-btn]");
+    const participantLoginDefaultLabel = participantLoginBtn?.textContent;
     const participantEmailEl = document.querySelector("[data-participant-email]");
     const participantLogoutBtn = document.querySelector("[data-participant-logout]");
     const participantLinkWrap = document.querySelector("[data-participant-link-wrap]");
@@ -252,6 +253,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       }
 
       try {
+        participantLoginBtn.disabled = true;
+        participantLoginBtn.textContent = "Generating...";
         setStatus(authStatus, "Generating link...", "!text-sky");
         const response = await fetch(`/api/participants/events/${slug}/request-magic-link${querySuffix}`, {
           method: "POST",
@@ -272,6 +275,9 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to generate magic link.";
         setStatus(authStatus, message, "!text-coral");
+      } finally {
+        participantLoginBtn.disabled = false;
+        participantLoginBtn.textContent = participantLoginDefaultLabel || "Get Magic Link";
       }
     });
 

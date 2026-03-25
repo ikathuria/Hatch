@@ -105,14 +105,24 @@ wrangler d1 execute hatch --file db/schema.sql --remote
 4. If you are upgrading an existing Hatch database, run pending migrations in order:
 
 ```sh
-wrangler d1 execute hatch --file db/migrations/01_add_org_social.sql --remote
-wrangler d1 execute hatch --file db/migrations/02_banner_url.sql --remote
-wrangler d1 execute hatch --file db/migrations/03_judging_and_participants.sql --remote
-wrangler d1 execute hatch --file db/migrations/04_participant_vote_identity.sql --remote
-wrangler d1 execute hatch --file db/migrations/05_scope_event_slug_to_organizer.sql --remote
+node scripts/apply-d1-migrations.mjs --database hatch --remote
 ```
 
 5. Ensure `wrangler.toml` has matching binding names (`DB`, `UPLOADS`) and correct resource IDs for your account.
+
+### Staging + production parity
+
+`wrangler.toml` now includes an `env.staging` section. Before using it:
+
+1. Create staging resources:
+
+```sh
+wrangler d1 create hatch-staging
+wrangler r2 bucket create hatch-uploads-staging
+```
+
+2. Replace `REPLACE_WITH_STAGING_D1_DATABASE_ID` in `wrangler.toml`.
+3. Use `--env staging` with Wrangler commands for staging deploys/migrations.
 
 ## Deploy on Cloudflare Workers
 
@@ -157,4 +167,17 @@ npm run dev       # local dev server
 npm run build     # production build
 npm run preview   # preview production build locally
 npm run deploy    # build + deploy to Cloudflare Workers
+npm run d1:migrate # apply tracked D1 migrations (remote)
+npm run d1:migrate:status # show pending tracked migrations
+npm run preflight # build + migration status + smoke checks
 ```
+
+For `npm run preflight`, set:
+
+- `SMOKE_BASE_URL` (required): deployed URL to test
+- `D1_REMOTE=1` (optional): checks remote D1 instead of local
+- `D1_ENV=staging` (optional): target Wrangler env for migration status
+
+## Pilot operations
+
+- Event-day runbook: `docs/april3-pilot-runbook.md`

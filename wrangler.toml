@@ -2,6 +2,10 @@ name = "hatch"
 compatibility_date = "2026-03-17"
 compatibility_flags = ["nodejs_compat"]
 
+[vars]
+ENVIRONMENT = "production"
+ENABLE_DEBUG_ENV = "0"
+
 [assets]
 binding = "ASSETS"
 directory = "./dist"
@@ -14,3 +18,19 @@ database_id = "5f3c909e-784a-428b-af7e-80bf7e4f4ca4"
 [[r2_buckets]]
 binding = "UPLOADS"
 bucket_name = "hatch-uploads"
+
+[env.staging]
+name = "hatch-staging"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+ENABLE_DEBUG_ENV = "1"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "hatch-staging"
+database_id = "REPLACE_WITH_STAGING_D1_DATABASE_ID"
+
+[[env.staging.r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "hatch-uploads-staging"

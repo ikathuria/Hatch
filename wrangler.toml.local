@@ -2,6 +2,10 @@ name = "hatch"
 compatibility_date = "2026-03-19"
 pages_build_output_dir = "dist"
 
+[vars]
+ENVIRONMENT = "local"
+ENABLE_DEBUG_ENV = "1"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "hatch"

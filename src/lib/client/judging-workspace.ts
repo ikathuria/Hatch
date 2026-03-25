@@ -71,6 +71,23 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     el.classList.remove("hidden", "!text-lime", "!text-coral", "!text-sky");
     if (tone) el.classList.add(tone);
   };
+  const setButtonBusy = (
+    button: HTMLButtonElement | null | undefined,
+    busy: boolean,
+    busyLabel: string
+  ) => {
+    if (!button) return;
+    if (busy) {
+      if (!button.dataset.originalLabel) {
+        button.dataset.originalLabel = button.textContent || "";
+      }
+      button.disabled = true;
+      button.textContent = busyLabel;
+      return;
+    }
+    button.disabled = false;
+    button.textContent = button.dataset.originalLabel || button.textContent || "";
+  };
 
   const elements = {
     title: $("[data-judging-workspace-title]"),
@@ -626,28 +643,44 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
 
   elements.rubricForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    await apiJson(`${baseApi}/rubric`, { method: "PUT", body: JSON.stringify(readRubric()) }, elements.rubricStatus);
-    await loadWorkspace();
+    const submit = (event.currentTarget as HTMLFormElement).querySelector(
+      'button[type="submit"]'
+    ) as HTMLButtonElement | null;
+    setButtonBusy(submit, true, "Saving...");
+    try {
+      await apiJson(`${baseApi}/rubric`, { method: "PUT", body: JSON.stringify(readRubric()) }, elements.rubricStatus);
+      await loadWorkspace();
+    } finally {
+      setButtonBusy(submit, false, "Saving...");
+    }
   });
 
   elements.judgeLinkForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
+    const submit = (event.currentTarget as HTMLFormElement).querySelector(
+      'button[type="submit"]'
+    ) as HTMLButtonElement | null;
+    setButtonBusy(submit, true, "Generating...");
     const formData = new FormData(event.currentTarget as HTMLFormElement);
     const payload = {
       label: String(formData.get("label") || "").trim(),
       expiresAt: String(formData.get("expiresAt") || "").trim(),
       pin: String(formData.get("pin") || "").trim()
     };
-    const result = (await apiJson(`${baseApi}/judge-links`, { method: "POST", body: JSON.stringify(payload) }, elements.linkStatus)) as {
-      link?: { token?: string };
-    };
-    const generatedToken = result.link?.token || "";
-    const generated = generatedToken ? `${window.location.origin}/judge/${generatedToken}` : "";
-    if (generated && elements.generatedLinkWrap && elements.generatedLink) {
-      (elements.generatedLink as HTMLInputElement).value = generated;
-      elements.generatedLinkWrap.classList.remove("hidden");
+    try {
+      const result = (await apiJson(`${baseApi}/judge-links`, { method: "POST", body: JSON.stringify(payload) }, elements.linkStatus)) as {
+        link?: { token?: string };
+      };
+      const generatedToken = result.link?.token || "";
+      const generated = generatedToken ? `${window.location.origin}/judge/${generatedToken}` : "";
+      if (generated && elements.generatedLinkWrap && elements.generatedLink) {
+        (elements.generatedLink as HTMLInputElement).value = generated;
+        elements.generatedLinkWrap.classList.remove("hidden");
+      }
+      await loadWorkspace();
+    } finally {
+      setButtonBusy(submit, false, "Generating...");
     }
-    await loadWorkspace();
   });
 
   elements.copyLink?.addEventListener("click", async () => {
@@ -663,6 +696,10 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
 
   elements.winnersForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
+    const submit = (event.currentTarget as HTMLFormElement).querySelector(
+      'button[type="submit"]'
+    ) as HTMLButtonElement | null;
+    setButtonBusy(submit, true, "Saving...");
     const locked =
       state.published || (state.scoreBasedWinnersApply && !state.manualOverride && !state.published);
     if (locked) {
@@ -676,6 +713,8 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
       await loadWorkspace();
     } catch {
       if (locked) renderWinnerControls();
+    } finally {
+      setButtonBusy(submit, false, "Saving...");
     }
   });
 
@@ -692,8 +731,14 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
   });
 
   elements.publishBtn?.addEventListener("click", async () => {
-    await apiJson(`${baseApi}/publish-results`, { method: "POST" }, elements.winnerStatus);
-    await loadWorkspace();
+    const publishBtn = elements.publishBtn as HTMLButtonElement | null;
+    setButtonBusy(publishBtn, true, "Publishing...");
+    try {
+      await apiJson(`${baseApi}/publish-results`, { method: "POST" }, elements.winnerStatus);
+      await loadWorkspace();
+    } finally {
+      setButtonBusy(publishBtn, false, "Publishing...");
+    }
   });
 
   if (elements.judgeLinkForm) {

@@ -108,6 +108,32 @@ import { site } from "../content/site";
     </div>
   </section>
 
+  {/* How It Works */}
+  <section id="how" class="py-32 relative">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+        <div class="max-w-2xl space-y-4">
+          <span class="text-xs font-bold uppercase tracking-[0.3em] text-sky">How it works</span>
+          <h2 class="section-title !mb-0">Launch in three steps</h2>
+          <p class="text-lg text-cream/50 leading-relaxed">
+            Designed for teams running real events on short timelines.
+          </p>
+        </div>
+      </div>
+      <div class="grid gap-6 md:grid-cols-3">
+        {site.steps.map((step, index) => (
+          <article class="card hatch-card !p-8">
+            <p class="text-xs font-bold uppercase tracking-[0.25em] text-cream/35 mb-4">
+              Step {index + 1}
+            </p>
+            <h3 class="text-2xl font-bold tracking-tight mb-3">{step.title}</h3>
+            <p class="text-sm text-cream/55 leading-relaxed">{step.description}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
   {/* Live Events Section */}
   <section id="events" class="py-32 bg-ink-muted/20">
     <div class="mx-auto max-w-6xl px-6">

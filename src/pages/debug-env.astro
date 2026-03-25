@@ -3,7 +3,13 @@ import { env } from "cloudflare:workers";
 
 const dbExists = !!(env as any)?.DB;
 const envKeys = env ? Object.keys(env) : [];
+const debugEnabled = String((env as any)?.ENABLE_DEBUG_ENV || "") === "1";
+
+if (!debugEnabled) {
+  Astro.response.status = 404;
+}
 ---
+{debugEnabled ? (
 <html>
   <body>
     <h1>Worker Import Debug</h1>
@@ -11,3 +17,10 @@ const envKeys = env ? Object.keys(env) : [];
     <p>DB exists in imported env: {String(dbExists)}</p>
   </body>
 </html>
+) : (
+  <html>
+    <body>
+      <h1>Not found</h1>
+    </body>
+  </html>
+)}

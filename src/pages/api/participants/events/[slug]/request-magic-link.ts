@@ -3,6 +3,7 @@ import { json } from "../../../../../lib/server/responses";
 import { getEnv } from "../../../../../lib/server/env";
 import { createParticipantMagicLink } from "../../../../../lib/server/participant-auth";
 import { normalizeEmail, extractEmails, isValidEmail } from "../../../../../lib/server/email";
+import { enforceRateLimit, getClientIp } from "../../../../../lib/server/rate-limit";
 
 const findEligibleEmail = async (env: ReturnType<typeof getEnv>, eventId: string, email: string) => {
   const applications = await env.DB.prepare(
@@ -84,6 +85,49 @@ export const POST: APIRoute = async (context) => {
     }
     if (!isValidEmail(email)) {
       return json({ error: "Please provide a valid email." }, 400);
+    }
+
+    const ip = getClientIp(context.request);
+    const byIp = await enforceRateLimit(env, {
+      scope: "participant.magic-link.ip",
+      key: `${event.id}:${ip}`,
+      limit: 12,
+      windowSeconds: 15 * 60
+    });
+    if (!byIp.ok) {
+      return json(
+        { error: "Too many access-link requests. Please try again shortly." },
+        429,
+        { "retry-after": String(byIp.retryAfterSeconds) }
+      );
+    }
+
+    const byEmail = await enforceRateLimit(env, {
+      scope: "participant.magic-link.email",
+      key: `${event.id}:${email}`,
+      limit: 6,
+      windowSeconds: 15 * 60
+    });
+    if (!byEmail.ok) {
+      return json(
+        { error: "Too many access-link requests for this email. Please try again later." },
+        429,
+        { "retry-after": String(byEmail.retryAfterSeconds) }
+      );
+    }
+
+    const cooldown = await enforceRateLimit(env, {
+      scope: "participant.magic-link.cooldown",
+      key: `${event.id}:${email}`,
+      limit: 1,
+      windowSeconds: 45
+    });
+    if (!cooldown.ok) {
+      return json(
+        { error: "Please wait a few seconds before requesting another link." },
+        429,
+        { "retry-after": String(cooldown.retryAfterSeconds) }
+      );
     }
 
     const eligible = await findEligibleEmail(env, event.id, email);

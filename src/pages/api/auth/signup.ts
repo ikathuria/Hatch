@@ -3,6 +3,7 @@ import { hashPassword, createSession, createSessionCookie } from "../../../lib/s
 import { json } from "../../../lib/server/responses";
 import { getEnv } from "../../../lib/server/env";
 import { emailPattern } from "../../../lib/server/validation";
+import { enforceRateLimit, getClientIp } from "../../../lib/server/rate-limit";
 
 export const POST: APIRoute = async (context) => {
   try {
@@ -16,6 +17,35 @@ export const POST: APIRoute = async (context) => {
     const normalizedEmail = String(email).trim().toLowerCase();
     if (!emailPattern.test(normalizedEmail)) {
       return json({ error: "Please provide a valid email." }, 400);
+    }
+
+    const ip = getClientIp(context.request);
+    const byIp = await enforceRateLimit(env, {
+      scope: "auth.signup.ip",
+      key: ip,
+      limit: 20,
+      windowSeconds: 10 * 60
+    });
+    if (!byIp.ok) {
+      return json(
+        { error: "Too many sign-up attempts. Please try again shortly." },
+        429,
+        { "retry-after": String(byIp.retryAfterSeconds) }
+      );
+    }
+
+    const byEmail = await enforceRateLimit(env, {
+      scope: "auth.signup.email",
+      key: normalizedEmail,
+      limit: 6,
+      windowSeconds: 30 * 60
+    });
+    if (!byEmail.ok) {
+      return json(
+        { error: "Too many sign-up attempts for this email. Please try again later." },
+        429,
+        { "retry-after": String(byEmail.retryAfterSeconds) }
+      );
     }
 
     const existing = await env.DB.prepare("SELECT id FROM organizers WHERE email = ?")
