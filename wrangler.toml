@@ -1,4 +1,4 @@
-name = "hatch"
+name = "hatch-staging"
 compatibility_date = "2026-03-17"
 compatibility_flags = ["nodejs_compat"]
 
