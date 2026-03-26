@@ -25,23 +25,32 @@ const envName = args.get("env");
 const dryRun = args.get("dry-run") === "true";
 const failOnPending = args.get("fail-on-pending") === "true";
 
-const wranglerCmd =
-  process.platform === "win32"
-    ? path.resolve("node_modules/.bin/wrangler.cmd")
-    : path.resolve("node_modules/.bin/wrangler");
+const wranglerJs = path.resolve("node_modules/wrangler/bin/wrangler.js");
+const nodeBin = process.execPath;
+
+if (!fs.existsSync(wranglerJs)) {
+  throw new Error(`Wrangler entrypoint not found: ${wranglerJs}`);
+}
 
 const run = (cmdArgs, { allowFailure = false } = {}) => {
-  const res = spawnSync(wranglerCmd, cmdArgs, {
+  const res = spawnSync(nodeBin, [wranglerJs, ...cmdArgs], {
     stdio: "pipe",
     encoding: "utf8",
     shell: false
   });
 
+  if (res.error && !allowFailure) {
+    throw new Error(
+      `Command failed to start: ${nodeBin} ${wranglerJs} ${cmdArgs.join(" ")} (${res.error.code || "ERR"}: ${res.error.message})`
+    );
+  }
+
   if (res.status !== 0 && !allowFailure) {
     const stderr = (res.stderr || "").trim();
     const stdout = (res.stdout || "").trim();
+    const details = [stderr, stdout].filter(Boolean).join("\n");
     throw new Error(
-      `Command failed: ${wranglerCmd} ${cmdArgs.join(" ")}\n${stderr || stdout || "Unknown error"}`
+      `Command failed: ${nodeBin} ${wranglerJs} ${cmdArgs.join(" ")}\n${details || "Unknown error"}`
     );
   }
 
@@ -149,6 +158,18 @@ const listMigrationFiles = () =>
     .filter((name) => name.endsWith(".sql"))
     .sort((a, b) => a.localeCompare(b));
 
+const assertStagingConfig = () => {
+  if (envName !== "staging") return;
+  const wranglerTomlPath = path.resolve("wrangler.toml");
+  if (!fs.existsSync(wranglerTomlPath)) return;
+  const body = fs.readFileSync(wranglerTomlPath, "utf8");
+  if (body.includes("REPLACE_WITH_STAGING_D1_DATABASE_ID")) {
+    throw new Error(
+      "wrangler.toml still has REPLACE_WITH_STAGING_D1_DATABASE_ID. Set the real staging D1 id before running staged migration checks."
+    );
+  }
+};
+
 const main = () => {
   if (!fs.existsSync(migrationsDir)) {
     throw new Error(`Migrations directory not found: ${migrationsDir}`);
@@ -156,6 +177,7 @@ const main = () => {
   if (!fs.existsSync(bootstrapSchema)) {
     throw new Error(`Schema file not found: ${bootstrapSchema}`);
   }
+  assertStagingConfig();
 
   console.log(`\n[db] Using database "${database}" (${remote ? "remote" : "local"})`);
   if (envName) console.log(`[db] Wrangler env: ${envName}`);

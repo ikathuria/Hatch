@@ -21,7 +21,7 @@
 Run from repo root:
 
 ```sh
-SMOKE_BASE_URL="https://<staging-host>" D1_REMOTE=1 D1_ENV=staging npm run preflight
+SMOKE_BASE_URL="https://hatch-staging.ishani-629.workers.dev/" D1_REMOTE=1 D1_ENV=staging npm run preflight
 ```
 
 Preflight passes only when:

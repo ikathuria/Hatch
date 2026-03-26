@@ -177,6 +177,8 @@ For `npm run preflight`, set:
 - `SMOKE_BASE_URL` (required): deployed URL to test
 - `D1_REMOTE=1` (optional): checks remote D1 instead of local
 - `D1_ENV=staging` (optional): target Wrangler env for migration status
+- `D1_DATABASE` (optional): D1 name override (`hatch-staging` auto-used when `D1_ENV=staging`)
+- `SKIP_MIGRATION_STATUS=1` (optional): run build + smoke checks only (temporary fallback)
 
 ## Pilot operations
 
