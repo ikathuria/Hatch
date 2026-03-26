@@ -29,7 +29,7 @@ ENABLE_DEBUG_ENV = "1"
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "hatch-staging"
-database_id = "REPLACE_WITH_STAGING_D1_DATABASE_ID"
+database_id = "a4874afc-247e-41dd-90f8-739673d46e13"
 
 [[env.staging.r2_buckets]]
 binding = "UPLOADS"
