@@ -1,10 +1,11 @@
-# Detailed Implementation Steps: Hatch UI Refresh ("Warm Nest Lab")
+# Detailed Implementation Steps: Hatch UI Refresh
 
 Last updated: 2026-03-25 (America/Chicago)
 Owner: Product + Design + Frontend Engineering
 
 ## Summary
-Execution source of truth for the Warm Nest Lab redesign.
+Execution source of truth for the Hatch redesign.
+Brand direction is now governed by `docs/brand-identity.md`.
 Priority order stays unchanged:
 1. Reliability and interaction regressions first.
 2. Wave 1 (Organizer + Judge).
@@ -26,8 +27,10 @@ Priority order stays unchanged:
 
 ## 1) Artifact + Workflow
 - This document is the master execution checklist.
+- `docs/brand-identity.md` is the source of truth for public-facing brand language and visual direction.
 - Status now tracked per step in the table above.
 - Linked from `README.md`:
+  - `README.md` -> **Product and design docs** -> `docs/brand-identity.md`
   - `README.md` -> **Product and design docs** -> `docs/ui-refresh-detailed-plan.md`
 
 ## 2) Preflight Reliability Audit
@@ -63,7 +66,7 @@ Priority order stays unchanged:
 - Date/time: 2026-03-25 21:13 CDT
 - Result: **PASS**
 
-## 3) Warm Nest Foundation
+## 3) Brand Foundation
 
 Completed:
 - Added semantic token foundation in `src/styles/global.css`:
@@ -83,6 +86,8 @@ Completed:
 - Removed hidden/easter-egg shell interactions from `BaseLayout.astro`.
 - Added centralized microcopy scaffold:
   - `src/content/microcopy.ts`
+- Locked the public design identity to `Hatch` with a warm, minimal incubation metaphor.
+- Retained `Warm Nest Lab` as internal historical shorthand only, not public UI language.
 
 ## 4) Wave 1 (Organizer + Judge)
 
@@ -107,7 +112,7 @@ Completed:
 
 Completed:
 - Landing page:
-  - Reworked into calmer Warm Nest Lab layout with stronger CTA hierarchy.
+  - Reworked into a calmer Hatch layout with stronger CTA hierarchy.
   - Removed noisy animated visual treatment from core flow.
 - Events discovery:
   - Filter controls and event cards retained with normalized empty/error states.
@@ -183,7 +188,8 @@ Required for final sign-off:
 - Contrast, focus visibility, keyboard traversal, and reduced-motion behavior.
 
 ## Assumptions and Defaults
-- Vibe: Warm Nest Lab.
+- Public identity: Hatch.
+- Internal mood: warm, minimal incubation metaphor.
 - Playfulness: playful shell, serious core workflows.
 - Wave order: Organizer + Judge first, then Public + Participant.
 - Copy scope: full UX rewrite.

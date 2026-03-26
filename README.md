@@ -186,4 +186,5 @@ For `npm run preflight`, set:
 
 ## Product and design docs
 
+- Brand identity: `docs/brand-identity.md`
 - UI refresh execution checklist: `docs/ui-refresh-detailed-plan.md`

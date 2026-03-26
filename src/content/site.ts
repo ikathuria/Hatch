@@ -1,57 +1,57 @@
 export const site = {
   brand: {
     name: "Hatch",
-    byline: "Incubate your next hackathon, then let it hatch."
+    byline: "Turn early ideas into real hackathons, teams, and launches."
   },
   hero: {
-    title: "Build a nest for your next hackathon.",
+    title: "Hatch ideas into real hackathons.",
     description:
-      "Hatch gives organizers a playful event home, smooth registration flow, and judging-ready submissions on a free stack.",
+      "Hatch gives organizers a calm home for launch, submissions, judging, and results, while giving builders a place where projects can take shape in public.",
     primaryCta: {
-      label: "Create an event",
+      label: "Start hosting",
       href: "/organizer/signup"
     },
     secondaryCta: {
-      label: "Browse events",
+      label: "Explore events",
       href: "#events"
     }
   },
   stats: [
-    { label: "Free forever core", value: "0$" },
-    { label: "Avg. launch time", value: "48h" },
-    { label: "Submission flow", value: "Built-in" },
-    { label: "Organizer seats", value: "Unlimited" }
+    { label: "Organizer setup", value: "Fast to launch" },
+    { label: "Project intake", value: "Applications + submissions" },
+    { label: "Decision stage", value: "Judging-ready" },
+    { label: "Public outcome", value: "Pages, winners, results" }
   ],
   features: [
     {
-      title: "Self-serve organizer onboarding",
-      description: "Create an account, hatch an event, and publish in minutes."
+      title: "Shape the event",
+      description: "Create the page, define tracks, set logistics, and give the idea a clear structure."
     },
     {
-      title: "Custom branded event pages",
-      description: "Share your mission, tracks, and schedule with a polished layout."
+      title: "Bring people in",
+      description: "Share a polished public page where builders can discover, apply, and stay oriented."
     },
     {
-      title: "Registration + submission capture",
-      description: "Collect applications and projects automatically into your dashboard."
+      title: "Review what emerges",
+      description: "Collect submissions, route judges in, and keep scoring organized when the work starts arriving."
     },
     {
-      title: "Data export ready",
-      description: "Download applications or submissions anytime for judges and mentors."
+      title: "Publish what hatched",
+      description: "Reveal winners, open the gallery, and give the event a clear ending people can revisit."
     }
   ],
   steps: [
     {
-      title: "Create your organizer account",
-      description: "Start free and set up your first event."
+      title: "Prepare",
+      description: "Set the event foundation with details, tracks, timing, and the page people will land on."
     },
     {
-      title: "Configure tracks + details",
-      description: "Add the basics, publish, and share the event URL."
+      title: "Gather",
+      description: "Open applications, collect projects, and bring judges and participants into one flow."
     },
     {
-      title: "Collect entries",
-      description: "Use built-in forms for applications and submissions."
+      title: "Hatch",
+      description: "Score the work, publish the outcome, and turn the idea into a real event story."
     }
   ],
   links: {

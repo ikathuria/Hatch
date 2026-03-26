@@ -19,7 +19,7 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={metaDescription} />
-    <meta name="theme-color" content="#121724" />
+    <meta name="theme-color" content="#130f0b" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -32,7 +32,7 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
         const applyTheme = (theme) => {
           document.documentElement.setAttribute("data-theme", theme);
           if (metaTheme) {
-            metaTheme.setAttribute("content", theme === "light" ? "#F8F3EA" : "#121724");
+            metaTheme.setAttribute("content", theme === "light" ? "#f4eee3" : "#130f0b");
           }
         };
         const saved = localStorage.getItem(KEY);
@@ -44,25 +44,27 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
     <div class="site-glow" aria-hidden="true"></div>
     <div class="hatch-shell" aria-hidden="true"></div>
 
-    <header class="pointer-events-none fixed left-0 right-0 top-0 z-[100] px-6 py-6">
-      <div class="pointer-events-auto mx-auto w-full max-w-6xl">
-        <div class="glass-panel flex items-center justify-between px-6 py-4 shadow-2xl shadow-ink/30">
-          <a href="/" class="group flex items-center gap-4 transition-all">
-            <span class="badge text-ink shadow-lime/40">
-              <HatchEggMark class="h-[26px] w-[18px]" />
-            </span>
-            <span class="text-xl font-bold tracking-tight text-cream transition-colors group-hover:text-lime">
+    <header class="pointer-events-none fixed left-0 right-0 top-0 z-[100] border-b border-cream/[0.08] bg-ink/[0.86] px-6 py-5 backdrop-blur-xl">
+      <div class="pointer-events-auto mx-auto flex w-full max-w-6xl items-center justify-between gap-6">
+        <a href="/" class="group flex items-center gap-3 transition-all">
+          <span class="flex h-11 w-11 items-center justify-center rounded-full border border-cream/[0.12] bg-cream/[0.03] text-cream transition-colors group-hover:border-lime/[0.35] group-hover:text-lime">
+            <HatchEggMark class="h-[26px] w-[18px]" />
+          </span>
+          <div class="space-y-0.5">
+            <span class="block text-xl font-bold tracking-[-0.08em] text-cream transition-colors group-hover:text-lime">
               {site.brand.name}
             </span>
-          </a>
+            <span class="block font-mono text-[0.65rem] uppercase tracking-[0.32em] text-cream/[0.35]">Ideas into launch</span>
+          </div>
+        </a>
 
-          <nav class="hidden items-center gap-10 md:flex">
-            <a class="nav-link" href="/events">Events</a>
-            <a class="nav-link" href="/#features">Features</a>
-            <a class="nav-link" href="/#how">How it works</a>
-          </nav>
+        <nav class="hidden items-center gap-8 md:flex">
+          <a class="nav-link font-mono text-xs uppercase tracking-[0.2em]" href="/events">Events</a>
+          <a class="nav-link font-mono text-xs uppercase tracking-[0.2em]" href="/#features">Flow</a>
+          <a class="nav-link font-mono text-xs uppercase tracking-[0.2em]" href="/#how">Process</a>
+        </nav>
 
-          <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
             <button
               class="theme-toggle"
               type="button"
@@ -74,19 +76,19 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
             </button>
             {organizer ? (
               <>
-                <button class="nav-link hidden text-xs uppercase tracking-[0.2em] sm:inline-flex" data-logout-header>
+                <button class="nav-link hidden font-mono text-xs uppercase tracking-[0.2em] sm:inline-flex" data-logout-header>
                   Log out
                 </button>
-                <a class="btn-primary !rounded-xl !px-8 !py-2.5 !text-xs" href="/organizer/dashboard">
+                <a class="btn-primary !rounded-full !px-6 !py-2.5 !text-xs" href="/organizer/dashboard">
                   Organizer
                 </a>
               </>
             ) : (
               <>
-                <a class="nav-link hidden text-xs uppercase tracking-[0.2em] sm:inline-flex" href="/organizer/login">
+                <a class="nav-link hidden font-mono text-xs uppercase tracking-[0.2em] sm:inline-flex" href="/organizer/login">
                   Log in
                 </a>
-                <a class="btn-primary !rounded-xl !px-8 !py-2.5 !text-xs" href="/organizer/signup">
+                <a class="btn-primary !rounded-full !px-6 !py-2.5 !text-xs" href="/organizer/signup">
                   Start hosting
                 </a>
               </>
@@ -100,32 +102,32 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
       <slot />
     </main>
 
-    <footer class="relative mt-20 border-t border-cream/10 bg-ink-muted/30 backdrop-blur-xl">
-      <div class="mx-auto max-w-6xl px-6 py-20">
-        <div class="grid gap-16 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
-          <div class="space-y-6">
+    <footer class="relative mt-20 border-t border-cream/[0.08] bg-ink-muted/20">
+      <div class="mx-auto max-w-6xl px-6 py-[4.5rem]">
+        <div class="grid gap-14 md:grid-cols-[1.4fr_1fr_1fr]">
+          <div class="space-y-5">
             <div class="flex items-center gap-3">
-              <span class="badge h-8 w-8 rounded-lg text-ink">
+              <span class="flex h-10 w-10 items-center justify-center rounded-full border border-cream/[0.12] bg-cream/[0.03] text-cream">
                 <HatchEggMark class="h-5 w-[14px]" />
               </span>
-              <span class="text-2xl font-bold tracking-tighter">{site.brand.name}</span>
+              <span class="text-2xl font-bold tracking-[-0.08em]">{site.brand.name}</span>
             </div>
-            <p class="max-w-xs leading-relaxed text-cream/60">{site.brand.byline}</p>
-            <p class="text-sm text-cream/45">Built for smooth event operations.</p>
+            <p class="max-w-sm leading-relaxed text-cream/[0.62]">{site.brand.byline}</p>
+            <p class="font-mono text-xs uppercase tracking-[0.22em] text-cream/[0.32]">Built for organizers. Open to builders.</p>
           </div>
 
-          <div class="space-y-6">
-            <h4 class="text-xs font-bold uppercase tracking-widest text-sky">Platform</h4>
-            <ul class="space-y-4 text-sm text-cream/70">
-              <li><a href="/events" class="transition-colors hover:text-lime">Find events</a></li>
-              <li><a href="/#features" class="transition-colors hover:text-lime">Organizer tools</a></li>
-              <li><a href="/#how" class="transition-colors hover:text-lime">How it works</a></li>
+          <div class="space-y-5">
+            <h4 class="font-mono text-[0.7rem] uppercase tracking-[0.28em] text-sky">Platform</h4>
+            <ul class="space-y-3 text-sm text-cream/70">
+              <li><a href="/events" class="transition-colors hover:text-lime">Explore events</a></li>
+              <li><a href="/#features" class="transition-colors hover:text-lime">Product flow</a></li>
+              <li><a href="/#how" class="transition-colors hover:text-lime">How Hatch works</a></li>
             </ul>
           </div>
 
-          <div class="space-y-6">
-            <h4 class="text-xs font-bold uppercase tracking-widest text-violet">Resources</h4>
-            <ul class="space-y-4 text-sm text-cream/70">
+          <div class="space-y-5">
+            <h4 class="font-mono text-[0.7rem] uppercase tracking-[0.28em] text-coral">Resources</h4>
+            <ul class="space-y-3 text-sm text-cream/70">
               <li>
                 <a
                   href="https://github.com/ikathuria/Hatch/blob/main/CONTRIBUTING.md"
@@ -138,26 +140,15 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
               </li>
               <li><a href="/privacy" class="transition-colors hover:text-lime">Privacy policy</a></li>
               <li><a href="/terms" class="transition-colors hover:text-lime">Terms of service</a></li>
-            </ul>
-          </div>
-
-          <div class="space-y-6">
-            <h4 class="text-xs font-bold uppercase tracking-widest text-coral">Support</h4>
-            <ul class="space-y-4 text-sm text-cream/70">
-              <li>
-                <a href={`mailto:${site.links.email}`} class="lowercase transition-colors hover:text-lime">
-                  {site.links.email}
-                </a>
-              </li>
               <li><a href="/code-of-conduct" class="transition-colors hover:text-lime">Code of conduct</a></li>
-              <li><a href="https://github.com/ikathuria/Hatch" class="transition-colors hover:text-lime">Documentation</a></li>
+              <li><a href={`mailto:${site.links.email}`} class="lowercase transition-colors hover:text-lime">{site.links.email}</a></li>
             </ul>
           </div>
         </div>
 
-        <div class="mt-20 flex flex-col items-center justify-between gap-6 border-t border-cream/10 pt-10 md:flex-row">
-          <p class="text-xs text-cream/40">&copy; {new Date().getFullYear()} {site.brand.name}. All rights reserved.</p>
-          <div class="status-pill !border-lime/20 !bg-lime/10 !text-lime text-xs">Warm Nest Lab UI</div>
+        <div class="mt-16 flex flex-col gap-4 border-t border-cream/[0.08] pt-8 md:flex-row md:items-center md:justify-between">
+          <p class="text-xs text-cream/[0.38]">&copy; {new Date().getFullYear()} {site.brand.name}. All rights reserved.</p>
+          <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-cream/[0.28]">Minimal launch infrastructure for modern hackathons</p>
         </div>
       </div>
     </footer>
@@ -172,7 +163,7 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem(THEME_KEY, theme);
         if (themeIcon) themeIcon.textContent = theme === "light" ? "L" : "D";
-        if (metaTheme) metaTheme.setAttribute("content", theme === "light" ? "#F8F3EA" : "#121724");
+        if (metaTheme) metaTheme.setAttribute("content", theme === "light" ? "#f4eee3" : "#130f0b");
       };
 
       const currentTheme = document.documentElement.getAttribute("data-theme") ?? "dark";

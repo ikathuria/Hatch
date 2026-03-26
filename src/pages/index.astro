@@ -4,91 +4,133 @@ import { site } from "../content/site";
 ---
 
 <BaseLayout title={`${site.brand.name} | Hackathon hosting platform`}>
-  <section class="mx-auto max-w-6xl px-6 py-16">
-    <div class="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-      <div class="space-y-6">
-        <span class="eyebrow !border-lime/25 !bg-lime/10 !text-lime">Warm Nest Lab</span>
-        <h1 class="text-5xl font-bold tracking-tight md:text-7xl">{site.hero.title}</h1>
-        <p class="max-w-2xl text-lg leading-relaxed text-cream/60">{site.hero.description}</p>
+  <section class="mx-auto max-w-6xl px-6 pb-10 pt-10">
+    <div class="grid gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      <div class="space-y-8">
+        <div class="space-y-4">
+          <span class="eyebrow !border-lime/20 !bg-lime/[0.08] !font-mono !text-[0.68rem] !tracking-[0.24em] !text-lime">
+            Launch ideas before they cool
+          </span>
+          <h1 class="max-w-3xl text-5xl font-bold tracking-[-0.08em] md:text-7xl">{site.hero.title}</h1>
+          <p class="max-w-2xl text-lg leading-relaxed text-cream/[0.64] md:text-xl">
+            {site.hero.description}
+          </p>
+        </div>
+
         <div class="flex flex-wrap gap-3">
-          <a class="btn-primary !px-8 !py-3.5" href={site.hero.primaryCta.href}>{site.hero.primaryCta.label}</a>
-          <a class="btn-ghost !px-8 !py-3.5" href={site.hero.secondaryCta.href}>{site.hero.secondaryCta.label}</a>
+          <a class="btn-primary !rounded-full !px-8 !py-3.5" href={site.hero.primaryCta.href}>{site.hero.primaryCta.label}</a>
+          <a class="btn-ghost !rounded-full !px-8 !py-3.5 !font-mono !text-xs !uppercase !tracking-[0.2em]" href={site.hero.secondaryCta.href}>
+            {site.hero.secondaryCta.label}
+          </a>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-3">
+          <div class="border-l border-lime/30 pl-4">
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime">Organizer-first</p>
+            <p class="mt-2 text-sm leading-relaxed text-cream/[0.55]">A calm workspace for setup, submissions, judging, and results.</p>
+          </div>
+          <div class="border-l border-sky/30 pl-4">
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-sky">Builder-aware</p>
+            <p class="mt-2 text-sm leading-relaxed text-cream/[0.55]">Public pages and flows that feel clear from apply through final gallery.</p>
+          </div>
+          <div class="border-l border-cream/[0.18] pl-4">
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-cream/70">Made to publish</p>
+            <p class="mt-2 text-sm leading-relaxed text-cream/[0.55]">Every event can end with structure, visibility, and a result people can revisit.</p>
+          </div>
         </div>
       </div>
 
-      <aside class="card !p-7 space-y-5">
-        <h2 class="text-xl font-bold">Why teams pick Hatch</h2>
-        <ul class="space-y-3 text-sm text-cream/65">
-          <li>Organizer dashboard for setup, judging, and publishing.</li>
-          <li>Judge links with optional PIN and expiry controls.</li>
-          <li>Public event pages with application, submission, and voting flows.</li>
-        </ul>
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
-          {site.stats.map((stat) => (
-            <div class="rounded-xl border border-cream/10 bg-cream/5 p-3">
-              <p class="text-xs uppercase tracking-widest text-cream/45">{stat.label}</p>
-              <p class="mt-1 text-lg font-bold">{stat.value}</p>
-            </div>
-          ))}
-        </div>
+      <aside class="landing-orbital" aria-hidden="true">
+        <div class="landing-orbital__ring landing-orbital__ring--outer"></div>
+        <div class="landing-orbital__ring landing-orbital__ring--inner"></div>
+        <div class="landing-orbital__glow"></div>
+        <div class="landing-orbital__shell landing-orbital__shell--top"></div>
+        <div class="landing-orbital__shell landing-orbital__shell--bottom"></div>
+        <div class="landing-orbital__crack"></div>
+        <div class="landing-orbital__label landing-orbital__label--left">prepare</div>
+        <div class="landing-orbital__label landing-orbital__label--top">gather</div>
+        <div class="landing-orbital__label landing-orbital__label--right">launch</div>
       </aside>
     </div>
   </section>
 
-  <section id="features" class="mx-auto max-w-6xl px-6 py-10">
-    <div class="space-y-3">
-      <span class="eyebrow !border-sky/25 !bg-sky/10 !text-sky">Organizer tools</span>
-      <h2 class="text-3xl font-bold tracking-tight md:text-4xl">Everything needed to run one event well</h2>
+  <section class="mx-auto max-w-6xl px-6 py-8">
+    <div class="proof-strip">
+      {site.stats.map((stat) => (
+        <div class="proof-strip__item">
+          <p class="proof-strip__value">{stat.value}</p>
+          <p class="proof-strip__label">{stat.label}</p>
+        </div>
+      ))}
     </div>
-    <div class="mt-8 grid gap-5 md:grid-cols-2">
+  </section>
+
+  <section id="features" class="mx-auto max-w-6xl px-6 py-14">
+    <div class="max-w-3xl space-y-3">
+      <span class="eyebrow !border-sky/[0.18] !bg-sky/[0.08] !font-mono !text-[0.68rem] !tracking-[0.24em] !text-sky">Product flow</span>
+      <h2 class="text-3xl font-bold tracking-[-0.07em] md:text-5xl">A launch system that stays warm without getting noisy.</h2>
+      <p class="text-base leading-relaxed text-cream/[0.58] md:text-lg">
+        Hatch gives structure to the messy middle of an event: the setup before launch, the people arriving, the projects taking shape, and the outcome everyone comes back to see.
+      </p>
+    </div>
+
+    <div class="fissure-divider" aria-hidden="true"></div>
+
+    <div class="grid gap-5 md:grid-cols-2">
       {site.features.map((feature) => (
-        <article class="card !p-6">
-          <h3 class="text-xl font-bold">{feature.title}</h3>
-          <p class="mt-2 text-sm leading-relaxed text-cream/60">{feature.description}</p>
+        <article class="landing-feature-card">
+          <p class="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-cream/[0.34]">Core capability</p>
+          <h3 class="mt-4 text-2xl font-bold tracking-[-0.05em]">{feature.title}</h3>
+          <p class="mt-3 text-sm leading-relaxed text-cream/[0.58] md:text-base">{feature.description}</p>
         </article>
       ))}
     </div>
   </section>
 
-  <section id="how" class="mx-auto max-w-6xl px-6 py-10">
-    <div class="space-y-3">
-      <span class="eyebrow !border-violet/25 !bg-violet/10 !text-violet">How it works</span>
-      <h2 class="text-3xl font-bold tracking-tight md:text-4xl">Launch in three steps</h2>
+  <section id="how" class="mx-auto max-w-6xl px-6 py-12">
+    <div class="max-w-3xl space-y-3">
+      <span class="eyebrow !border-cream/[0.14] !bg-cream/[0.04] !font-mono !text-[0.68rem] !tracking-[0.24em] !text-cream/70">From first draft to public launch</span>
+      <h2 class="text-3xl font-bold tracking-[-0.07em] md:text-5xl">Prepare. Gather. Hatch.</h2>
     </div>
+
     <div class="mt-8 grid gap-5 md:grid-cols-3">
       {site.steps.map((step, index) => (
-        <article class="card !p-6">
-          <p class="text-xs font-bold uppercase tracking-widest text-cream/40">Step {index + 1}</p>
-          <h3 class="mt-3 text-xl font-bold">{step.title}</h3>
-          <p class="mt-2 text-sm leading-relaxed text-cream/60">{step.description}</p>
+        <article class="landing-step-card">
+          <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime/80">0{index + 1}</p>
+          <h3 class="mt-5 text-2xl font-bold tracking-[-0.05em]">{step.title}</h3>
+          <p class="mt-3 text-sm leading-relaxed text-cream/[0.58] md:text-base">{step.description}</p>
         </article>
       ))}
     </div>
   </section>
 
   <section id="events" class="mx-auto max-w-6xl px-6 py-12">
-    <div class="mb-7 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <div class="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
-        <span class="eyebrow !border-lime/25 !bg-lime/10 !text-lime">Live events</span>
-        <h2 class="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Upcoming and active hackathons</h2>
+        <span class="eyebrow !border-lime/20 !bg-lime/[0.08] !font-mono !text-[0.68rem] !tracking-[0.24em] !text-lime">Live on Hatch</span>
+        <h2 class="mt-3 text-3xl font-bold tracking-[-0.07em] md:text-5xl">Ideas that already made it out into the world.</h2>
+        <p class="mt-3 max-w-2xl text-base leading-relaxed text-cream/[0.58]">
+          Published events are the proof. Hatch moves from planning to public pages, active submissions, and finished results without asking organizers to stitch together their own stack.
+        </p>
       </div>
-      <a class="btn-ghost !px-5 !py-3 !text-sm" href="/events">Browse all events</a>
+      <a class="btn-ghost !rounded-full !px-5 !py-3 !font-mono !text-xs !uppercase !tracking-[0.2em]" href="/events">Browse all events</a>
     </div>
 
     <div class="grid gap-5 md:grid-cols-2" data-events-grid aria-live="polite">
-      <div class="card !p-8 text-cream/40">Loading events...</div>
+      <div class="landing-event-card !p-8 text-cream/40">Loading events...</div>
     </div>
   </section>
 
   <section class="mx-auto max-w-5xl px-6 py-14">
-    <div class="card !p-10 text-center md:!p-14">
-      <h2 class="text-3xl font-bold tracking-tight md:text-5xl">Ready to host your next hackathon?</h2>
+    <div class="landing-cta-panel text-center">
+      <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime/80">Start with the idea. Keep the structure.</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-[-0.07em] md:text-5xl">Launch the next hackathon people actually remember.</h2>
       <p class="mx-auto mt-4 max-w-2xl text-cream/60">
-        Create your organizer account, launch your event page, and run judging from one workspace.
+        Create the page, open the flow, collect the work, and publish the outcome from one calm workspace.
       </p>
       <div class="mt-7 flex flex-wrap justify-center gap-3">
-        <a class="btn-primary !px-8 !py-3.5" href="/organizer/signup">Create organizer account</a>
-        <a class="btn-ghost !px-8 !py-3.5" href="/events">See public events</a>
+        <a class="btn-primary !rounded-full !px-8 !py-3.5" href="/organizer/signup">Create organizer account</a>
+        <a class="btn-ghost !rounded-full !px-8 !py-3.5 !font-mono !text-xs !uppercase !tracking-[0.2em]" href="/events">See public events</a>
       </div>
     </div>
   </section>
@@ -118,7 +160,7 @@ import { site } from "../content/site";
     const renderEvents = (events) => {
       if (!grid) return;
       if (!events.length) {
-        grid.innerHTML = '<div class="card !p-8 text-cream/45 italic border-dashed">No events are published yet.</div>';
+        grid.innerHTML = '<div class="landing-event-card !p-8 text-cream/45 italic border-dashed">No events are published yet.</div>';
         return;
       }
 
@@ -128,15 +170,20 @@ import { site } from "../content/site";
           const organizerId = String(event.organizerId || "").trim();
           const href = organizerId ? `/events/${organizerId}/${event.slug}` : `/events/${event.slug}`;
           return `
-            <article class="card !p-6">
-              <div class="flex items-center justify-between gap-3">
-                <span class="status-pill !bg-sky/10 !text-sky !border-sky/20">${escapeHtml(event.mode || "Hackathon")}</span>
-                <span class="text-xs uppercase tracking-widest text-cream/40">${escapeHtml(event.location || "Location TBD")}</span>
+            <article class="landing-event-card">
+              <div class="flex items-start justify-between gap-4">
+                <span class="status-pill !border-sky/[0.18] !bg-sky/[0.08] !font-mono !text-[0.66rem] !uppercase !tracking-[0.22em] !text-sky">${escapeHtml(event.mode || "Hackathon")}</span>
+                <span class="font-mono text-[0.66rem] uppercase tracking-[0.22em] text-cream/[0.36]">${escapeHtml(event.location || "Location TBD")}</span>
               </div>
-              <h3 class="mt-4 text-2xl font-bold">${escapeHtml(event.title || "Untitled event")}</h3>
-              <p class="mt-2 text-sm text-cream/60">${escapeHtml(event.tagline || "No tagline yet.")}</p>
-              <p class="mt-4 text-xs uppercase tracking-widest text-cream/45">${formatDate(event.startDate)} - ${formatDate(event.endDate)}</p>
-              <a class="btn-primary mt-5 !w-full !text-sm" href="${href}">Open event</a>
+              <h3 class="mt-8 text-3xl font-bold tracking-[-0.05em]">${escapeHtml(event.title || "Untitled event")}</h3>
+              <p class="mt-3 min-h-12 text-sm leading-relaxed text-cream/[0.58]">${escapeHtml(event.tagline || "No tagline yet.")}</p>
+              <div class="mt-8 flex items-end justify-between gap-4 border-t border-cream/[0.08] pt-5">
+                <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/40">${formatDate(event.startDate)} - ${formatDate(event.endDate)}</p>
+                <a class="inline-flex items-center gap-2 font-mono text-[0.7rem] uppercase tracking-[0.22em] text-lime transition-colors hover:text-cream" href="${href}">
+                  Open event
+                  <span aria-hidden="true">/</span>
+                </a>
+              </div>
             </article>
           `;
         })
@@ -152,7 +199,7 @@ import { site } from "../content/site";
         renderEvents(Array.isArray(payload.events) ? payload.events : []);
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to load events.";
-        grid.innerHTML = `<div class="card !p-8 text-coral border-coral/20">${escapeHtml(message)}</div>`;
+        grid.innerHTML = `<div class="landing-event-card !p-8 text-coral border-coral/20">${escapeHtml(message)}</div>`;
       }
     };
 
