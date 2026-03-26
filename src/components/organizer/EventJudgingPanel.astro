@@ -11,24 +11,24 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
 <div class="judging-workspace space-y-8" data-judging-root data-judging-event-id={eventId}>
   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <div class="card !p-5">
-      <p class="text-xs font-bold uppercase tracking-widest text-cream/35 mb-2">Rubric</p>
+      <p class="mb-2 text-xs font-bold uppercase tracking-widest text-cream/35">Rubric</p>
       <p class="text-2xl font-bold" data-stat-criteria>0</p>
-      <p class="text-sm text-cream/45 mt-1">Criteria configured</p>
+      <p class="mt-1 text-sm text-cream/45">Criteria configured</p>
     </div>
     <div class="card !p-5">
-      <p class="text-xs font-bold uppercase tracking-widest text-cream/35 mb-2">Judge links</p>
+      <p class="mb-2 text-xs font-bold uppercase tracking-widest text-cream/35">Judge links</p>
       <p class="text-2xl font-bold" data-stat-judge-links>0</p>
-      <p class="text-sm text-cream/45 mt-1">Active or revoked</p>
+      <p class="mt-1 text-sm text-cream/45">Shared access links</p>
     </div>
     <div class="card !p-5">
-      <p class="text-xs font-bold uppercase tracking-widest text-cream/35 mb-2">Tie warnings</p>
+      <p class="mb-2 text-xs font-bold uppercase tracking-widest text-cream/35">Tie warnings</p>
       <p class="text-2xl font-bold" data-stat-ties>0</p>
-      <p class="text-sm text-cream/45 mt-1">Need review</p>
+      <p class="mt-1 text-sm text-cream/45">Need a winner decision</p>
     </div>
     <div class="card !p-5">
-      <p class="text-xs font-bold uppercase tracking-widest text-cream/35 mb-2">Results</p>
+      <p class="mb-2 text-xs font-bold uppercase tracking-widest text-cream/35">Results</p>
       <p class="text-2xl font-bold" data-stat-results>Draft</p>
-      <p class="text-sm text-cream/45 mt-1">Reveal state</p>
+      <p class="mt-1 text-sm text-cream/45">Publish status</p>
     </div>
   </div>
 
@@ -36,12 +36,12 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
     <section class="card !p-6 md:!p-8 space-y-6">
       <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Rubric builder</span>
-          <h3 class="text-2xl font-bold tracking-tight mt-3">Custom scoring</h3>
+          <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Rubric</span>
+          <h3 class="mt-3 text-2xl font-bold tracking-tight">Scoring setup</h3>
         </div>
         <div class="flex items-center gap-3">
           <label class="text-xs font-bold uppercase tracking-widest text-cream/40" for={id("score-scale")}>Score scale</label>
-          <select class="input-field !w-auto !py-3 !px-4" id={id("score-scale")} data-score-scale>
+          <select class="input-field !w-auto !px-4 !py-3" id={id("score-scale")} data-score-scale>
             <option value="5">1-5</option>
             <option value="10" selected>1-10</option>
             <option value="20">1-20</option>
@@ -53,9 +53,11 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
       <form class="space-y-4" data-rubric-form>
         <div class="space-y-4" data-rubric-rows></div>
         <div class="flex flex-col gap-4 pt-2 md:flex-row md:items-center md:justify-between">
-          <button class="btn-ghost !px-5 !py-3 !text-sm" type="button" data-add-criterion>+ Add criterion</button>
+          <button class="btn-ghost !px-5 !py-3 !text-sm" type="button" data-add-criterion>
+            + Add criterion
+          </button>
           <div class="flex items-center gap-4">
-            <span class="status-pill hidden !bg-transparent !border-none !p-0" data-rubric-status></span>
+            <span class="status-pill hidden !border-none !bg-transparent !p-0" data-rubric-status></span>
             <button class="btn-primary !px-6" type="submit">Save rubric</button>
           </div>
         </div>
@@ -65,10 +67,8 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
     <section class="card !p-6 md:!p-8 space-y-6">
       <div class="space-y-2">
         <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Judge access</span>
-        <h3 class="text-2xl font-bold tracking-tight mt-3">Shared links</h3>
-        <p class="text-sm text-cream/50 leading-relaxed">
-          Revocable links, optional PIN, expiry.
-        </p>
+        <h3 class="mt-3 text-2xl font-bold tracking-tight">Invite judges</h3>
+        <p class="text-sm leading-relaxed text-cream/50">Generate revocable links with optional PIN and expiry.</p>
       </div>
 
       <form class="space-y-4" data-judge-link-form>
@@ -85,7 +85,7 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
           <input class="input-field" id={id("judge-pin")} name="pin" type="text" inputmode="numeric" autocomplete="off" placeholder="1234" />
         </div>
         <div class="flex items-center justify-between gap-4">
-          <span class="status-pill hidden !bg-transparent !border-none !p-0" data-link-status></span>
+          <span class="status-pill hidden !border-none !bg-transparent !p-0" data-link-status></span>
           <button class="btn-primary !px-6" type="submit">Generate link</button>
         </div>
       </form>
@@ -101,7 +101,7 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
       <div class="space-y-3">
         <h4 class="text-xs font-bold uppercase tracking-widest text-cream/40">Existing links</h4>
         <div class="space-y-3" data-judge-links>
-          <div class="text-sm text-cream/35 italic">No judge links loaded yet.</div>
+          <div class="text-sm italic text-cream/35">No judge links loaded yet.</div>
         </div>
       </div>
     </section>
@@ -111,11 +111,11 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
     <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
       <div>
         <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Scoreboard</span>
-        <h3 class="text-2xl font-bold tracking-tight mt-3">Ranked submissions</h3>
+        <h3 class="mt-3 text-2xl font-bold tracking-tight">Ranked submissions</h3>
       </div>
       <span class="status-pill hidden" data-overview-status></span>
     </div>
-    <div class="overflow-x-auto -mx-2 px-2">
+    <div class="-mx-2 overflow-x-auto px-2">
       <table class="min-w-full text-left text-sm">
         <thead class="text-xs uppercase tracking-widest text-cream/35">
           <tr>
@@ -130,7 +130,7 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
         </thead>
         <tbody class="align-top divide-y divide-cream/5" data-overview-rows>
           <tr>
-            <td colspan="7" class="py-6 text-cream/35 italic">Waiting for judging data…</td>
+            <td colspan="7" class="py-6 italic text-cream/35">Waiting for scoring data...</td>
           </tr>
         </tbody>
       </table>
@@ -142,12 +142,12 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
       <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <span class="eyebrow !text-coral !bg-coral/10 !border-coral/20">Tie breaks</span>
-          <h3 class="text-2xl font-bold tracking-tight mt-3">Manual resolution</h3>
+          <h3 class="mt-3 text-2xl font-bold tracking-tight">Resolve tied winners</h3>
         </div>
         <span class="status-pill hidden" data-tie-status></span>
       </div>
       <div class="space-y-4" data-tie-breaks>
-        <div class="text-sm text-cream/35 italic">No unresolved ties yet.</div>
+        <div class="text-sm italic text-cream/35">No unresolved ties yet.</div>
       </div>
     </section>
 
@@ -155,17 +155,14 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
       <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Winners</span>
-          <h3 class="text-2xl font-bold tracking-tight mt-3">Publishable results</h3>
+          <h3 class="mt-3 text-2xl font-bold tracking-tight">Set winners and publish</h3>
         </div>
         <span class="status-pill hidden" data-winner-status></span>
       </div>
 
       <form class="space-y-5" data-winners-form>
-        <div
-          class="rounded-2xl border border-cream/10 bg-cream/[0.03] p-4 space-y-2 hidden"
-          data-score-based-winners-hint
-        >
-          <label class="flex items-start gap-3 cursor-pointer select-none">
+        <div class="hidden space-y-2 rounded-2xl border border-cream/10 bg-cream/[0.03] p-4" data-score-based-winners-hint>
+          <label class="flex cursor-pointer select-none items-start gap-3">
             <input
               type="checkbox"
               class="mt-1 accent-lime"
@@ -174,7 +171,7 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
             />
             <span>
               <span class="text-sm font-semibold text-cream/90">Manual override</span>
-              <span id={id("manual-override-help")} class="block text-sm text-cream/45 mt-1 leading-relaxed">
+              <span id={id("manual-override-help")} class="mt-1 block text-sm leading-relaxed text-cream/45">
                 Winners follow the highest total score when there are no ties. Check this to pick different winners
                 yourself, then save.
               </span>
@@ -188,7 +185,7 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
           </select>
         </div>
         <div class="space-y-4" data-track-winners>
-          <div class="text-sm text-cream/35 italic">Track winner selectors appear when tracks load.</div>
+          <div class="text-sm italic text-cream/35">Track winner selectors appear when tracks load.</div>
         </div>
         <div class="space-y-2">
           <label class="form-label" for={id("winner-notes")}>Tie-break notes</label>
@@ -197,31 +194,26 @@ const id = (suffix: string) => `judging-${eventId}-${suffix}`;
             id={id("winner-notes")}
             name="notes"
             rows="4"
-            placeholder="Record any manual tie-break rationale before publishing."
+            placeholder="Optional: explain how ties were resolved."
           ></textarea>
         </div>
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <p class="text-sm text-cream/40" data-winners-hint>
-            Select winners before publishing results.
-          </p>
-          <button class="btn-primary !px-6" type="submit">Save winners</button>
+          <p class="text-sm text-cream/40" data-winners-hint>Select winners before publishing results.</p>
+          <div class="flex flex-wrap items-center gap-3">
+            <button class="btn-ghost !px-6" type="submit">Save winners</button>
+            <button class="btn-primary !px-6" type="button" data-publish-results>Publish results</button>
+          </div>
         </div>
       </form>
     </section>
   </section>
 
-  <div class="flex justify-end">
-    <button class="btn-primary !px-6 !py-2.5 !text-xs" type="button" data-publish-results>
-      Publish results
-    </button>
-  </div>
-
   {showStandaloneLink && (
     <p class="text-center text-xs text-cream/35">
-      <a class="text-lime font-semibold hover:underline" href={`/organizer/events/${eventId}/judging`}>
-        Open full-page judging
+      <a class="font-semibold text-lime hover:underline" href={`/organizer/events/${eventId}/judging`}>
+        Open full-page judging workspace
       </a>
-      · same data, more room
+      � same data, more room
     </p>
   )}
 </div>

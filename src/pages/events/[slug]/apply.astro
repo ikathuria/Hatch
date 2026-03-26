@@ -2,109 +2,109 @@
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Apply to Compete | Hatch">
-  <section class="mx-auto w-full max-w-4xl px-6 py-16">
-    <div class="card !p-12 relative overflow-hidden group">
-      <div class="absolute inset-0 bg-gradient-to-br from-lime/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-      
-      <div class="relative z-10 space-y-12">
-        <div class="space-y-4">
-          <div class="flex items-center gap-3">
-              <a href="#" data-back-link class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-              </a>
-              <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Mission Entry</span>
-          </div>
-          <h1 class="text-4xl md:text-5xl font-bold tracking-tighter" data-event-title>Apply to Compete</h1>
-          <p class="text-lg text-cream/50 leading-relaxed font-medium" data-event-tagline>Initialize your participation protocol. We'll synchronize your status shortly.</p>
+<BaseLayout title="Apply to Participate | Hatch">
+  <section class="mx-auto w-full max-w-4xl px-6 py-12">
+    <div class="card !p-8 md:!p-10">
+      <div class="mb-8 space-y-3">
+        <div class="flex items-center gap-3">
+          <a
+            href="#"
+            data-back-link
+            class="flex h-8 w-8 items-center justify-center rounded-lg bg-cream/5 transition-colors hover:bg-cream/10"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </a>
+          <span class="eyebrow !border-lime/20 !bg-lime/10 !text-lime">Participant application</span>
+        </div>
+        <h1 class="text-4xl font-bold tracking-tight md:text-5xl" data-event-title>Apply to participate</h1>
+        <p class="text-cream/55" data-event-tagline>Tell organizers who you are and what you want to build.</p>
+      </div>
+
+      <form class="space-y-8" data-form>
+        <div class="grid gap-6 md:grid-cols-2">
+          <label class="space-y-2">
+            <span class="form-label">Full name <span class="text-coral">*</span></span>
+            <input class="input-field" name="fullName" required placeholder="Jordan Lee" />
+          </label>
+
+          <label class="space-y-2">
+            <span class="form-label">Email <span class="text-coral">*</span></span>
+            <input class="input-field" type="email" name="email" required placeholder="you@example.com" />
+          </label>
+
+          <label class="space-y-2">
+            <span class="form-label">Organization</span>
+            <input class="input-field" name="organization" placeholder="School, company, or community" />
+          </label>
+
+          <label class="space-y-2">
+            <span class="form-label">Primary role <span class="text-coral">*</span></span>
+            <select class="input-field" name="role" required>
+              <option value="">Select role</option>
+              <option>Developer</option>
+              <option>Designer</option>
+              <option>Product / Business</option>
+              <option>AI / Data</option>
+              <option>Other</option>
+            </select>
+          </label>
+
+          <label class="space-y-2">
+            <span class="form-label">Track <span class="text-coral">*</span></span>
+            <select class="input-field" name="track" required data-track-select>
+              <option value="">Select track</option>
+            </select>
+          </label>
+
+          <label class="space-y-2">
+            <span class="form-label">Location / time zone</span>
+            <input class="input-field" name="location" placeholder="Chicago, IL (UTC-6)" />
+          </label>
         </div>
 
-        <form class="space-y-10" data-form>
-          <div class="grid md:grid-cols-2 gap-8">
-            <div class="space-y-6">
-                <div class="space-y-2">
-                    <label class="form-label">Personnel Identifier <span class="text-coral">*</span></label>
-                    <input class="input-field" name="fullName" required placeholder="Jordan Lee" />
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label">Communication Endpoint <span class="text-coral">*</span></label>
-                    <input class="input-field" type="email" name="email" required placeholder="you@stellar.io" />
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label">Affiliation / Colony</label>
-                    <input class="input-field" name="organization" placeholder="School, Hub, or Collective" />
-                </div>
-            </div>
+        <div class="space-y-6 border-t border-cream/10 pt-6">
+          <label class="space-y-2">
+            <span class="form-label">Team status <span class="text-coral">*</span></span>
+            <select class="input-field" name="teamStatus" required>
+              <option value="">Select team status</option>
+              <option>Solo and looking for teammates</option>
+              <option>Already have a team</option>
+              <option>Open to either</option>
+            </select>
+          </label>
 
-            <div class="space-y-6">
-                <div class="space-y-2">
-                    <label class="form-label">Primary Specialization <span class="text-coral">*</span></label>
-                    <select class="input-field" name="role" required>
-                        <option value="">Select Specialization</option>
-                        <option>Architect (Developer)</option>
-                        <option>Designer (UI/UX)</option>
-                        <option>Strategist (Business)</option>
-                        <option>Synthesizer (AI/Data)</option>
-                        <option>Other</option>
-                    </select>
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label">Target Track <span class="text-coral">*</span></label>
-                    <select class="input-field" name="track" required data-track-select>
-                        <option value="">Choose an objective...</option>
-                    </select>
-                </div>
-                <div class="space-y-2">
-                    <label class="form-label">Synchronization Mode</label>
-                    <input class="input-field" name="location" placeholder="Chicago / UTC-6" />
-                </div>
-            </div>
-          </div>
+          <label class="space-y-2">
+            <span class="form-label">Project idea (optional)</span>
+            <textarea class="input-field" name="idea" rows="4" placeholder="What would you like to build?"></textarea>
+          </label>
 
-          <div class="space-y-6 pt-6 border-t border-cream/5">
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="space-y-2">
-                    <label class="form-label">Squad Configuration <span class="text-coral">*</span></label>
-                    <select class="input-field" name="teamStatus" required>
-                        <option value="">Select configuration</option>
-                        <option>Solo Operator (Looking for Squad)</option>
-                        <option>Squad Leader (Have a Team)</option>
-                        <option>Flexible (Open to Either)</option>
-                    </select>
-                </div>
-                <div class="flex items-center h-full pt-8">
-                    <label class="flex items-start gap-4 cursor-pointer group">
-                        <input type="checkbox" name="consent" required class="w-6 h-6 rounded-lg bg-cream/5 border border-cream/10 accent-lime cursor-pointer mt-1" />
-                        <span class="text-sm text-cream/40 group-hover:text-cream/60 transition-colors pt-1">
-                            I verify compliance with the <a class="text-lime font-bold hover:underline" href="/code-of-conduct">Protocol of Conduct</a> <span class="text-coral">*</span>.
-                        </span>
-                    </label>
-                </div>
-            </div>
+          <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-cream/10 bg-cream/5 p-4">
+            <input type="checkbox" name="consent" required class="mt-1 h-5 w-5 rounded accent-lime" />
+            <span class="text-sm text-cream/65">
+              I agree to the <a class="font-semibold text-lime hover:underline" href="/code-of-conduct">Code of conduct</a>
+              and event rules. <span class="text-coral">*</span>
+            </span>
+          </label>
+        </div>
 
-            <div class="space-y-2">
-                <label class="form-label">Mission Objectives (Optional)</label>
-                <textarea class="input-field" name="idea" rows="4" placeholder="Briefly describe your proposed build or problem set."></textarea>
-            </div>
-          </div>
-
-          <div class="pt-10 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div class="status-pill !bg-transparent !border-none hidden" data-status></div>
-              <button class="btn-primary !px-16 !py-5 text-lg w-full md:w-auto" type="submit">Establish Participation</button>
-          </div>
-        </form>
-      </div>
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <span class="status-pill hidden !border-none !bg-transparent !p-0 text-sm" data-status role="status" aria-live="polite"></span>
+          <button class="btn-primary !px-10 !py-3.5" type="submit">Submit application</button>
+        </div>
+      </form>
     </div>
   </section>
 
   <script>
+    import { uiCopy } from "../../../content/microcopy";
+
     const pathParts = window.location.pathname.split("/").filter(Boolean);
-    const hasOrganizerScopedPath =
-      pathParts[0] === "events" && pathParts.length >= 4;
+    const hasOrganizerScopedPath = pathParts[0] === "events" && pathParts.length >= 4;
     const slug = hasOrganizerScopedPath ? pathParts[2] : pathParts[1] || "";
     const organizerId = hasOrganizerScopedPath ? pathParts[1] : "";
     const routeBase = organizerId ? `/events/${organizerId}/${slug}` : `/events/${slug}`;
     const querySuffix = organizerId ? `?organizerId=${encodeURIComponent(organizerId)}` : "";
+
     const backLink = document.querySelector("[data-back-link]");
     const form = document.querySelector("[data-form]");
     const status = document.querySelector("[data-status]");
@@ -112,13 +112,11 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const taglineEl = document.querySelector("[data-event-tagline]");
     const trackSelect = document.querySelector("[data-track-select]");
     const button = form?.querySelector("button[type='submit']");
-    const defaultLabel = button?.textContent;
+    const defaultLabel = button?.textContent || "Submit application";
     const fullNameInput = form?.querySelector("input[name='fullName']");
     const emailInput = form?.querySelector("input[name='email']");
 
-    if (backLink) {
-      backLink.href = routeBase;
-    }
+    if (backLink) backLink.href = routeBase;
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -179,12 +177,12 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       try {
         const response = await fetch(`/api/events/${slug}${querySuffix}`);
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error || "Mission not found.");
+        if (!response.ok) throw new Error(payload.error || "Event not found.");
         const { event, tracks } = payload;
         if (titleEl) titleEl.textContent = `Apply to ${event.title}`;
         if (taglineEl) taglineEl.textContent = event.tagline || "";
         if (trackSelect) {
-          trackSelect.innerHTML = '<option value="">Choose an objective...</option>';
+          trackSelect.innerHTML = '<option value="">Select track</option>';
           tracks.forEach((track) => {
             const option = document.createElement("option");
             option.value = track.name;
@@ -193,8 +191,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           });
         }
         await prefillIdentity(event?.id || "");
-      } catch (error) {
-        setStatus("Signal failure: Event unavailable.", "!text-coral");
+      } catch {
+        setStatus("This event is not available right now.", "!text-coral");
         if (button) button.disabled = true;
       }
     };
@@ -205,21 +203,21 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
       if (!form.checkValidity()) {
         form.reportValidity();
-        window.alert("Please complete all required fields.");
+        setStatus("Complete all required fields before submitting.", "!text-coral");
         return;
       }
 
       const emailValue = String(emailInput?.value || "").trim();
       if (!emailPattern.test(emailValue)) {
-        window.alert("Please provide a valid email address.");
+        setStatus("Enter a valid email address.", "!text-coral");
         emailInput?.focus();
         return;
       }
 
       if (button) {
-          button.disabled = true;
-          button.classList.remove("btn-primary--success");
-          button.textContent = "Synchronizing...";
+        button.disabled = true;
+        button.classList.remove("btn-primary--success");
+        button.textContent = "Submitting...";
       }
       setStatus("", "");
 
@@ -230,28 +228,28 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(payload.error || "Uplink failure.");
+          throw new Error(payload.error || "Unable to submit application.");
         }
+
         const fullNameValue = String(fullNameInput?.value || "").trim();
         if (fullNameValue) window.localStorage.setItem("hatch.participant.name", fullNameValue);
         if (emailValue) window.localStorage.setItem("hatch.participant.email", emailValue);
 
-        setStatus("Entry established. Returning to event page...", "!text-lime");
+        setStatus(uiCopy.participant.apply.success, "!text-lime");
         if (button) {
-            button.textContent = "Success";
-            button.classList.add("btn-primary--success");
+          button.textContent = "Submitted";
+          button.classList.add("btn-primary--success");
         }
         window.setTimeout(() => {
           window.location.href = routeBase;
         }, 900);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Uplink failure.";
+        const message = error instanceof Error ? error.message : "Unable to submit application.";
         setStatus(message, "!text-coral");
-        window.alert(message);
         if (button) {
-            button.disabled = false;
-            button.classList.remove("btn-primary--success");
-            button.textContent = defaultLabel;
+          button.disabled = false;
+          button.classList.remove("btn-primary--success");
+          button.textContent = defaultLabel;
         }
       }
     });
@@ -259,4 +257,3 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     loadEvent();
   </script>
 </BaseLayout>
-

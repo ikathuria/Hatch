@@ -12,12 +12,12 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
           <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Judge Portal</span>
           <h1 class="text-4xl font-bold tracking-tighter">Secure scoring access</h1>
           <p class="text-sm text-cream/50 leading-relaxed">
-            Use the shared link token and optional PIN to review submissions and enter rubric scores.
+            Use your shared link token and optional PIN to open the judging workspace.
           </p>
         </div>
 
         <div class="rounded-3xl border border-cream/10 bg-cream/[0.03] p-5 space-y-3">
-          <p class="text-xs uppercase tracking-widest text-cream/35 font-bold">Token</p>
+          <p class="text-xs uppercase tracking-widest text-cream/35 font-bold">Link token</p>
           <p class="font-mono text-xs break-all text-cream/80" data-token-display>{token || 'Missing token'}</p>
         </div>
 
@@ -34,7 +34,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
 
         <div class="status-pill hidden !bg-transparent !border-none !p-0" data-login-status></div>
         <div class="rounded-3xl border border-cream/10 bg-sky/5 p-5 hidden" data-lock-banner>
-          <p class="text-xs uppercase tracking-widest font-bold text-sky mb-2">Access state</p>
+          <p class="text-xs uppercase tracking-widest font-bold text-sky mb-2">Workspace status</p>
           <p class="text-sm text-cream/70 leading-relaxed" data-lock-message></p>
         </div>
       </section>
@@ -45,9 +45,9 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
             <div>
               <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Workspace</span>
               <h2 class="section-title !mb-0 mt-4 text-4xl" data-event-title>Waiting for access...</h2>
-              <p class="text-cream/50 mt-3" data-event-meta>Enter the workspace to begin scoring.</p>
+              <p class="text-cream/50 mt-3" data-event-meta>Sign in to load submissions and rubric criteria.</p>
             </div>
-            <span class="status-pill hidden" data-workspace-status></span>
+            <span class="status-pill hidden" data-workspace-status role="status" aria-live="polite"></span>
           </div>
           <div class="grid gap-4 md:grid-cols-3">
             <div class="rounded-2xl border border-cream/10 bg-cream/[0.03] p-4">
@@ -73,6 +73,8 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
   </div>
 
   <script define:vars={{ token }}>
+    import { uiCopy } from "../../content/microcopy";
+
     const apiBase = "/api/judge";
     const tokenPattern = /^[a-f0-9]{64}$/i;
     const normalizedToken = String(token || "").trim();
@@ -185,14 +187,14 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
 
     const globalSaveIdleMessage = () => {
       const time = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date());
-      setGlobalSaveStatus(`All changes saved · ${time}`, "!text-lime");
+      setGlobalSaveStatus(`${uiCopy.judge.autosaveSaved} ${time}`, "!text-lime");
     };
 
     const bumpSaveFlight = (delta) => {
       saveRequestsInFlight += delta;
       if (saveRequestsInFlight < 0) saveRequestsInFlight = 0;
       if (!batchFlushActive && saveRequestsInFlight > 0) {
-        setGlobalSaveStatus("Saving your scores…", "!text-sky");
+        setGlobalSaveStatus(uiCopy.judge.autosaveSaving, "!text-sky");
       }
     };
 
@@ -221,13 +223,13 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
       if (state.locked || !state.eventId || !submissionId) return { ok: false };
       const entries = collectScoreEntries(submissionId);
       if (!entries.length) {
-        if (!silent) setCardSaveStatus(submissionId, "Enter at least one score to save.", "!text-coral");
+        if (!silent) setCardSaveStatus(submissionId, "Enter at least one score before saving.", "!text-coral");
         else setCardSaveStatus(submissionId, "", "");
         return { ok: false };
       }
 
       bumpSaveFlight(1);
-      if (!silent) setCardSaveStatus(submissionId, "Saving…", "!text-sky");
+      if (!silent) setCardSaveStatus(submissionId, uiCopy.common.saving, "!text-sky");
 
       try {
         const response = await fetch(`${apiBase}/events/${state.eventId}/scores`, {
@@ -255,7 +257,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
     const scheduleAutosave = (submissionId) => {
       const prev = autosaveTimers.get(submissionId);
       if (prev) clearTimeout(prev);
-      setCardSaveStatus(submissionId, "Will save shortly…", "!text-cream/45");
+      setCardSaveStatus(submissionId, "Will save shortly...", "!text-cream/45");
       autosaveTimers.set(
         submissionId,
         setTimeout(() => {
@@ -276,7 +278,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
         return;
       }
       batchFlushActive = true;
-      setGlobalSaveStatus("Saving all submissions…", "!text-sky");
+      setGlobalSaveStatus("Saving all submissions...", "!text-sky");
       const results = [];
       for (const id of toSave) {
         results.push(await saveSubmissionScores(id, { silent: true }));
@@ -284,7 +286,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
       batchFlushActive = false;
       const allOk = results.every((r) => r.ok);
       if (allOk) {
-        setGlobalSaveStatus("All set — every scored submission is saved to the server.", "!text-lime");
+        setGlobalSaveStatus("All scored submissions are saved to the server.", "!text-lime");
       } else {
         setGlobalSaveStatus("Some saves failed. Fix the highlighted cards and try again.", "!text-coral");
       }
@@ -345,7 +347,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
       }
       setStatus(
         elements.workspaceStatus,
-        state.locked ? "Read only" : "Ready",
+        state.locked ? "Read only - results published" : "Ready for scoring",
         state.locked ? "!text-coral" : "!text-lime"
       );
       renderCounts();
@@ -359,7 +361,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
       }
       if (!state.submissions.length) {
         elements.submissions.innerHTML =
-          '<div class="card !p-8 text-cream/35 italic">No submissions loaded.</div>';
+          '<div class="card !p-8 text-cream/35 italic">No submissions are available yet.</div>';
         return;
       }
       if (!state.criteria.length) {
@@ -456,7 +458,7 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
       elements.submissions.innerHTML = cardsHtml + footerHtml;
 
       if (footerHtml) {
-        setGlobalSaveStatus("Edits save automatically after you pause typing.", "!text-cream/45");
+        setGlobalSaveStatus(uiCopy.judge.autosavePending, "!text-cream/45");
       } else {
         setGlobalSaveStatus("", "");
       }
@@ -485,8 +487,8 @@ const token = Astro.params.token ? String(Astro.params.token) : '';
         state.judgeScores = toList(payload.judgeScores);
         state.locked = payload.event?.resultsStatus === "published";
         state.lockMessage = state.locked
-          ? "Results are published. Scores are locked."
-          : "Workspace is open.";
+          ? uiCopy.judge.readonly
+          : "Workspace is open for scoring.";
 
         if (elements.loginButton) elements.loginButton.textContent = "Refresh workspace";
         if (elements.logoutButton) elements.logoutButton.classList.remove("hidden");

@@ -19,7 +19,7 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={metaDescription} />
-    <meta name="theme-color" content="#0F172A" />
+    <meta name="theme-color" content="#121724" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -32,11 +32,10 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
         const applyTheme = (theme) => {
           document.documentElement.setAttribute("data-theme", theme);
           if (metaTheme) {
-            metaTheme.setAttribute("content", theme === "light" ? "#F8FAFC" : "#0F172A");
+            metaTheme.setAttribute("content", theme === "light" ? "#F8F3EA" : "#121724");
           }
         };
         const saved = localStorage.getItem(KEY);
-        // Default to dark mode unless the user explicitly chose a theme.
         applyTheme(saved === "light" || saved === "dark" ? saved : "dark");
       })();
     </script>
@@ -44,55 +43,51 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
   <body class="bg-ink text-cream">
     <div class="site-glow" aria-hidden="true"></div>
     <div class="hatch-shell" aria-hidden="true"></div>
-    <div class="hatch-confetti" aria-hidden="true" data-hatch-confetti>
-      <span class="egg"></span><span class="egg"></span><span class="egg"></span><span class="egg"></span>
-      <span class="egg"></span><span class="egg"></span><span class="egg"></span><span class="egg"></span>
-    </div>
-    <div class="hatch-toast" role="status" aria-live="polite" data-hatch-toast></div>
-    <div class="hatch-banner" aria-live="polite" data-hatch-banner></div>
-    <div class="hatch-flash" aria-hidden="true" data-hatch-flash></div>
-    <div class="hatch-boom" aria-hidden="true" data-hatch-boom>EGG!</div>
-    <button class="hatch-trigger" type="button" data-hatch-trigger aria-label="Trigger Hatch easter egg">
-      Egg
-    </button>
-    <header class="fixed top-0 left-0 right-0 z-[100] px-6 py-6 pointer-events-none">
-      <div class="mx-auto max-w-6xl w-full pointer-events-auto">
-        <div class="glass-panel px-6 py-4 flex items-center justify-between shadow-2xl shadow-ink/40">
-          <a href="/" class="flex items-center gap-4 group transition-all">
-            <span class="badge shadow-lime/40 text-ink">
+
+    <header class="pointer-events-none fixed left-0 right-0 top-0 z-[100] px-6 py-6">
+      <div class="pointer-events-auto mx-auto w-full max-w-6xl">
+        <div class="glass-panel flex items-center justify-between px-6 py-4 shadow-2xl shadow-ink/30">
+          <a href="/" class="group flex items-center gap-4 transition-all">
+            <span class="badge text-ink shadow-lime/40">
               <HatchEggMark class="h-[26px] w-[18px]" />
             </span>
-            <span class="text-xl font-bold tracking-tight text-cream group-hover:text-lime transition-colors">
+            <span class="text-xl font-bold tracking-tight text-cream transition-colors group-hover:text-lime">
               {site.brand.name}
             </span>
           </a>
-          
-          <nav class="hidden md:flex items-center gap-10">
+
+          <nav class="hidden items-center gap-10 md:flex">
             <a class="nav-link" href="/events">Events</a>
             <a class="nav-link" href="/#features">Features</a>
             <a class="nav-link" href="/#how">How it works</a>
           </nav>
 
-          <div class="flex items-center gap-6">
-            <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light and dark mode" title="Toggle theme">
+          <div class="flex items-center gap-4">
+            <button
+              class="theme-toggle"
+              type="button"
+              data-theme-toggle
+              aria-label="Toggle light and dark mode"
+              title="Toggle theme"
+            >
               <span data-theme-icon>D</span>
             </button>
             {organizer ? (
               <>
-                <button class="nav-link hidden sm:inline-flex text-xs uppercase tracking-[0.2em]" data-logout-header>
-                  Logout
+                <button class="nav-link hidden text-xs uppercase tracking-[0.2em] sm:inline-flex" data-logout-header>
+                  Log out
                 </button>
-                <a class="btn-primary !py-2.5 !px-8 !text-xs !rounded-xl" href="/organizer/dashboard">
-                  Nest
+                <a class="btn-primary !rounded-xl !px-8 !py-2.5 !text-xs" href="/organizer/dashboard">
+                  Organizer
                 </a>
               </>
             ) : (
               <>
-                <a class="nav-link hidden sm:inline-flex text-xs uppercase tracking-[0.2em]" href="/organizer/login">
-                  Login
+                <a class="nav-link hidden text-xs uppercase tracking-[0.2em] sm:inline-flex" href="/organizer/login">
+                  Log in
                 </a>
-                <a class="btn-primary !py-2.5 !px-8 !text-xs !rounded-xl" href="/organizer/signup">
-                  Hatch One
+                <a class="btn-primary !rounded-xl !px-8 !py-2.5 !text-xs" href="/organizer/signup">
+                  Start hosting
                 </a>
               </>
             )}
@@ -101,7 +96,7 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
       </div>
     </header>
 
-    <main class="pt-32 pb-20 overflow-hidden">
+    <main class="overflow-hidden pb-20 pt-32">
       <slot />
     </main>
 
@@ -110,60 +105,59 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
         <div class="grid gap-16 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div class="space-y-6">
             <div class="flex items-center gap-3">
-              <span class="badge w-8 h-8 rounded-lg text-ink">
+              <span class="badge h-8 w-8 rounded-lg text-ink">
                 <HatchEggMark class="h-5 w-[14px]" />
               </span>
               <span class="text-2xl font-bold tracking-tighter">{site.brand.name}</span>
             </div>
-            <p class="text-cream/60 max-w-xs leading-relaxed">
-              {site.brand.byline}
-            </p>
-            <div class="pt-4 flex gap-4">
-              <a href="#" class="w-10 h-10 rounded-full bg-cream/5 flex items-center justify-center hover:bg-lime hover:text-ink transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-              </a>
-              <a href="#" class="w-10 h-10 rounded-full bg-cream/5 flex items-center justify-center hover:bg-lime hover:text-ink transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-              </a>
-            </div>
+            <p class="max-w-xs leading-relaxed text-cream/60">{site.brand.byline}</p>
+            <p class="text-sm text-cream/45">Built for smooth event operations.</p>
           </div>
-          
+
           <div class="space-y-6">
             <h4 class="text-xs font-bold uppercase tracking-widest text-sky">Platform</h4>
             <ul class="space-y-4 text-sm text-cream/70">
-              <li><a href="/#events" class="hover:text-lime transition-colors">Find Hackathons</a></li>
-              <li><a href="/#features" class="hover:text-lime transition-colors">For Organizers</a></li>
-              <li><a href="/#how" class="hover:text-lime transition-colors">How it Works</a></li>
+              <li><a href="/events" class="transition-colors hover:text-lime">Find events</a></li>
+              <li><a href="/#features" class="transition-colors hover:text-lime">Organizer tools</a></li>
+              <li><a href="/#how" class="transition-colors hover:text-lime">How it works</a></li>
             </ul>
           </div>
 
           <div class="space-y-6">
             <h4 class="text-xs font-bold uppercase tracking-widest text-violet">Resources</h4>
             <ul class="space-y-4 text-sm text-cream/70">
-              <li><a href="https://github.com/ikathuria/Hatch/blob/main/CONTRIBUTING.md" class="hover:text-lime transition-colors" target="_blank" rel="noreferrer">Contributing</a></li>
-              <li><a href="/privacy" class="hover:text-lime transition-colors">Privacy Policy</a></li>
-              <li><a href="/terms" class="hover:text-lime transition-colors">Terms of Service</a></li>
+              <li>
+                <a
+                  href="https://github.com/ikathuria/Hatch/blob/main/CONTRIBUTING.md"
+                  class="transition-colors hover:text-lime"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Contributing
+                </a>
+              </li>
+              <li><a href="/privacy" class="transition-colors hover:text-lime">Privacy policy</a></li>
+              <li><a href="/terms" class="transition-colors hover:text-lime">Terms of service</a></li>
             </ul>
           </div>
 
           <div class="space-y-6">
             <h4 class="text-xs font-bold uppercase tracking-widest text-coral">Support</h4>
             <ul class="space-y-4 text-sm text-cream/70">
-              <li><a href={`mailto:${site.links.email}`} class="hover:text-lime transition-colors lowercase">{site.links.email}</a></li>
-              <li><a href="https://github.com/ikathuria/Hatch" class="hover:text-lime transition-colors">Documentation</a></li>
-              <li><a href="#" class="hover:text-lime transition-colors">Help Center</a></li>
+              <li>
+                <a href={`mailto:${site.links.email}`} class="lowercase transition-colors hover:text-lime">
+                  {site.links.email}
+                </a>
+              </li>
+              <li><a href="/code-of-conduct" class="transition-colors hover:text-lime">Code of conduct</a></li>
+              <li><a href="https://github.com/ikathuria/Hatch" class="transition-colors hover:text-lime">Documentation</a></li>
             </ul>
           </div>
         </div>
 
-        <div class="mt-20 pt-10 border-t border-cream/10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p class="text-xs text-cream/40">
-            &copy; {new Date().getFullYear()} {site.brand.name}. All rights reserved worldwide.
-          </p>
-          <div class="status-pill !bg-lime/5 !border-lime/20 !text-lime text-xs">
-            <span class="w-1.5 h-1.5 rounded-full bg-lime animate-pulse mr-2"></span>
-            Nest is Warm
-          </div>
+        <div class="mt-20 flex flex-col items-center justify-between gap-6 border-t border-cream/10 pt-10 md:flex-row">
+          <p class="text-xs text-cream/40">&copy; {new Date().getFullYear()} {site.brand.name}. All rights reserved.</p>
+          <div class="status-pill !border-lime/20 !bg-lime/10 !text-lime text-xs">Warm Nest Lab UI</div>
         </div>
       </div>
     </footer>
@@ -173,14 +167,17 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
       const themeBtn = document.querySelector("[data-theme-toggle]");
       const themeIcon = document.querySelector("[data-theme-icon]");
       const metaTheme = document.querySelector('meta[name="theme-color"]');
+
       const setTheme = (theme) => {
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem(THEME_KEY, theme);
         if (themeIcon) themeIcon.textContent = theme === "light" ? "L" : "D";
-        if (metaTheme) metaTheme.setAttribute("content", theme === "light" ? "#F8FAFC" : "#0F172A");
+        if (metaTheme) metaTheme.setAttribute("content", theme === "light" ? "#F8F3EA" : "#121724");
       };
+
       const currentTheme = document.documentElement.getAttribute("data-theme") ?? "dark";
       if (themeIcon) themeIcon.textContent = currentTheme === "light" ? "L" : "D";
+
       themeBtn?.addEventListener("click", () => {
         const nextTheme = (document.documentElement.getAttribute("data-theme") ?? "dark") === "dark" ? "light" : "dark";
         setTheme(nextTheme);
@@ -191,171 +188,10 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
         try {
           const res = await fetch("/api/auth/logout", { method: "POST" });
           if (res.ok) window.location.href = "/";
-        } catch {}
-      });
-
-      const body = document.body;
-      const toastEl = document.querySelector("[data-hatch-toast]");
-      const bannerEl = document.querySelector("[data-hatch-banner]");
-      const flashEl = document.querySelector("[data-hatch-flash]");
-      const boomEl = document.querySelector("[data-hatch-boom]");
-      const confettiEl = document.querySelector("[data-hatch-confetti]");
-      const triggerBtn = document.querySelector("[data-hatch-trigger]");
-      let hatchMode = false;
-      let typed = "";
-      let konamiBuffer = [];
-      let toastTimer = 0;
-      let bannerTimer = 0;
-
-      const showToast = (message) => {
-        if (!toastEl) return;
-        toastEl.textContent = message;
-        toastEl.style.display = "block";
-        toastEl.classList.add("is-visible");
-        window.clearTimeout(toastTimer);
-        toastTimer = window.setTimeout(() => {
-          toastEl.classList.remove("is-visible");
-          window.setTimeout(() => {
-            toastEl.style.display = "none";
-          }, 220);
-        }, 2200);
-      };
-
-      const showBanner = (message) => {
-        if (!bannerEl) return;
-        bannerEl.textContent = message;
-        bannerEl.style.display = "block";
-        bannerEl.classList.add("is-visible");
-        window.clearTimeout(bannerTimer);
-        bannerTimer = window.setTimeout(() => {
-          bannerEl.classList.remove("is-visible");
-          window.setTimeout(() => {
-            bannerEl.style.display = "none";
-          }, 240);
-        }, 1400);
-      };
-
-      const flashScreen = () => {
-        if (!flashEl) return;
-        flashEl.style.display = "block";
-        flashEl.classList.add("is-active");
-        window.setTimeout(() => {
-          flashEl.classList.remove("is-active");
-          flashEl.style.display = "none";
-        }, 320);
-      };
-
-      const boom = (label = "EGG!") => {
-        if (boomEl) {
-          boomEl.textContent = label;
-          boomEl.style.display = "grid";
-          boomEl.classList.add("is-active");
-          window.setTimeout(() => {
-            boomEl.classList.remove("is-active");
-            boomEl.style.display = "none";
-          }, 700);
-        }
-        body.classList.add("hatch-shake");
-        window.setTimeout(() => body.classList.remove("hatch-shake"), 450);
-      };
-
-      const triggerConfetti = () => {
-        if (!confettiEl) return;
-        confettiEl.style.display = "block";
-        confettiEl.classList.add("is-active");
-        window.setTimeout(() => {
-          confettiEl.classList.remove("is-active");
-          confettiEl.style.display = "none";
-        }, 1300);
-      };
-
-      const toggleHatchMode = () => {
-        hatchMode = !hatchMode;
-        body.classList.toggle("hatch-mode", hatchMode);
-        showToast(hatchMode ? "Hatch mode ON: extra playful UI unlocked." : "Hatch mode OFF.");
-        showBanner(hatchMode ? "Hatch Mode Activated" : "Hatch Mode Disabled");
-        flashScreen();
-        boom(hatchMode ? "HATCH!" : "COOL.");
-      };
-
-      window.addEventListener("keydown", (event) => {
-        const target = event.target;
-        if (
-          target &&
-          target.nodeType === 1 &&
-          (target.closest?.("input, textarea, select, [contenteditable='true']") ||
-            target.isContentEditable)
-        ) {
-          return;
-        }
-
-        const key = String(event.key || "").toLowerCase();
-
-        if (event.altKey && event.shiftKey) {
-          if (key === "h") {
-            toggleHatchMode();
-            return;
-          }
-          if (key === "e") {
-            triggerConfetti();
-            showBanner("Egg Unlocked");
-            showToast("Shortcut accepted: egg confetti.");
-            flashScreen();
-            boom("EGG!");
-            return;
-          }
-          if (key === "k") {
-            triggerConfetti();
-            showBanner("Konami Shortcut");
-            showToast("Shortcut accepted: hatchlings deployed.");
-            flashScreen();
-            boom("KONAMI!");
-            return;
-          }
-        }
-
-        if (/^[a-z]$/.test(key)) {
-          typed = (typed + key).slice(-10);
-          if (typed.endsWith("hatch")) {
-            toggleHatchMode();
-            typed = "";
-          } else if (typed.endsWith("egg")) {
-            triggerConfetti();
-            showToast("Dev egg dropped. Keep shipping.");
-            showBanner("Egg Unlocked");
-            flashScreen();
-            boom("EGG!");
-            typed = "";
-          }
-        }
-
-        const konami = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright"];
-        if (key.startsWith("arrow")) {
-          konamiBuffer = [...konamiBuffer, key].slice(-konami.length);
-          if (konami.every((expected, i) => konamiBuffer[i] === expected)) {
-            triggerConfetti();
-            showToast("Konami accepted. Hatchlings deployed.");
-            showBanner("Konami Unlocked");
-            flashScreen();
-            boom("KONAMI!");
-            konamiBuffer = [];
-          }
+        } catch {
+          // no-op
         }
       });
-
-      triggerBtn?.addEventListener("click", () => {
-        triggerConfetti();
-        showBanner("Egg Unlocked");
-        showToast("Hatch egg triggered.");
-        flashScreen();
-        boom("EGG!");
-      });
-
-      if (toastEl) toastEl.style.display = "none";
-      if (bannerEl) bannerEl.style.display = "none";
-      if (flashEl) flashEl.style.display = "none";
-      if (boomEl) boomEl.style.display = "none";
-      if (confettiEl) confettiEl.style.display = "none";
     </script>
   </body>
 </html>

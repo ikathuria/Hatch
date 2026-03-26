@@ -1,0 +1,36 @@
+---
+interface Props {
+  as?: "button" | "a";
+  variant?: "primary" | "secondary";
+  state?: "default" | "loading" | "success" | "error";
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  as = "button",
+  variant = "primary",
+  state = "default",
+  class: className = "",
+  ...rest
+} = Astro.props as Props;
+
+const Tag = as;
+const variantClass = variant === "secondary" ? "ui-button--secondary" : "ui-button--primary";
+const stateClass =
+  state === "loading"
+    ? "is-loading"
+    : state === "success"
+      ? "is-success"
+      : state === "error"
+        ? "is-error"
+        : "";
+---
+
+<Tag
+  class:list={[variantClass, stateClass, className]}
+  aria-busy={state === "loading" ? "true" : undefined}
+  {...rest}
+>
+  <slot />
+</Tag>

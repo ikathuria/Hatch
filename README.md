@@ -183,3 +183,7 @@ For `npm run preflight`, set:
 ## Pilot operations
 
 - Event-day runbook: `docs/april3-pilot-runbook.md`
+
+## Product and design docs
+
+- UI refresh execution checklist: `docs/ui-refresh-detailed-plan.md`

@@ -2,105 +2,103 @@
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Submit Your Build | Hatch">
-  <section class="mx-auto w-full max-w-4xl px-6 py-16">
-    <div class="card !p-12 relative overflow-hidden group">
-      <div class="absolute inset-0 bg-gradient-to-br from-violet/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-
-      <div class="relative z-10 space-y-12">
-        <div class="space-y-4">
-          <div class="flex items-center gap-3">
-            <a href="#" data-back-link class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            </a>
-            <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Final Uplink</span>
-          </div>
-          <h1 class="text-4xl md:text-5xl font-bold tracking-tighter" data-event-title>Submit Your Project</h1>
-          <p class="text-lg text-cream/50 leading-relaxed font-medium" data-event-tagline>Transmit your final build data to the judging collective.</p>
+<BaseLayout title="Submit Project | Hatch">
+  <section class="mx-auto w-full max-w-4xl px-6 py-12">
+    <div class="card !p-8 md:!p-10">
+      <div class="mb-8 space-y-3">
+        <div class="flex items-center gap-3">
+          <a
+            href="#"
+            data-back-link
+            class="flex h-8 w-8 items-center justify-center rounded-lg bg-cream/5 transition-colors hover:bg-cream/10"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </a>
+          <span class="eyebrow !border-violet/20 !bg-violet/10 !text-violet">Project submission</span>
         </div>
-
-        <div class="rounded-3xl border border-sky/20 bg-sky/5 p-5 space-y-4 hidden" data-auth-gate>
-          <p class="text-xs uppercase tracking-widest font-bold text-sky">Participant access required</p>
-          <p class="text-sm text-cream/70 leading-relaxed" data-auth-message>
-            Apply to this event first to unlock project submission.
-          </p>
-          <div class="flex items-center gap-3">
-            <a class="btn-primary !px-5 !py-3 !text-sm" data-apply-link href="#">Apply to participate</a>
-            <button class="btn-ghost !px-4 !py-2 !text-xs hidden" data-participant-logout type="button">Sign Out</button>
-          </div>
-          <span class="text-xs text-cream/45 hidden" data-participant-email></span>
-          <span class="status-pill hidden !bg-transparent !border-none !p-0 !text-xs" data-auth-status></span>
-        </div>
-
-        <form class="space-y-10" data-form>
-          <fieldset class="space-y-10" data-submit-fieldset disabled>
-            <div class="grid md:grid-cols-2 gap-8">
-              <div class="space-y-6">
-                <div class="space-y-2">
-                  <label class="form-label">Squad Designation <span class="text-coral">*</span></label>
-                  <input class="input-field" name="teamName" required placeholder="Nova Force" />
-                </div>
-                <div class="space-y-2">
-                  <label class="form-label">Project Identity <span class="text-coral">*</span></label>
-                  <input class="input-field" name="projectName" required placeholder="Neural Bridge v1.0" />
-                </div>
-                <div class="space-y-2">
-                  <label class="form-label">Target Track <span class="text-coral">*</span></label>
-                  <select class="input-field" name="track" required data-track-select>
-                    <option value="">Choose an objective...</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="space-y-6">
-                <div class="space-y-2">
-                  <label class="form-label">Source Nexus (Repository)</label>
-                  <input class="input-field" type="url" name="repoUrl" placeholder="https://github.com/..." />
-                  <p class="text-xs text-cream/40">Must start with https://github.com/ or github.com/</p>
-                </div>
-                <div class="space-y-2">
-                  <label class="form-label">Live Link (Demo)</label>
-                  <input class="input-field" type="url" name="demoUrl" placeholder="https://live-deploy.app" />
-                </div>
-                <div class="space-y-2">
-                  <label class="form-label">Briefing Artifact (Slides)</label>
-                  <input class="input-field" type="url" name="deckUrl" placeholder="https://pitch.deck/..." />
-                </div>
-              </div>
-            </div>
-
-            <div class="space-y-8 pt-6 border-t border-cream/5">
-              <div class="space-y-2">
-                <label class="form-label">Mission Briefing (Description) <span class="text-coral">*</span></label>
-                <textarea class="input-field" name="description" rows="5" required placeholder="What did you build and why does it matter?"></textarea>
-              </div>
-
-              <div class="grid md:grid-cols-2 gap-8">
-                <div class="space-y-2">
-                  <label class="form-label">Contact Endpoint <span class="text-coral">*</span></label>
-                  <input class="input-field" type="email" name="contactEmail" required placeholder="lead@squad.io" />
-                </div>
-                <div class="space-y-2">
-                  <label class="form-label">Squad Manifest (Names + Emails) <span class="text-coral">*</span></label>
-                  <textarea class="input-field" name="members" rows="3" required placeholder="Avery P. - avery@io.com"></textarea>
-                </div>
-              </div>
-            </div>
-
-            <div class="pt-10 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div class="status-pill !bg-transparent !border-none hidden" data-status></div>
-              <button class="btn-primary !px-16 !py-5 text-lg w-full md:w-auto" type="submit">Submit Project</button>
-            </div>
-          </fieldset>
-        </form>
+        <h1 class="text-4xl font-bold tracking-tight md:text-5xl" data-event-title>Submit your project</h1>
+        <p class="text-cream/55" data-event-tagline>Share your final build for judging.</p>
       </div>
+
+      <div class="mb-8 hidden rounded-2xl border border-sky/20 bg-sky/10 p-5" data-auth-gate>
+        <p class="text-xs font-bold uppercase tracking-widest text-sky">Participant access required</p>
+        <p class="mt-2 text-sm leading-relaxed text-cream/70" data-auth-message>
+          Apply to this event first to unlock project submission.
+        </p>
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <a class="btn-primary !px-5 !py-3 !text-sm" data-apply-link href="#">Apply to participate</a>
+          <button class="btn-ghost !px-4 !py-2 !text-xs hidden" data-participant-logout type="button">Sign out</button>
+        </div>
+        <span class="mt-3 block text-xs text-cream/50 hidden" data-participant-email></span>
+        <span class="status-pill mt-3 hidden !border-none !bg-transparent !p-0 !text-xs" data-auth-status role="status" aria-live="polite"></span>
+      </div>
+
+      <form class="space-y-8" data-form>
+        <fieldset class="space-y-8" data-submit-fieldset disabled>
+          <div class="grid gap-6 md:grid-cols-2">
+            <label class="space-y-2">
+              <span class="form-label">Team name <span class="text-coral">*</span></span>
+              <input class="input-field" name="teamName" required placeholder="Nova Force" />
+            </label>
+
+            <label class="space-y-2">
+              <span class="form-label">Project name <span class="text-coral">*</span></span>
+              <input class="input-field" name="projectName" required placeholder="Neural Bridge" />
+            </label>
+
+            <label class="space-y-2">
+              <span class="form-label">Track <span class="text-coral">*</span></span>
+              <select class="input-field" name="track" required data-track-select>
+                <option value="">Select track</option>
+              </select>
+            </label>
+
+            <label class="space-y-2">
+              <span class="form-label">Contact email <span class="text-coral">*</span></span>
+              <input class="input-field" type="email" name="contactEmail" required placeholder="lead@team.com" />
+            </label>
+
+            <label class="space-y-2">
+              <span class="form-label">Repository URL</span>
+              <input class="input-field" type="url" name="repoUrl" placeholder="https://github.com/your-repo" />
+              <span class="text-xs text-cream/45">Must start with `https://github.com/` or `github.com/`.</span>
+            </label>
+
+            <label class="space-y-2">
+              <span class="form-label">Demo URL</span>
+              <input class="input-field" type="url" name="demoUrl" placeholder="https://your-demo.app" />
+            </label>
+
+            <label class="space-y-2 md:col-span-2">
+              <span class="form-label">Slides URL</span>
+              <input class="input-field" type="url" name="deckUrl" placeholder="https://your-pitch-deck" />
+            </label>
+          </div>
+
+          <label class="space-y-2">
+            <span class="form-label">Project description <span class="text-coral">*</span></span>
+            <textarea class="input-field" name="description" rows="5" required placeholder="What did you build and why does it matter?"></textarea>
+          </label>
+
+          <label class="space-y-2">
+            <span class="form-label">Team members (names + emails) <span class="text-coral">*</span></span>
+            <textarea class="input-field" name="members" rows="4" required placeholder="Avery P. - avery@io.com"></textarea>
+          </label>
+
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <span class="status-pill hidden !border-none !bg-transparent !p-0 text-sm" data-status role="status" aria-live="polite"></span>
+            <button class="btn-primary !px-10 !py-3.5" type="submit">Submit project</button>
+          </div>
+        </fieldset>
+      </form>
     </div>
   </section>
 
   <script>
+    import { uiCopy } from "../../../content/microcopy";
+
     const pathParts = window.location.pathname.split("/").filter(Boolean);
-    const hasOrganizerScopedPath =
-      pathParts[0] === "events" && pathParts.length >= 4;
+    const hasOrganizerScopedPath = pathParts[0] === "events" && pathParts.length >= 4;
     const slug = hasOrganizerScopedPath ? pathParts[2] : pathParts[1] || "";
     const organizerId = hasOrganizerScopedPath ? pathParts[1] : "";
     const routeBase = organizerId ? `/events/${organizerId}/${slug}` : `/events/${slug}`;
@@ -115,7 +113,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const taglineEl = document.querySelector("[data-event-tagline]");
     const trackSelect = document.querySelector("[data-track-select]");
     const button = form?.querySelector("button[type='submit']");
-    const defaultLabel = button?.textContent;
+    const defaultLabel = button?.textContent || "Submit project";
     const contactEmailInput = form?.querySelector("input[name='contactEmail']");
 
     const authGate = document.querySelector("[data-auth-gate]");
@@ -155,7 +153,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       button.disabled = !enabled;
       if (!enabled) {
         button.textContent = "Participant access required";
-      } else if (button.textContent !== "Complete") {
+      } else if (button.textContent !== "Submitted") {
         button.textContent = defaultLabel;
       }
     };
@@ -163,6 +161,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const renderAuthGate = () => {
       const authorized = Boolean(state.participantEmail);
       if (authGate) authGate.classList.toggle("hidden", authorized);
+
       if (participantEmailEl) {
         if (state.sessionEmail) {
           participantEmailEl.textContent = `Signed in as ${state.sessionEmail}`;
@@ -172,16 +171,17 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           participantEmailEl.textContent = "";
         }
       }
+
       if (participantLogoutBtn) {
         participantLogoutBtn.classList.toggle("hidden", !state.sessionEmail);
       }
+
       if (authMessage) {
         if (state.hasForeignSession) {
           authMessage.textContent =
             "You are signed in for a different event. Sign out, then apply to this event to unlock submission.";
         } else {
-          authMessage.textContent =
-            "Apply to this event first to unlock project submission.";
+          authMessage.textContent = uiCopy.public.detail.applyFirst;
         }
       }
     };
@@ -221,14 +221,14 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       try {
         const response = await fetch(`/api/events/${slug}${querySuffix}`);
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error || "Mission not found.");
+        if (!response.ok) throw new Error(payload.error || "Event not found.");
         const { event, tracks } = payload;
         state.eventId = String(event?.id || "");
 
         if (titleEl) titleEl.textContent = `Submit for ${event.title}`;
         if (taglineEl) taglineEl.textContent = event.tagline || "";
         if (trackSelect) {
-          trackSelect.innerHTML = '<option value="">Choose an objective...</option>';
+          trackSelect.innerHTML = '<option value="">Select track</option>';
           tracks.forEach((track) => {
             const option = document.createElement("option");
             option.value = track.name;
@@ -238,8 +238,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         }
 
         await loadParticipant();
-      } catch (error) {
-        setStatus(status, "Signal failure: Event unavailable.", "!text-coral");
+      } catch {
+        setStatus(status, "This event is not available right now.", "!text-coral");
         setSubmissionEnabled(false);
       }
     };
@@ -261,20 +261,19 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       if (!state.participantEmail) {
         setSubmissionEnabled(false);
         renderAuthGate();
-        setStatus(authStatus, "Apply to this event before submitting.", "!text-coral");
-        window.alert("Apply to this event first to unlock submission.");
+        setStatus(authStatus, uiCopy.participant.submit.gated, "!text-coral");
         return;
       }
 
       if (!form.checkValidity()) {
         form.reportValidity();
-        window.alert("Please complete all required fields.");
+        setStatus(status, "Complete all required fields before submitting.", "!text-coral");
         return;
       }
 
       const repoValue = String(form.repoUrl?.value || "").trim();
       if (repoValue && !githubPattern.test(repoValue)) {
-        window.alert("Repository URL must start with https://github.com/ or github.com/.");
+        setStatus(status, "Repository URL must start with https://github.com/ or github.com/.", "!text-coral");
         form.repoUrl?.focus();
         return;
       }
@@ -282,7 +281,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       if (button) {
         button.disabled = true;
         button.classList.remove("btn-primary--success");
-        button.textContent = "Transmitting...";
+        button.textContent = "Submitting...";
       }
       setStatus(status, "", "");
 
@@ -293,20 +292,19 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(payload.error || "Uplink failure.");
+          throw new Error(payload.error || "Unable to submit project.");
         }
-        setStatus(status, "Submission received. Returning to event page...", "!text-lime");
+        setStatus(status, uiCopy.participant.submit.success, "!text-lime");
         if (button) {
-          button.textContent = "Complete";
+          button.textContent = "Submitted";
           button.classList.add("btn-primary--success");
         }
         window.setTimeout(() => {
           window.location.href = routeBase;
         }, 900);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Uplink failure.";
+        const message = error instanceof Error ? error.message : "Unable to submit project.";
         setStatus(status, message, "!text-coral");
-        window.alert(message);
         if (button) {
           button.disabled = false;
           button.classList.remove("btn-primary--success");
@@ -321,4 +319,3 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     loadEvent();
   </script>
 </BaseLayout>
-

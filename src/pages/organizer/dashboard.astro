@@ -4,441 +4,134 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
 <BaseLayout title="Organizer Dashboard | Hatch">
   <div class="mx-auto max-w-6xl px-6 py-12">
-    {/* Dashboard Header */}
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+    <div class="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
       <div class="space-y-4">
-        <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Your Nest</span>
-        <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">Your Hackathons</h1>
-        <p class="text-cream/50 max-w-2xl leading-relaxed">
-          Manage events, review applications, and track submissions from one playful organizer home.
+        <span class="eyebrow !border-lime/25 !bg-lime/10 !text-lime">Organizer Workspace</span>
+        <h1 class="text-4xl font-bold tracking-tighter md:text-5xl">Your events</h1>
+        <p class="max-w-2xl text-cream/60">
+          Manage event setup, judging, and publishing from one reliable dashboard.
         </p>
       </div>
-      <div class="flex items-center gap-4">
-        <button class="btn-ghost !px-6" data-logout>
-           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2 opacity-60"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-           Sign Out
-        </button>
-        <a class="btn-primary !px-8" href="/organizer/events/new">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          New Event
-        </a>
+      <div class="flex flex-wrap items-center gap-3">
+        <button class="btn-ghost !px-6" data-logout type="button">Sign out</button>
+        <a class="btn-primary !px-8" href="/organizer/events/new">New event</a>
       </div>
     </div>
 
-    {/* Quick Stats */}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16">
-        <div class="card !p-8 border-cream/10 bg-cream/[0.02]">
-            <span class="text-xs font-bold uppercase tracking-widest text-cream/30 mb-2 block">Total Events</span>
-            <span class="text-4xl font-bold" id="stat-total-events">0</span>
-        </div>
-        <div class="card !p-8 border-cream/10 bg-cream/[0.02]">
-            <span class="text-xs font-bold uppercase tracking-widest text-cream/30 mb-2 block">Active Hackers</span>
-            <span class="text-4xl font-bold" id="stat-total-hackers">--</span>
-        </div>
-        <div class="card !p-8 border-cream/10 bg-cream/[0.02]">
-            <span class="text-xs font-bold uppercase tracking-widest text-cream/30 mb-2 block">Global Reach</span>
-            <span class="text-4xl font-bold">12+</span>
-        </div>
+    <div class="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div class="card !p-6">
+        <p class="text-xs font-bold uppercase tracking-widest text-cream/40">Total events</p>
+        <p class="mt-3 text-3xl font-bold" id="stat-total-events">0</p>
+      </div>
+      <div class="card !p-6">
+        <p class="text-xs font-bold uppercase tracking-widest text-cream/40">Published</p>
+        <p class="mt-3 text-3xl font-bold" id="stat-live-events">0</p>
+      </div>
+      <div class="card !p-6">
+        <p class="text-xs font-bold uppercase tracking-widest text-cream/40">Draft</p>
+        <p class="mt-3 text-3xl font-bold" id="stat-draft-events">0</p>
+      </div>
     </div>
 
-    {/* Events Grid */}
-    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3" data-events-grid>
-      <div class="card p-20 flex items-center justify-center text-cream/20 italic col-span-full">
-        Warming up your event nest...
-      </div>
+    <div aria-live="polite" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3" data-events-grid>
+      <div class="card !p-10 text-cream/35 italic border-dashed col-span-full">Loading your events...</div>
     </div>
   </div>
-
-  {/* Create event modal */}
-  <div class="modal-overlay hidden opacity-0" data-modal>
-    <div
-      class="card flex w-full max-h-[min(90vh,56rem)] max-w-4xl translate-y-8 flex-col overflow-hidden border-cream/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] !p-0 transition-transform duration-300 ease-out"
-      id="modal-container"
-    >
-      <div class="flex shrink-0 items-start justify-between gap-6 border-b border-cream/10 bg-gradient-to-r from-lime/15 to-sky/15 px-6 py-6 sm:px-8 sm:py-7">
-        <div class="min-w-0 space-y-1">
-          <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Create event</h2>
-          <p class="text-sm leading-relaxed text-cream/55">
-            Set the basics now; you can add tracks, FAQs, and refine everything in the Hatchery editor afterward.
-          </p>
-        </div>
-        <button
-          type="button"
-          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cream/5 transition-colors hover:bg-cream/10"
-          data-close-modal
-          aria-label="Close"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-      </div>
-
-      <form class="flex min-h-0 flex-1 flex-col" data-create-form>
-        <div class="create-modal-scroll min-h-0 flex-1 space-y-10 overflow-y-auto px-6 py-8 sm:px-8">
-          <section class="space-y-5">
-            <div>
-              <h3 class="text-lg font-bold tracking-tight text-cream">Basics</h3>
-              <p class="mt-1 text-sm text-cream/45">Name, URL slug, and how the event reads on the public page.</p>
-            </div>
-            <div class="grid gap-6 sm:grid-cols-2">
-              <div class="space-y-2 sm:col-span-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-title">Event name *</label>
-                <input class="input-field" id="create-title" name="title" required placeholder="Technosphere 2026" data-create-title />
-                <p class="text-xs leading-relaxed text-cream/40">The headline builders see first on your public page.</p>
-              </div>
-              <div class="space-y-2 sm:col-span-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-slug">URL slug *</label>
-                <input class="input-field font-mono text-sm" id="create-slug" name="slug" required placeholder="technosphere-2026" data-create-slug />
-                <p class="text-xs leading-relaxed text-cream/40">Lowercase, numbers, hyphens only. Public URL: <span class="text-cream/55">/events/</span><span class="text-lime/90" data-slug-preview>your-slug</span></p>
-              </div>
-              <div class="space-y-2 sm:col-span-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-tagline">Tagline</label>
-                <input class="input-field" id="create-tagline" name="tagline" placeholder="One line that sells the vibe" />
-              </div>
-              <div class="space-y-2 sm:col-span-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-description">Description</label>
-                <textarea class="input-field min-h-[7rem] resize-y" id="create-description" name="description" rows="4" placeholder="What to expect, who should apply, schedule overview…"></textarea>
-              </div>
-            </div>
-          </section>
-
-          <section class="space-y-5">
-            <div>
-              <h3 class="text-lg font-bold tracking-tight text-cream">Schedule</h3>
-              <p class="mt-1 text-sm text-cream/45">Hackathon window and when applications close.</p>
-            </div>
-            <div class="grid gap-6 sm:grid-cols-2">
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-start">Starts *</label>
-                <input class="input-field" id="create-start" name="startDate" type="datetime-local" required />
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-end">Ends *</label>
-                <input class="input-field" id="create-end" name="endDate" type="datetime-local" required />
-              </div>
-              <div class="space-y-2 sm:col-span-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-deadline">Application deadline</label>
-                <input class="input-field max-w-md" id="create-deadline" name="applicationDeadline" type="datetime-local" />
-                <p class="text-xs leading-relaxed text-cream/40">Optional. Leave empty if you have not decided yet.</p>
-              </div>
-            </div>
-          </section>
-
-          <section class="space-y-5">
-            <div>
-              <h3 class="text-lg font-bold tracking-tight text-cream">Venue &amp; format</h3>
-              <p class="mt-1 text-sm text-cream/45">Where it happens and how people participate.</p>
-            </div>
-            <div class="grid gap-6 sm:grid-cols-2">
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-org">Organization</label>
-                <input class="input-field" id="create-org" name="organizationName" placeholder="e.g. Acme Tech" />
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-location">Location</label>
-                <input class="input-field" id="create-location" name="location" placeholder="City, venue, or Remote" />
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-mode">Format</label>
-                <select class="input-field" id="create-mode" name="mode">
-                  <option value="Hybrid">Hybrid</option>
-                  <option value="In-person">In-person</option>
-                  <option value="Online">Online</option>
-                </select>
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-capacity">Capacity (optional)</label>
-                <input class="input-field" id="create-capacity" name="maxParticipants" type="number" min="1" placeholder="e.g. 200" />
-              </div>
-            </div>
-          </section>
-
-          <section class="space-y-5">
-            <div>
-              <h3 class="text-lg font-bold tracking-tight text-cream">Links &amp; banner</h3>
-              <p class="mt-1 text-sm text-cream/45">Optional links and a cover image for the public event page.</p>
-            </div>
-            <div class="grid gap-6 sm:grid-cols-2">
-              <div class="space-y-3 sm:col-span-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-banner">Banner image</label>
-                <input
-                  class="input-field"
-                  id="create-banner"
-                  name="bannerUrl"
-                  type="text"
-                  inputmode="url"
-                  autocomplete="off"
-                  placeholder="https://… or upload below"
-                  data-banner-url
-                />
-                <p class="text-xs leading-relaxed text-cream/40">
-                  Paste a direct HTTPS image link, or upload a file (JPEG, PNG, WebP, or GIF, up to 5&nbsp;MB).
-                </p>
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <label class="inline-flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-cream/20 bg-cream/[0.04] px-5 py-3 text-sm font-medium text-cream/80 transition-colors hover:border-lime/35 hover:bg-cream/[0.07]">
-                    <input
-                      type="file"
-                      class="sr-only"
-                      accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif"
-                      data-banner-file
-                    />
-                    <span data-banner-file-label>Choose image to upload</span>
-                  </label>
-                  <span class="text-xs text-cream/35" data-banner-upload-status></span>
-                </div>
-                  <div class="mt-1 hidden overflow-hidden rounded-2xl border border-cream/10 bg-cream/[0.04] aspect-[21/9] max-h-40" data-banner-preview-wrap>
-                  <img class="h-full w-full object-cover" alt="Banner preview" data-banner-preview />
-                </div>
-              </div>
-              <div class="space-y-2 sm:col-span-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-website">Website</label>
-                <input class="input-field" id="create-website" name="websiteUrl" type="url" placeholder="https://yoursite.com" />
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-twitter">Twitter / X</label>
-                <input class="input-field" id="create-twitter" name="twitterUrl" type="url" placeholder="https://x.com/…" />
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-cream/85" for="create-discord">Discord</label>
-                <input class="input-field" id="create-discord" name="discordUrl" type="url" placeholder="https://discord.gg/…" />
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <div class="flex shrink-0 flex-col gap-4 border-t border-cream/10 bg-ink-muted/40 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <label class="flex cursor-pointer items-center gap-3 select-none">
-            <input
-              type="checkbox"
-              name="isPublished"
-              class="h-5 w-5 rounded border border-cream/20 bg-cream/[0.06] text-lime focus:ring-2 focus:ring-lime/35"
-            />
-            <span class="text-sm font-medium text-cream/75">Publish immediately</span>
-          </label>
-          <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-            <span class="status-pill hidden !border-none !bg-transparent !p-0 text-sm" data-status></span>
-            <button class="btn-primary w-full !px-10 sm:w-auto" type="submit">Create event</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <style>
-    .create-modal-scroll {
-      scrollbar-gutter: stable;
-    }
-    .create-modal-scroll::-webkit-scrollbar {
-      width: 8px;
-    }
-    .create-modal-scroll::-webkit-scrollbar-thumb {
-      background: hsla(var(--cream), 0.12);
-      border-radius: 99px;
-    }
-  </style>
 
   <script>
     const eventsGrid = document.querySelector("[data-events-grid]");
-    const modal = document.querySelector("[data-modal]");
-    const modalContainer = document.querySelector("#modal-container");
-    const openModal = document.querySelector("[data-open-create]");
-    const closeModal = document.querySelector("[data-close-modal]");
-    const createForm = document.querySelector("[data-create-form]");
-    const status = document.querySelector("[data-status]");
     const logoutButton = document.querySelector("[data-logout]");
     const totalEventsStat = document.querySelector("#stat-total-events");
-    const titleInput = createForm?.querySelector("[data-create-title]");
-    const slugInput = createForm?.querySelector("[data-create-slug]");
-    const slugPreviewEl = createForm?.querySelector("[data-slug-preview]");
-    const bannerUrlInput = createForm?.querySelector("[data-banner-url]");
-    const bannerPreviewWrap = createForm?.querySelector("[data-banner-preview-wrap]");
-    const bannerPreviewImg = createForm?.querySelector("[data-banner-preview]");
-    const bannerFileInput = createForm?.querySelector("[data-banner-file]");
-    const bannerUploadStatus = createForm?.querySelector("[data-banner-upload-status]");
-    const modalScroll = createForm?.querySelector(".create-modal-scroll");
-
-    const U_BANNER_PREFIX = "/api/media/banner/";
-    const U_BANNER_UUID =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-    const isRenderableBannerUrl = (value) => {
-      const s = String(value).trim();
-      if (!s) return false;
-      if (s.startsWith(U_BANNER_PREFIX)) {
-        return U_BANNER_UUID.test(s.slice(U_BANNER_PREFIX.length));
-      }
-      try {
-        const u = new URL(s);
-        return u.protocol === "http:" || u.protocol === "https:";
-      } catch {
-        return false;
-      }
-    };
-
-    const refreshBannerPreview = () => {
-      const v = bannerUrlInput?.value.trim() ?? "";
-      if (!bannerPreviewWrap || !bannerPreviewImg) return;
-      if (v && isRenderableBannerUrl(v)) {
-        bannerPreviewImg.src = v;
-        bannerPreviewWrap.classList.remove("hidden");
-      } else {
-        bannerPreviewWrap.classList.add("hidden");
-        bannerPreviewImg.removeAttribute("src");
-      }
-    };
-
-    let slugTouched = false;
-
-    const slugify = (raw) =>
-      raw
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-
-    const syncSlugPreview = () => {
-      if (!slugPreviewEl || !slugInput) return;
-      slugPreviewEl.textContent = slugInput.value.trim() || "your-slug";
-    };
-
-    titleInput?.addEventListener("input", () => {
-      if (slugTouched || !slugInput) return;
-      slugInput.value = slugify(titleInput.value);
-      syncSlugPreview();
-    });
-
-    slugInput?.addEventListener("input", () => {
-      slugTouched = true;
-      syncSlugPreview();
-    });
-
-    bannerUrlInput?.addEventListener("input", refreshBannerPreview);
-
-    bannerFileInput?.addEventListener("change", async () => {
-      const file = bannerFileInput.files?.[0];
-      if (!file || !bannerUrlInput) return;
-      if (bannerUploadStatus) {
-        bannerUploadStatus.textContent = "";
-        bannerUploadStatus.classList.remove("!text-coral");
-      }
-      const fd = new FormData();
-      fd.append("file", file);
-      try {
-        const res = await fetch("/api/organizer/upload/banner", { method: "POST", body: fd });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || "Upload failed");
-        bannerUrlInput.value = typeof data.url === "string" ? data.url : "";
-        refreshBannerPreview();
-      } catch (e) {
-        if (bannerUploadStatus) {
-          bannerUploadStatus.textContent = e instanceof Error ? e.message : "Upload failed";
-          bannerUploadStatus.classList.add("!text-coral");
-        }
-        bannerFileInput.value = "";
-      }
-    });
-
-    syncSlugPreview();
-
-    const open = () => {
-      modal?.classList.remove("hidden");
-      modalScroll?.scrollTo({ top: 0 });
-      setTimeout(() => {
-        modal?.classList.remove("opacity-0");
-        modalContainer?.classList.add("translate-y-0");
-        modalContainer?.classList.remove("translate-y-8");
-      }, 10);
-    };
-
-    const close = () => {
-      modal?.classList.add("opacity-0");
-      modalContainer?.classList.add("translate-y-8");
-      setTimeout(() => {
-        modal?.classList.add("hidden");
-      }, 300);
-    };
-
-    openModal?.addEventListener("click", open);
-    closeModal?.addEventListener("click", close);
-    modal?.addEventListener("click", (e) => {
-      if (e.target === modal) close();
-    });
-
-    logoutButton?.addEventListener("click", async () => {
-      await fetch("/api/auth/logout", { method: "POST" });
-      window.location.href = "/";
-    });
+    const liveEventsStat = document.querySelector("#stat-live-events");
+    const draftEventsStat = document.querySelector("#stat-draft-events");
 
     const formatDate = (value) => {
       if (!value) return "TBD";
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return value;
-      
-      const hasTime = value.includes("T") || (value.includes(" ") && value.length > 10);
-      
       return new Intl.DateTimeFormat(undefined, {
         month: "short",
         day: "numeric",
-        year: "numeric",
-        ...(hasTime ? { hour: "numeric", minute: "numeric" } : {})
+        year: "numeric"
       }).format(date);
     };
 
     const formatRange = (start, end) => {
       if (!start && !end) return "Dates TBD";
       if (!start || !end) return formatDate(start || end);
-      return `${formatDate(start)} – ${formatDate(end)}`;
+      return `${formatDate(start)} - ${formatDate(end)}`;
+    };
+
+    const renderEmptyState = (message) => {
+      if (!eventsGrid) return;
+      eventsGrid.innerHTML = `
+        <div class="card !p-10 text-cream/45 border-dashed col-span-full">
+          <p class="text-lg font-semibold">No events yet</p>
+          <p class="mt-2 text-sm text-cream/50">${message}</p>
+          <a class="btn-primary mt-6 !px-6 !py-3" href="/organizer/events/new">Create your first event</a>
+        </div>
+      `;
     };
 
     const renderEvents = (events) => {
       if (!eventsGrid) return;
-      eventsGrid.innerHTML = "";
-      
-      if (totalEventsStat) totalEventsStat.textContent = events.length;
 
-      if (events.length === 0) {
-        eventsGrid.innerHTML = '<div class="card p-20 flex flex-col items-center justify-center text-cream/20 italic col-span-full border-dashed">No events yet. Hatch your first one.</div>';
+      const total = events.length;
+      const liveCount = events.filter((event) => event.isPublished).length;
+      const draftCount = total - liveCount;
+
+      if (totalEventsStat) totalEventsStat.textContent = String(total);
+      if (liveEventsStat) liveEventsStat.textContent = String(liveCount);
+      if (draftEventsStat) draftEventsStat.textContent = String(draftCount);
+
+      if (!total) {
+        renderEmptyState("Create an event to unlock setup, submissions, and judging.");
         return;
       }
 
-      events.forEach((event) => {
-        const dateRange = formatRange(event.startDate, event.endDate);
-        const card = document.createElement("div");
-        card.className = "card group flex flex-col !p-8 animate-in fade-in slide-in-from-bottom-4 duration-500 hover:border-violet/30";
-        card.innerHTML = `
-          <div class="flex justify-between items-start mb-6">
-            <span class="status-pill ${event.isPublished ? '!bg-lime/10 !text-lime !border-lime/20' : '!bg-sky/10 !text-sky !border-sky/20'} !py-1 !px-3 !text-[10px] uppercase tracking-[0.2em]">
-                ${event.isPublished ? "Live" : "Draft"}
-            </span>
-            <div class="flex gap-2">
-                <a href="/events/${event.organizerId}/${event.slug}" class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors" title="View Public Page">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                </a>
-            </div>
-          </div>
+      eventsGrid.innerHTML = events
+        .map((event) => {
+          const organizerId = String(event.organizerId || "").trim();
+          const publicHref = organizerId
+            ? `/events/${organizerId}/${event.slug}`
+            : `/events/${event.slug}`;
+          const dateRange = formatRange(event.startDate, event.endDate);
+          const statusLabel = event.isPublished ? "Published" : "Draft";
+          const statusClass = event.isPublished
+            ? "!border-lime/25 !bg-lime/10 !text-lime"
+            : "!border-sky/25 !bg-sky/10 !text-sky";
 
-          <div class="space-y-2 mb-8">
-            <h3 class="text-2xl font-bold tracking-tight group-hover:text-violet transition-colors">${event.title}</h3>
-            <p class="text-sm text-cream/40 line-clamp-1">${event.tagline || ""}</p>
-          </div>
+          return `
+            <article class="card !p-7 flex flex-col gap-6">
+              <div class="flex items-start justify-between gap-4">
+                <span class="status-pill ${statusClass}">${statusLabel}</span>
+                <span class="text-xs uppercase tracking-widest text-cream/40">${formatDate(event.updatedAt || event.createdAt)}</span>
+              </div>
 
-          <div class="space-y-3 pt-6 border-t border-cream/5 mb-8">
-            <div class="flex items-center gap-3 text-xs text-cream/60">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-violet"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                ${dateRange}
-            </div>
-            <div class="flex items-center gap-3 text-xs text-cream/60">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                ${event.location || "Location TBD"}
-            </div>
-          </div>
+              <div class="space-y-2">
+                <h2 class="text-2xl font-bold tracking-tight">${event.title || "Untitled event"}</h2>
+                <p class="text-sm text-cream/55">${event.tagline || "Add a short tagline in the editor."}</p>
+              </div>
 
-          <a class="btn-ghost !w-full justify-center !py-3 !text-xs uppercase tracking-widest hover:border-violet/40 hover:text-violet" href="/organizer/events/${event.id}">
-             Configure Event
-             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </a>
-        `;
-        eventsGrid.appendChild(card);
-      });
+              <dl class="space-y-2 text-sm text-cream/55">
+                <div class="flex items-center justify-between gap-3">
+                  <dt class="uppercase tracking-widest text-[11px] text-cream/35">Dates</dt>
+                  <dd>${dateRange}</dd>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <dt class="uppercase tracking-widest text-[11px] text-cream/35">Location</dt>
+                  <dd>${event.location || "Location TBD"}</dd>
+                </div>
+              </dl>
+
+              <div class="mt-auto flex flex-wrap gap-3">
+                <a class="btn-primary !px-5 !py-3 !text-sm" href="/organizer/events/${event.id}">Open editor</a>
+                <a class="btn-ghost !px-5 !py-3 !text-sm" href="${publicHref}" target="_blank" rel="noreferrer">Public page</a>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
     };
 
     const loadEvents = async () => {
@@ -448,88 +141,25 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           window.location.href = "/organizer/login";
           return;
         }
-        const payload = await response.json();
-        renderEvents(payload.events || []);
+
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Unable to load events.");
+        renderEvents(Array.isArray(payload.events) ? payload.events : []);
       } catch (error) {
-        if (eventsGrid) {
-          eventsGrid.innerHTML = '<div class="card p-12 text-cream/40 text-center italic border-red-500/20">Critical system error while syncing events.</div>';
-        }
+        if (!eventsGrid) return;
+        const message = error instanceof Error ? error.message : "Unable to load events.";
+        eventsGrid.innerHTML = `
+          <div class="card !p-10 text-coral border-coral/20 col-span-full">
+            <p class="font-semibold">Dashboard unavailable</p>
+            <p class="mt-2 text-sm">${message}</p>
+          </div>
+        `;
       }
     };
 
-    createForm?.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!createForm || !status) return;
-
-      const submitBtn = createForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Creating…";
-
-      status.textContent = "";
-      status.classList.add("hidden");
-
-      const maxRaw = createForm.querySelector("#create-capacity")?.value?.trim() ?? "";
-      const parsedMax = parseInt(maxRaw, 10);
-
-      const payload = {
-        title: createForm.querySelector("#create-title")?.value?.trim() || "",
-        slug: createForm.querySelector("#create-slug")?.value?.trim() || "",
-        tagline: createForm.querySelector("#create-tagline")?.value?.trim() || "",
-        description: createForm.querySelector("#create-description")?.value?.trim() || "",
-        startDate: createForm.querySelector("#create-start")?.value || "",
-        endDate: createForm.querySelector("#create-end")?.value || "",
-        applicationDeadline: createForm.querySelector("#create-deadline")?.value || "",
-        organizationName: createForm.querySelector("#create-org")?.value?.trim() || "",
-        location: createForm.querySelector("#create-location")?.value?.trim() || "",
-        mode: createForm.querySelector("#create-mode")?.value || "Hybrid",
-        maxParticipants: maxRaw === "" || !Number.isFinite(parsedMax) ? null : parsedMax,
-        bannerUrl: createForm.querySelector("#create-banner")?.value?.trim() || "",
-        websiteUrl: createForm.querySelector("#create-website")?.value?.trim() || "",
-        twitterUrl: createForm.querySelector("#create-twitter")?.value?.trim() || "",
-        discordUrl: createForm.querySelector("#create-discord")?.value?.trim() || "",
-        isPublished: !!createForm.querySelector('input[name="isPublished"]')?.checked
-      };
-
-      try {
-        const response = await fetch("/api/organizer/events", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) {
-          throw new Error(result.error || "Unable to create event.");
-        }
-
-        submitBtn.textContent = "Success!";
-        submitBtn.classList.add("btn-primary--success");
-        createForm.reset();
-        slugTouched = false;
-        syncSlugPreview();
-        bannerPreviewWrap?.classList.add("hidden");
-        bannerPreviewImg?.removeAttribute("src");
-        if (bannerFileInput) bannerFileInput.value = "";
-        if (bannerUploadStatus) {
-          bannerUploadStatus.textContent = "";
-          bannerUploadStatus.classList.remove("!text-coral");
-        }
-
-        setTimeout(() => {
-          close();
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-          submitBtn.classList.remove("btn-primary--success");
-          loadEvents();
-        }, 800);
-      } catch (error) {
-        submitBtn.disabled = false;
-        submitBtn.classList.remove("btn-primary--success");
-        submitBtn.textContent = originalText;
-        status.textContent = error.message;
-        status.classList.remove("hidden");
-        status.classList.add("!text-coral");
-      }
+    logoutButton?.addEventListener("click", async () => {
+      await fetch("/api/auth/logout", { method: "POST" });
+      window.location.href = "/";
     });
 
     loadEvents();

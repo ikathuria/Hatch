@@ -1,0 +1,27 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  actionLabel?: string;
+  actionHref?: string;
+  class?: string;
+}
+
+const {
+  title,
+  description = "",
+  actionLabel = "",
+  actionHref = "",
+  class: className = ""
+} = Astro.props as Props;
+---
+
+<div class:list={["ui-empty-state space-y-3", className]}>
+  <p class="text-base font-semibold text-cream">{title}</p>
+  {description ? <p class="text-sm">{description}</p> : null}
+  {actionLabel && actionHref ? (
+    <a class="btn-primary !px-4 !py-2 !text-sm" href={actionHref}>
+      {actionLabel}
+    </a>
+  ) : null}
+</div>

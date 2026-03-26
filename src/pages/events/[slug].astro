@@ -29,7 +29,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
                 <div class="flex flex-wrap gap-6 pt-4">
                     <a class="btn-primary !px-12 !py-4" data-apply-link href="#">Apply to Participate</a>
-                    <a class="btn-ghost !px-12 !py-4" data-submit-link href="#">Submit Project</a>
+                    <a class="btn-ghost !px-12 !py-4" data-submit-link href="#">Submit project</a>
                 </div>
                 <div class="flex flex-wrap items-center gap-3">
                   <button class="btn-ghost !px-5 !py-2 !text-xs" type="button" data-copy-link>
@@ -42,7 +42,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     Download .ics
                   </a>
                 </div>
-                <span class="text-xs text-cream/45 hidden" data-share-status></span>
+                <span class="text-xs text-cream/45 hidden" data-share-status role="status" aria-live="polite"></span>
             </div>
         </div>
         
@@ -86,10 +86,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   </p>
                   <div class="flex items-center gap-3">
                     <a class="btn-primary !px-5 !py-3 !text-sm" data-participant-apply-link href="#">Apply to participate</a>
-                    <button class="btn-ghost !px-4 !py-2 !text-xs hidden" data-participant-logout type="button">Sign Out</button>
+                    <button class="btn-ghost !px-4 !py-2 !text-xs hidden" data-participant-logout type="button">Sign out</button>
                   </div>
                   <span class="text-xs text-cream/40 hidden" data-participant-email></span>
-                  <span class="status-pill hidden !bg-transparent !border-none !p-0 !text-xs" data-participant-status></span>
+                  <span class="status-pill hidden !bg-transparent !border-none !p-0 !text-xs" data-participant-status role="status" aria-live="polite"></span>
                 </div>
               </div>
               <div class="grid gap-6 mt-10" data-event-gallery>
@@ -100,7 +100,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             <section data-tab-panel="faq" class="hidden">
               <h2 class="section-title text-4xl">Frequently Asked</h2>
               <div class="grid gap-4 mt-10" data-event-faqs>
-                <div class="card !p-12 text-cream/20 italic border-dashed">FAQ grid is offline.</div>
+                <div class="card !p-12 text-cream/20 italic border-dashed">Loading FAQs...</div>
               </div>
             </section>
         </div>
@@ -128,7 +128,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
             <div class="card !p-8">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-sky mb-6">Need Support?</h3>
-                <p class="text-sm text-cream/50 mb-6">Reach out to the organizers if you have questions about the logistics or tracks.</p>
+                <p class="text-sm text-cream/50 mb-6">Reach out to the organizers if you have questions about logistics, tracks, or deadlines.</p>
                 <a href="mailto:hello@hatch.dev" class="btn-ghost !w-full !py-3 !text-xs justify-center uppercase tracking-widest" data-contact-link>Contact Organizer</a>
             </div>
         </aside>
@@ -424,19 +424,18 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const updateSubmitCallToAction = () => {
       if (!submitLink) return;
       const canSubmit = Boolean(state.participantEmail);
-      submitLink.classList.remove("opacity-60", "pointer-events-none");
+      submitLink.classList.remove("opacity-60");
       submitLink.removeAttribute("aria-disabled");
 
       if (canSubmit) {
         submitLink.href = `${routeBase}/submit`;
-        submitLink.textContent = "Submit Project";
+        submitLink.textContent = "Submit project";
         return;
       }
 
       submitLink.href = `${routeBase}/apply`;
-      submitLink.textContent = "Submit locked (apply first)";
-      submitLink.classList.add("opacity-60", "pointer-events-none");
-      submitLink.setAttribute("aria-disabled", "true");
+      submitLink.textContent = "Apply to unlock submission";
+      submitLink.classList.add("opacity-60");
     };
 
     const renderGallery = () => {
@@ -444,13 +443,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
       if (!state.resultsPublished) {
         galleryEl.innerHTML =
-          '<div class="card !p-12 text-cream/35 italic border-dashed">Project gallery will unlock when results are published by organizers.</div>';
+          '<div class="card !p-12 text-cream/35 italic border-dashed">Project gallery unlocks after organizers publish results.</div>';
         return;
       }
 
       if (!Array.isArray(state.gallery) || state.gallery.length === 0) {
         galleryEl.innerHTML =
-          '<div class="card !p-12 text-cream/35 italic border-dashed">No projects have been published yet.</div>';
+          '<div class="card !p-12 text-cream/35 italic border-dashed">No projects are visible yet.</div>';
         return;
       }
 
@@ -618,7 +617,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           .join("");
       } else {
         tracksEl.innerHTML =
-          '<div class="card !p-12 text-cream/40 text-center italic">Tracks will be announced once the system stabilizes.</div>';
+          '<div class="card !p-12 text-cream/40 text-center italic">Tracks have not been published yet.</div>';
       }
     };
 
@@ -644,7 +643,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           .join("");
       } else {
         faqsEl.innerHTML =
-          '<div class="card !p-12 text-cream/40 text-center italic">FAQ updates are currently in development.</div>';
+          '<div class="card !p-12 text-cream/40 text-center italic">No FAQs have been published yet.</div>';
       }
     };
 
@@ -724,10 +723,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         updateEventStatus();
         updateCalendarLinks();
       } catch (error) {
-        if (titleEl) titleEl.textContent = "Signal Lost";
+        if (titleEl) titleEl.textContent = "Event unavailable";
         if (descEl)
           descEl.textContent =
-            "We couldn't synchronize with this event's data. It may be unpublished or non-existent.";
+            "We could not load this event. It may be unpublished or unavailable.";
         if (tracksEl) tracksEl.innerHTML = "";
         if (faqsEl) faqsEl.innerHTML = "";
         if (galleryEl) galleryEl.innerHTML = "";
@@ -755,7 +754,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         }
       } catch {
         if (shareStatusEl) {
-          shareStatusEl.textContent = "Unable to copy automatically. Copy from your address bar.";
+          shareStatusEl.textContent = "Could not copy automatically. Copy the URL from your address bar.";
           shareStatusEl.classList.remove("hidden");
         }
       }

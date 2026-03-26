@@ -15,18 +15,18 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
             <a href="/organizer/dashboard" class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             </a>
-            <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">The Hatchery</span>
+            <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20">Event editor</span>
         </div>
         <h1 class="text-4xl md:text-5xl font-bold tracking-tighter" data-event-title>Loading Event...</h1>
-        <p class="text-cream/50 max-w-2xl leading-relaxed" data-page-subtitle>Tune your event details in real-time. Updates sync to your public event nest when saved.</p>
+        <p class="text-cream/50 max-w-2xl leading-relaxed" data-page-subtitle>Update event details, tracks, FAQ, judging, and exports in one place.</p>
       </div>
       <div class="flex items-center gap-4">
           <a class="btn-ghost !px-6" data-public-link href="#" target="_blank">
              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2 opacity-60"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-             Live View
+             Public page
           </a>
-          <span class="status-pill hidden !bg-transparent !border-none !p-0" data-status></span>
-          <button class="btn-primary !px-10" id="save-btn-top" type="submit" form="event-config-form">Save Changes</button>
+          <span class="status-pill hidden !bg-transparent !border-none !p-0" data-status role="status" aria-live="polite"></span>
+          <button class="btn-primary !px-10" id="save-btn-top" type="submit" form="event-config-form">Save changes</button>
       </div>
     </div>
 
@@ -81,16 +81,16 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
                     <input class="input-field" name="title" required placeholder="Technosphere 2026" />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">Global Slug *</label>
+                    <label class="form-label">URL slug *</label>
                     <input class="input-field" name="slug" required placeholder="technosphere-2026" />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">Brief Tagline</label>
+                    <label class="form-label">Tagline</label>
                     <input class="input-field" name="tagline" placeholder="Bending reality with code..." />
                 </div>
             </div>
             <div class="space-y-2">
-                <label class="form-label">Full Description</label>
+                <label class="form-label">Description</label>
                 <textarea class="input-field !h-[calc(100%-2rem)]" name="description" placeholder="Tell the world about your mission..."></textarea>
             </div>
             <div class="space-y-3 md:col-span-2">
@@ -127,26 +127,26 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
       <section class="space-y-8" data-tab-section data-tab-id="logistics">
         <div class="flex items-center gap-4 mb-2">
             <span class="w-8 h-8 rounded-lg bg-sky/10 text-sky flex items-center justify-center font-bold text-xs border border-sky/20">02</span>
-            <h2 class="text-2xl font-bold tracking-tight">Logistics & Parameters</h2>
+            <h2 class="text-2xl font-bold tracking-tight">Schedule and logistics</h2>
         </div>
         <div class="card !p-10 grid md:grid-cols-2 lg:grid-cols-3 gap-10 border-cream/10 bg-cream/[0.02]">
             <div class="space-y-6">
                 <div class="space-y-2">
-                    <label class="form-label">Start Horizon *</label>
+                    <label class="form-label">Start date and time *</label>
                     <input class="input-field" name="startDate" type="datetime-local" required />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">End Horizon *</label>
+                    <label class="form-label">End date and time *</label>
                     <input class="input-field" name="endDate" type="datetime-local" required />
                 </div>
             </div>
             <div class="space-y-6">
                 <div class="space-y-2">
-                    <label class="form-label">Deployment Hub</label>
+                    <label class="form-label">Location</label>
                     <input class="input-field" name="location" placeholder="San Francisco / Global" />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">Operational Mode</label>
+                    <label class="form-label">Format</label>
                     <select class="input-field" name="mode">
                         <option>Hybrid</option>
                         <option>In-person</option>
@@ -156,35 +156,35 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
             </div>
             <div class="space-y-6">
                 <div class="space-y-2">
-                    <label class="form-label">Organization Branding</label>
+                    <label class="form-label">Organization name</label>
                     <input class="input-field" name="organizationName" placeholder="e.g. Major League Hacking" />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">Official Website</label>
+                    <label class="form-label">Website</label>
                     <input class="input-field" name="websiteUrl" placeholder="https://hackathon.com" />
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-6">
                 <div class="space-y-2">
-                    <label class="form-label">Twitter/X Profile</label>
+                    <label class="form-label">Twitter/X</label>
                     <input class="input-field" name="twitterUrl" placeholder="https://x.com/handle" />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">Discord Server</label>
+                    <label class="form-label">Discord</label>
                     <input class="input-field" name="discordUrl" placeholder="https://discord.gg/invitelink" />
                 </div>
             </div>
             <div class="space-y-6">
                 <div class="space-y-2">
-                    <label class="form-label">Participant Capacity</label>
+                    <label class="form-label">Participant capacity</label>
                     <input class="input-field" name="maxParticipants" type="number" placeholder="e.g. 500" />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">Application Cutoff</label>
+                    <label class="form-label">Application deadline</label>
                     <input class="input-field" name="applicationDeadline" type="datetime-local" />
                 </div>
                 <div class="space-y-3 pt-8">
-                    <p class="form-label text-center">Publish Status</p>
+                    <p class="form-label text-center">Publish status</p>
                     <label class="mx-auto inline-flex cursor-pointer items-center gap-3 select-none" for="isPublishedSwitch">
                         <span class="relative inline-flex h-7 w-12 items-center rounded-full border border-cream/10 bg-cream/5 transition-colors hover:border-lime/30">
                             <input
@@ -207,7 +207,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <span class="w-8 h-8 rounded-lg bg-lime/10 text-lime flex items-center justify-center font-bold text-xs border border-lime/20">03</span>
-                <h2 class="text-2xl font-bold tracking-tight">Specialized Tracks</h2>
+                <h2 class="text-2xl font-bold tracking-tight">Tracks</h2>
             </div>
             <button class="btn-ghost !py-2 !px-4 !text-xs uppercase tracking-widest hover:border-lime/30 hover:text-lime" type="button" data-add-track>
                 + Add Track
@@ -221,7 +221,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <span class="w-8 h-8 rounded-lg bg-coral/10 text-coral flex items-center justify-center font-bold text-xs border border-coral/20">04</span>
-                <h2 class="text-2xl font-bold tracking-tight">Knowledge Base</h2>
+                <h2 class="text-2xl font-bold tracking-tight">FAQ</h2>
             </div>
             <button class="btn-ghost !py-2 !px-4 !text-xs uppercase tracking-widest hover:border-coral/30 hover:text-coral" type="button" data-add-faq>
                 + Add FAQ
@@ -248,7 +248,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
       <section class="space-y-8" data-existing-only data-tab-section data-tab-id="exports">
         <div class="flex items-center gap-4 mb-2">
             <span class="w-8 h-8 rounded-lg bg-cream/10 text-cream flex items-center justify-center font-bold text-xs border border-cream/20">06</span>
-            <h2 class="text-2xl font-bold tracking-tight">Data Integrity</h2>
+            <h2 class="text-2xl font-bold tracking-tight">Exports</h2>
         </div>
         <div class="grid md:grid-cols-2 gap-8">
             <div class="card !p-10 border-cream/10 bg-cream/[0.01] hover:bg-cream/[0.03] transition-all">
@@ -259,7 +259,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
                     </div>
                 </div>
                 <p class="text-sm text-cream/40 mb-8 leading-relaxed">Download a comprehensive dataset of all registered participants for external processing.</p>
-                <a class="btn-ghost !w-full justify-center !py-4 text-xs font-bold uppercase tracking-widest" data-applications-link href="#">Fetch .CSV Dataset</a>
+                <a class="btn-ghost !w-full justify-center !py-4 text-xs font-bold uppercase tracking-widest" data-applications-link href="#">Download CSV</a>
             </div>
 
             <div class="card !p-10 border-cream/10 bg-cream/[0.01] hover:bg-cream/[0.03] transition-all">
@@ -270,7 +270,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
                     </div>
                 </div>
                 <p class="text-sm text-cream/40 mb-8 leading-relaxed">Retrieve final project submissions including links, descriptions, and track designations.</p>
-                <a class="btn-ghost !w-full justify-center !py-4 text-xs font-bold uppercase tracking-widest" data-submissions-link href="#">Fetch .CSV Submissions</a>
+                <a class="btn-ghost !w-full justify-center !py-4 text-xs font-bold uppercase tracking-widest" data-submissions-link href="#">Download CSV</a>
             </div>
         </div>
       </section>
@@ -307,8 +307,8 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
     const titleInput = form?.querySelector("input[name='title']");
     const slugInput = form?.querySelector("input[name='slug']");
 
-    const defaultTopLabel = isCreateMode ? "Create Event" : "Save Changes";
-    const defaultSubmitLabel = isCreateMode ? "Create Event" : "Save Event Changes";
+    const defaultTopLabel = isCreateMode ? "Create event" : "Save changes";
+    const defaultSubmitLabel = isCreateMode ? "Create event" : "Save changes";
     const submitBtn = form?.querySelector("[data-hidden-submit]");
     let currentOrganizerId = "";
 
@@ -490,16 +490,16 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
           <div class="grid md:grid-cols-2 gap-8 flex-1">
              <div class="space-y-6">
                 <div class="space-y-2">
-                    <label class="form-label">Track Identifier</label>
+                    <label class="form-label">Track name</label>
                     <input class="input-field" name="trackName" value="${data.name || ""}" placeholder="AI / Sustainability" />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">Prize Allotment</label>
+                    <label class="form-label">Prize</label>
                     <input class="input-field" name="trackPrize" value="${data.prize || ""}" placeholder="$5,000 + Macbook Pro" />
                 </div>
              </div>
              <div class="space-y-2">
-                <label class="form-label">Track Objectives</label>
+                <label class="form-label">Description</label>
                 <textarea class="input-field !h-[calc(100%-2rem)]" name="trackDescription" rows="3" placeholder="Define the goals of this specific track...">${data.description || ""}</textarea>
              </div>
           </div>
@@ -513,11 +513,11 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         wrapper.innerHTML = `
           <div class="grid md:grid-cols-2 gap-8 flex-1">
              <div class="space-y-2">
-                <label class="form-label">Subject Probe</label>
+                <label class="form-label">Question</label>
                 <input class="input-field" name="faqQuestion" value="${data.question || ""}" placeholder="Is there travel reimbursement?" />
              </div>
              <div class="space-y-2">
-                <label class="form-label">Response Directive</label>
+                <label class="form-label">Answer</label>
                 <textarea class="input-field" name="faqAnswer" rows="2" placeholder="Provide clarity on the subject...">${data.answer || ""}</textarea>
              </div>
           </div>
@@ -651,7 +651,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
       event.preventDefault();
       if (!form) return;
 
-      setButtonsState(true, isCreateMode ? "Creating..." : "Saving...", isCreateMode ? "Creating..." : "Persisting...");
+      setButtonsState(true, isCreateMode ? "Creating..." : "Saving...", isCreateMode ? "Creating..." : "Saving...");
       clearStatus();
 
       const payload = collectPayload();
@@ -688,7 +688,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
             if (!enrichResponse.ok) {
               const enrichResult = await enrichResponse.json().catch(() => ({}));
               setStatus(
-                `Event created, but tracks/FAQs were not saved yet (${enrichResult.error || "follow-up save failed"}). Opening editor...`,
+                `Event created, but tracks/FAQ were not saved yet (${enrichResult.error || "follow-up save failed"}). Opening editor...`,
                 true
               );
               setTimeout(() => {
@@ -698,7 +698,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
             }
           }
 
-          window.location.href = "/organizer/dashboard";
+          window.location.href = `/organizer/events/${createdId}`;
           return;
         }
 
@@ -714,20 +714,21 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
 
         const result = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(result.error || "Persistence failed.");
+          throw new Error(result.error || "Unable to save event.");
         }
-
-        window.location.href = "/organizer/dashboard";
+        setButtonsState(false, defaultTopLabel, defaultSubmitLabel);
+        setStatus("Changes saved.", false);
+        setTimeout(() => clearStatus(), 2000);
         return;
       } catch (error) {
         submitBtn?.classList.remove("btn-primary--success");
-        setButtonsState(false, defaultTopLabel, isCreateMode ? "Create Event" : "Retry Save");
+        setButtonsState(false, defaultTopLabel, isCreateMode ? "Create event" : "Retry save");
         setStatus(error instanceof Error ? error.message : "Unable to save event.", true);
       }
     });
 
     if (isCreateMode) {
-      if (titleEl) titleEl.textContent = "Create Event";
+      if (titleEl) titleEl.textContent = "Create event";
       if (subtitleEl) subtitleEl.textContent = "Set up a brand-new event, then fine-tune details before you publish.";
       existingOnlyEls.forEach((el) => el.classList.add("hidden"));
       setButtonsState(false, defaultTopLabel, defaultSubmitLabel);

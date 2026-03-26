@@ -4,201 +4,105 @@ import { site } from "../content/site";
 ---
 
 <BaseLayout title={`${site.brand.name} | Hackathon hosting platform`}>
-  {/* Hero Section */}
-  <section class="hero-nest relative pt-20 pb-32 overflow-hidden">
-    <div class="site-glow opacity-50"></div>
-    <div class="mx-auto max-w-6xl px-6 relative z-10">
-      <div class="flex flex-col lg:flex-row items-center gap-20">
-        <div class="flex-1 text-center lg:text-left space-y-8 animate-float">
-          <span class="eyebrow">The Future of Hackathons</span>
-          <h1 class="text-6xl md:text-8xl font-bold leading-[0.9] tracking-tighter">
-            {site.hero.title.split(' ').map((word, i) => (
-              i === 2 ? <span class="text-lime text-glow-lime">{word} </span> : word + ' '
-            ))}
-          </h1>
-          <p class="text-xl text-cream/60 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-            {site.hero.description}
-          </p>
-          <div class="flex flex-wrap justify-center lg:justify-start gap-6 pt-4">
-            <a class="btn-primary group" href={site.hero.primaryCta.href}>
-              {site.hero.primaryCta.label}
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
-            <a class="btn-ghost" href={site.hero.secondaryCta.href}>
-              {site.hero.secondaryCta.label}
-            </a>
-          </div>
+  <section class="mx-auto max-w-6xl px-6 py-16">
+    <div class="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+      <div class="space-y-6">
+        <span class="eyebrow !border-lime/25 !bg-lime/10 !text-lime">Warm Nest Lab</span>
+        <h1 class="text-5xl font-bold tracking-tight md:text-7xl">{site.hero.title}</h1>
+        <p class="max-w-2xl text-lg leading-relaxed text-cream/60">{site.hero.description}</p>
+        <div class="flex flex-wrap gap-3">
+          <a class="btn-primary !px-8 !py-3.5" href={site.hero.primaryCta.href}>{site.hero.primaryCta.label}</a>
+          <a class="btn-ghost !px-8 !py-3.5" href={site.hero.secondaryCta.href}>{site.hero.secondaryCta.label}</a>
         </div>
+      </div>
 
-        <div class="flex-1 w-full max-w-md lg:max-w-none">
-          <div class="hatching-grid grid grid-cols-2 gap-6">
-            {site.stats.map((stat, i) => (
-              <div class={`card hatch-card group transition-all ${i % 2 === 1 ? 'mt-8' : ''} ${(stat.label.toLowerCase().includes("free") || stat.value.toLowerCase().includes("built-in")) ? "spark-card" : ""}`}>
-                <div class="hatch-card-wireframe" aria-hidden="true">
-                  <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M40 94 C40 132 63 160 90 160 C117 160 140 132 140 94 C140 56 117 28 90 28 C63 28 40 56 40 94 Z" />
-                    <path d="M58 104 L90 72 L122 104" />
-                    <path d="M54 86 L90 120 L126 86" />
-                  </svg>
-                </div>
-                {(stat.label.toLowerCase().includes("free") || stat.value.toLowerCase().includes("built-in")) && <div class="spark-pulse" aria-hidden="true"></div>}
-                <div class="flex flex-col gap-2">
-                  <span class="text-sm font-bold uppercase tracking-widest text-sky/60 group-hover:text-sky transition-colors">{stat.label}</span>
-                  <span class="text-4xl font-bold tracking-tighter counter-value">{stat.value}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div class="project-growth mt-8">
-            <div class="project-growth__header">
-              <span class="text-xs font-bold uppercase tracking-[0.2em] text-sky/70">Project Growth</span>
-              <span class="text-sm text-cream/60">Sprouting this week</span>
+      <aside class="card !p-7 space-y-5">
+        <h2 class="text-xl font-bold">Why teams pick Hatch</h2>
+        <ul class="space-y-3 text-sm text-cream/65">
+          <li>Organizer dashboard for setup, judging, and publishing.</li>
+          <li>Judge links with optional PIN and expiry controls.</li>
+          <li>Public event pages with application, submission, and voting flows.</li>
+        </ul>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
+          {site.stats.map((stat) => (
+            <div class="rounded-xl border border-cream/10 bg-cream/5 p-3">
+              <p class="text-xs uppercase tracking-widest text-cream/45">{stat.label}</p>
+              <p class="mt-1 text-lg font-bold">{stat.value}</p>
             </div>
-            <svg class="project-growth__chart" viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <defs>
-                <linearGradient id="growth-stroke" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="var(--hatch-cyan)" />
-                  <stop offset="100%" stop-color="var(--hatch-indigo)" />
-                </linearGradient>
-              </defs>
-              <path class="project-growth__line" d="M10 106 C45 98, 72 70, 95 74 C120 78, 130 102, 150 98 C170 94, 188 58, 210 52 C230 47, 246 62, 265 54 C285 46, 300 20, 310 14" />
-              <circle cx="95" cy="74" r="4" />
-              <circle cx="210" cy="52" r="4" />
-              <circle cx="310" cy="14" r="5" />
-            </svg>
-          </div>
+          ))}
         </div>
-      </div>
+      </aside>
     </div>
   </section>
 
-  {/* Features Area */}
-  <section id="features" class="py-32 relative">
-    <div class="mx-auto max-w-6xl px-6">
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
-        <div class="max-w-2xl space-y-4">
-          <span class="text-xs font-bold uppercase tracking-[0.3em] text-violet">Organizer Suite</span>
-          <h2 class="section-title !mb-0">Built for high-impact events</h2>
-          <p class="text-lg text-cream/50 leading-relaxed">
-            Everything you need to launch a hackathon with clarity — no custom
-            tooling or spreadsheets required.
-          </p>
-        </div>
-        <div class="h-px bg-cream/5 flex-1 hidden md:block mb-6 mx-12"></div>
-      </div>
-
-      <div class="grid gap-8 md:grid-cols-2">
-        {site.features.map((feature) => (
-          <div class="card hatch-card !p-8 group hover:-translate-y-2">
-            <div class="hatch-card-wireframe" aria-hidden="true">
-              <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
-                <path d="M40 94 C40 132 63 160 90 160 C117 160 140 132 140 94 C140 56 117 28 90 28 C63 28 40 56 40 94 Z" />
-                <path d="M58 104 L90 72 L122 104" />
-                <path d="M54 86 L90 120 L126 86" />
-              </svg>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-cream/5 flex items-center justify-center mb-6 group-hover:bg-lime group-hover:text-ink transition-all">
-               <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-            </div>
-            <h3 class="text-xl font-bold mb-3">{feature.title}</h3>
-            <p class="text-sm text-cream/40 leading-relaxed group-hover:text-cream/70 transition-colors">{feature.description}</p>
-          </div>
-        ))}
-      </div>
+  <section id="features" class="mx-auto max-w-6xl px-6 py-10">
+    <div class="space-y-3">
+      <span class="eyebrow !border-sky/25 !bg-sky/10 !text-sky">Organizer tools</span>
+      <h2 class="text-3xl font-bold tracking-tight md:text-4xl">Everything needed to run one event well</h2>
+    </div>
+    <div class="mt-8 grid gap-5 md:grid-cols-2">
+      {site.features.map((feature) => (
+        <article class="card !p-6">
+          <h3 class="text-xl font-bold">{feature.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-cream/60">{feature.description}</p>
+        </article>
+      ))}
     </div>
   </section>
 
-  {/* How It Works */}
-  <section id="how" class="py-32 relative">
-    <div class="mx-auto max-w-6xl px-6">
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
-        <div class="max-w-2xl space-y-4">
-          <span class="text-xs font-bold uppercase tracking-[0.3em] text-sky">How it works</span>
-          <h2 class="section-title !mb-0">Launch in three steps</h2>
-          <p class="text-lg text-cream/50 leading-relaxed">
-            Designed for teams running real events on short timelines.
-          </p>
-        </div>
-      </div>
-      <div class="grid gap-6 md:grid-cols-3">
-        {site.steps.map((step, index) => (
-          <article class="card hatch-card !p-8">
-            <p class="text-xs font-bold uppercase tracking-[0.25em] text-cream/35 mb-4">
-              Step {index + 1}
-            </p>
-            <h3 class="text-2xl font-bold tracking-tight mb-3">{step.title}</h3>
-            <p class="text-sm text-cream/55 leading-relaxed">{step.description}</p>
-          </article>
-        ))}
-      </div>
+  <section id="how" class="mx-auto max-w-6xl px-6 py-10">
+    <div class="space-y-3">
+      <span class="eyebrow !border-violet/25 !bg-violet/10 !text-violet">How it works</span>
+      <h2 class="text-3xl font-bold tracking-tight md:text-4xl">Launch in three steps</h2>
+    </div>
+    <div class="mt-8 grid gap-5 md:grid-cols-3">
+      {site.steps.map((step, index) => (
+        <article class="card !p-6">
+          <p class="text-xs font-bold uppercase tracking-widest text-cream/40">Step {index + 1}</p>
+          <h3 class="mt-3 text-xl font-bold">{step.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-cream/60">{step.description}</p>
+        </article>
+      ))}
     </div>
   </section>
 
-  {/* Live Events Section */}
-  <section id="events" class="py-32 bg-ink-muted/20">
-    <div class="mx-auto max-w-6xl px-6">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-10 mb-16">
-        <div class="space-y-4 text-center md:text-left">
-          <h2 class="section-title !mb-0">Upcoming Hackathons</h2>
-          <p class="text-cream/50">Browse global events hosted by the Hatch community.</p>
-        </div>
-        <div class="flex items-center gap-4">
-          <button class="w-12 h-12 rounded-xl border border-cream/10 flex items-center justify-center hover:bg-cream/5 disabled:opacity-30" id="prev-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-          </button>
-          <button class="w-12 h-12 rounded-xl border border-cream/10 flex items-center justify-center hover:bg-cream/5 disabled:opacity-30" id="next-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </button>
-        </div>
+  <section id="events" class="mx-auto max-w-6xl px-6 py-12">
+    <div class="mb-7 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <div>
+        <span class="eyebrow !border-lime/25 !bg-lime/10 !text-lime">Live events</span>
+        <h2 class="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Upcoming and active hackathons</h2>
       </div>
+      <a class="btn-ghost !px-5 !py-3 !text-sm" href="/events">Browse all events</a>
+    </div>
 
-      <div class="grid gap-8 md:grid-cols-2" data-events-grid>
-        <div class="card animate-pulse py-20 flex items-center justify-center text-cream/30">
-          Syncing with the grid...
-        </div>
-      </div>
-
-      <div class="mt-12 text-center" data-events-empty hidden>
-        <div class="card inline-block !px-12 !py-8">
-            <p class="text-cream/40 italic">The grid is silent. No events published yet.</p>
-            <a href="/organizer/signup" class="text-lime font-bold mt-4 block hover:underline">Be the first to host &rarr;</a>
-        </div>
-      </div>
+    <div class="grid gap-5 md:grid-cols-2" data-events-grid aria-live="polite">
+      <div class="card !p-8 text-cream/40">Loading events...</div>
     </div>
   </section>
 
-  {/* CTA Section */}
-  <section class="py-32">
-    <div class="mx-auto max-w-4xl px-6 text-center">
-      <div class="card !p-20 relative overflow-hidden group">
-        <div class="absolute inset-0 bg-gradient-to-br from-lime/10 via-transparent to-sky/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-        <div class="relative z-10 space-y-8">
-            <h2 class="text-5xl md:text-6xl font-bold tracking-tighter">Ready to manifest your event?</h2>
-            <p class="text-xl text-cream/60 max-w-xl mx-auto">Join the next generation of hackathon organizers and build something legendary.</p>
-            <div class="pt-6">
-                <a class="btn-primary !px-12 !py-5 !text-lg" href="/organizer/signup">Get Started Free</a>
-            </div>
-        </div>
+  <section class="mx-auto max-w-5xl px-6 py-14">
+    <div class="card !p-10 text-center md:!p-14">
+      <h2 class="text-3xl font-bold tracking-tight md:text-5xl">Ready to host your next hackathon?</h2>
+      <p class="mx-auto mt-4 max-w-2xl text-cream/60">
+        Create your organizer account, launch your event page, and run judging from one workspace.
+      </p>
+      <div class="mt-7 flex flex-wrap justify-center gap-3">
+        <a class="btn-primary !px-8 !py-3.5" href="/organizer/signup">Create organizer account</a>
+        <a class="btn-ghost !px-8 !py-3.5" href="/events">See public events</a>
       </div>
     </div>
   </section>
-
-  <style>
-    .counter-value {
-      color: hsl(var(--cream));
-      line-height: 1;
-      text-shadow: 0 8px 26px hsla(var(--ink), 0.16);
-    }
-
-    :root[data-theme="light"] .counter-value {
-      color: hsl(var(--cream));
-      text-shadow: none;
-    }
-  </style>
 
   <script>
     const grid = document.querySelector("[data-events-grid]");
-    const empty = document.querySelector("[data-events-empty]");
+
+    const escapeHtml = (value) =>
+      String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 
     const formatDate = (value) => {
       if (!value) return "TBD";
@@ -211,54 +115,44 @@ import { site } from "../content/site";
       }).format(date);
     };
 
-    const formatRange = (start, end) => {
-      if (!start && !end) return "Dates TBD";
-      if (!start || !end) return formatDate(start || end);
-      return `${formatDate(start)} – ${formatDate(end)}`;
-    };
+    const renderEvents = (events) => {
+      if (!grid) return;
+      if (!events.length) {
+        grid.innerHTML = '<div class="card !p-8 text-cream/45 italic border-dashed">No events are published yet.</div>';
+        return;
+      }
 
-    const createCard = (event) => {
-      const dateRange = formatRange(event.startDate, event.endDate);
-      const card = document.createElement("a");
-      const organizerId = String(event.organizerId || "").trim();
-      card.href = organizerId ? `/events/${organizerId}/${event.slug}` : `/events/${event.slug}`;
-      card.className = "card group block !p-10 hover:border-lime/40 transition-all";
-      card.innerHTML = `
-        <div class="flex justify-between items-start mb-8">
-            <span class="status-pill !bg-cream/5 !text-cream/60 !py-1 !px-4 !text-xs uppercase tracking-widest">${event.mode || "Hackathon"}</span>
-            <div class="w-10 h-10 rounded-full border border-cream/10 flex items-center justify-center group-hover:bg-lime group-hover:text-ink group-hover:border-lime transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-            </div>
-        </div>
-        <h3 class="text-3xl font-bold tracking-tight mb-4 group-hover:text-lime transition-colors">${event.title}</h3>
-        <p class="text-cream/40 line-clamp-2 leading-relaxed mb-10 group-hover:text-cream transition-colors">${event.tagline || "No description provided."}</p>
-        <div class="flex items-center gap-6 pt-6 border-t border-cream/5">
-            <div class="flex items-center gap-2 text-sm text-cream/40">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <span>${dateRange}</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-cream/40">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                <span>${event.location || "Online"}</span>
-            </div>
-        </div>
-      `;
-      return card;
+      grid.innerHTML = events
+        .slice(0, 6)
+        .map((event) => {
+          const organizerId = String(event.organizerId || "").trim();
+          const href = organizerId ? `/events/${organizerId}/${event.slug}` : `/events/${event.slug}`;
+          return `
+            <article class="card !p-6">
+              <div class="flex items-center justify-between gap-3">
+                <span class="status-pill !bg-sky/10 !text-sky !border-sky/20">${escapeHtml(event.mode || "Hackathon")}</span>
+                <span class="text-xs uppercase tracking-widest text-cream/40">${escapeHtml(event.location || "Location TBD")}</span>
+              </div>
+              <h3 class="mt-4 text-2xl font-bold">${escapeHtml(event.title || "Untitled event")}</h3>
+              <p class="mt-2 text-sm text-cream/60">${escapeHtml(event.tagline || "No tagline yet.")}</p>
+              <p class="mt-4 text-xs uppercase tracking-widest text-cream/45">${formatDate(event.startDate)} - ${formatDate(event.endDate)}</p>
+              <a class="btn-primary mt-5 !w-full !text-sm" href="${href}">Open event</a>
+            </article>
+          `;
+        })
+        .join("");
     };
 
     const loadEvents = async () => {
       if (!grid) return;
       try {
         const response = await fetch("/api/events");
-        const payload = await response.json();
-        grid.innerHTML = "";
-        if (!payload.events || payload.events.length === 0) {
-          empty?.removeAttribute("hidden");
-          return;
-        }
-        payload.events.forEach((event) => grid.appendChild(createCard(event)));
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Unable to load events.");
+        renderEvents(Array.isArray(payload.events) ? payload.events : []);
       } catch (error) {
-        grid.innerHTML = '<div class="card !p-12 text-cream/40 text-center italic">Failed to synchronize with the Hackathon Grid.</div>';
+        const message = error instanceof Error ? error.message : "Unable to load events.";
+        grid.innerHTML = `<div class="card !p-8 text-coral border-coral/20">${escapeHtml(message)}</div>`;
       }
     };
 

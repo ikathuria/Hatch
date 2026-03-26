@@ -1,0 +1,14 @@
+---
+interface Props {
+  as?: "input" | "textarea" | "select";
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { as = "input", class: className = "", ...rest } = Astro.props as Props;
+const Tag = as;
+---
+
+<Tag class:list={["ui-input", className]} {...rest}>
+  <slot />
+</Tag>

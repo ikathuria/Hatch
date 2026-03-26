@@ -1,0 +1,16 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  class?: string;
+}
+
+const { eyebrow = "", title, description = "", class: className = "" } = Astro.props as Props;
+---
+
+<header class:list={["space-y-3", className]}>
+  {eyebrow ? <span class="eyebrow">{eyebrow}</span> : null}
+  <h2>{title}</h2>
+  {description ? <p class="text-cream/60">{description}</p> : null}
+</header>

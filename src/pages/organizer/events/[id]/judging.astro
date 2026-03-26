@@ -7,20 +7,20 @@ const eventId = Astro.params.id ? String(Astro.params.id) : "";
 
 <BaseLayout title="Judging | Hatch">
   <div class="mx-auto max-w-7xl px-6 py-12">
-    <div class="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between mb-10">
+    <div class="mb-10 flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
       <div class="space-y-4">
         <div class="flex items-center gap-3">
           <a
             href={`/organizer/events/${eventId}`}
-            class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors"
+            class="flex h-8 w-8 items-center justify-center rounded-lg bg-cream/5 transition-colors hover:bg-cream/10"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
           </a>
-          <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Judging room</span>
+          <span class="eyebrow !border-lime/20 !bg-lime/10 !text-lime">Judging workspace</span>
         </div>
-        <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">Judging workspace</h1>
-        <p class="text-cream/50 max-w-3xl leading-relaxed">
-          Same tools as the Judging tab on the event editor — use this page when you want more space.
+        <h1 class="text-4xl font-bold tracking-tighter md:text-5xl">Judging workspace</h1>
+        <p class="max-w-3xl leading-relaxed text-cream/50">
+          Same tools as the Judging tab on the event editor. Use this page when you want more room.
         </p>
       </div>
     </div>

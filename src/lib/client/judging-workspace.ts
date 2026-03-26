@@ -1,3 +1,5 @@
+import { uiCopy } from "../../content/microcopy";
+
 export function initJudgingWorkspace(root: HTMLElement | null, eventId: string): void {
   if (!root || !eventId || root.dataset.judgingReady === "1") return;
   root.dataset.judgingReady = "1";
@@ -220,17 +222,17 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
 
   const apiJson = async (url: string, options: RequestInit = {}, statusEl: Element | null = null) => {
     try {
-      setStatus(statusEl, "Saving...", "!text-sky");
+      setStatus(statusEl, uiCopy.common.saving, "!text-sky");
       const response = await fetch(url, {
         headers: { "content-type": "application/json", ...(options.headers || {}) },
         ...options
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error((payload as { error?: string }).error || `Request failed (${response.status})`);
-      setStatus(statusEl, (payload as { message?: string }).message || "Saved", "!text-lime");
+      setStatus(statusEl, (payload as { message?: string }).message || uiCopy.common.saved, "!text-lime");
       return payload;
     } catch (error) {
-      setStatus(statusEl, error instanceof Error ? error.message : "Error", "!text-coral");
+      setStatus(statusEl, error instanceof Error ? error.message : uiCopy.common.unavailable, "!text-coral");
       throw error;
     }
   };
@@ -256,7 +258,8 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
       createdAt?: string;
     }>;
     if (!links.length) {
-      elements.judgeLinks.innerHTML = '<div class="text-sm text-cream/35 italic">No judge links yet.</div>';
+      elements.judgeLinks.innerHTML =
+        '<div class="text-sm text-cream/35 italic">No judge links yet. Generate one to invite judges.</div>';
       return;
     }
     const now = Date.now();
@@ -312,7 +315,7 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     const rankings = toList(state.overallRanking) as Array<Record<string, unknown>>;
     if (!rankings.length) {
       elements.overviewRows.innerHTML =
-        '<tr><td colspan="7" class="py-8 text-cream/35 italic">No submissions scored yet.</td></tr>';
+        `<tr><td colspan="7" class="py-8 text-cream/35 italic">${uiCopy.organizer.judging.noSubmissions}</td></tr>`;
       return;
     }
     elements.overviewRows.innerHTML = rankings
@@ -354,11 +357,20 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     const ties = toList(state.unresolvedTies) as Array<Record<string, unknown>>;
     setStatus(
       elements.tieStatus,
-      ties.length ? `${ties.length} unresolved` : "All clear",
+      ties.length ? `${ties.length} tie group${ties.length === 1 ? "" : "s"} need review` : "No open ties",
       ties.length ? "!text-coral" : "!text-lime"
     );
     if (!ties.length) {
-      elements.tieBreaks.innerHTML = '<div class="text-sm text-cream/35 italic">No unresolved ties yet.</div>';
+      elements.tieBreaks.innerHTML =
+        '<div class="text-sm text-cream/35 italic">No unresolved ties. Winner picks are clear.</div>';
+      return;
+    }
+    if (state.published) {
+      elements.tieBreaks.innerHTML = `
+        <div class="rounded-2xl border border-lime/20 bg-lime/10 p-4 text-sm text-cream/80">
+          Results are published. Tie controls are read only.
+        </div>
+      `;
       return;
     }
     elements.tieBreaks.innerHTML = ties
@@ -442,7 +454,7 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     const tracks = toList(state.tracks) as Array<{ name: string }>;
     if (!tracks.length) {
       elements.trackWinners.innerHTML =
-        '<div class="text-sm text-cream/35 italic">No tracks configured for this event.</div>';
+        '<div class="text-sm text-cream/35 italic">No tracks configured. Add tracks in the event editor to set track winners.</div>';
       const lockWinners =
         state.published || (state.scoreBasedWinnersApply && !state.manualOverride && !state.published);
       if (elements.overallWinner) (elements.overallWinner as HTMLSelectElement).disabled = lockWinners;
@@ -496,14 +508,28 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     }
     if (elements.winnersHint) {
       if (state.published) {
-        elements.winnersHint.textContent = "Results are published.";
+        elements.winnersHint.textContent = uiCopy.organizer.judging.published;
       } else if (state.scoreBasedWinnersApply && !state.manualOverride) {
         elements.winnersHint.textContent =
-          "Winners follow the leaderboard when there are no ties. Use manual override to pick someone else, then save.";
+          "Winners follow the top scores when there are no ties. Enable manual override only if you need to choose different winners.";
       } else {
-        elements.winnersHint.textContent = "Select winners before publishing results.";
+        elements.winnersHint.textContent = "Save winners, then publish results when you are ready to lock judging.";
       }
     }
+  };
+
+  const syncPublishButton = () => {
+    const publishBtn = elements.publishBtn as HTMLButtonElement | null;
+    if (!publishBtn) return;
+    if (state.published) {
+      publishBtn.disabled = true;
+      publishBtn.textContent = "Results published";
+      publishBtn.setAttribute("aria-disabled", "true");
+      return;
+    }
+    publishBtn.disabled = false;
+    publishBtn.textContent = "Publish results";
+    publishBtn.removeAttribute("aria-disabled");
   };
 
   const syncStats = () => {
@@ -513,7 +539,7 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     if (elements.statResults) elements.statResults.textContent = state.published ? "Published" : "Draft";
     setStatus(
       elements.overviewStatus,
-      state.published ? "Results published" : "Draft only",
+      state.published ? "Results are live and scoring is locked." : "Draft mode: judges can still score.",
       state.published ? "!text-lime" : "!text-sky"
     );
   };
@@ -534,6 +560,7 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     renderWinnerControls();
     updateWinnerHints();
     syncStats();
+    syncPublishButton();
   };
 
   const readRubric = () => ({
@@ -688,14 +715,18 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
     if (!value) return;
     try {
       await navigator.clipboard.writeText(value);
-      setStatus(elements.linkStatus, "Copied link", "!text-lime");
+      setStatus(elements.linkStatus, "Judge link copied.", "!text-lime");
     } catch {
-      setStatus(elements.linkStatus, "Copy failed", "!text-coral");
+      setStatus(elements.linkStatus, "Copy failed. Copy manually from the field.", "!text-coral");
     }
   });
 
   elements.winnersForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (state.published) {
+      setStatus(elements.winnerStatus, uiCopy.organizer.judging.locked, "!text-sky");
+      return;
+    }
     const submit = (event.currentTarget as HTMLFormElement).querySelector(
       'button[type="submit"]'
     ) as HTMLButtonElement | null;
@@ -731,6 +762,7 @@ export function initJudgingWorkspace(root: HTMLElement | null, eventId: string):
   });
 
   elements.publishBtn?.addEventListener("click", async () => {
+    if (state.published) return;
     const publishBtn = elements.publishBtn as HTMLButtonElement | null;
     setButtonBusy(publishBtn, true, "Publishing...");
     try {
