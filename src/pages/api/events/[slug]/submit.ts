@@ -4,6 +4,7 @@ import { getEnv } from "../../../../lib/server/env";
 import { emailPattern } from "../../../../lib/server/validation";
 import { requireParticipantSession } from "../../../../lib/server/participant-auth";
 import { extractEmails, normalizeEmail } from "../../../../lib/server/email";
+import { loadParticipantTeam } from "../../../../lib/server/participant-workspace";
 
 const getValue = (form: FormData, key: string) => {
   const value = form.get(key);
@@ -100,15 +101,25 @@ export const POST: APIRoute = async (context) => {
     }
 
     const form = await context.request.formData();
-    const teamName = getValue(form, "teamName");
     const projectName = getValue(form, "projectName");
     const description = getValue(form, "description");
     const repoUrl = getValue(form, "repoUrl");
     const demoUrl = getValue(form, "demoUrl");
     const deckUrl = getValue(form, "deckUrl");
     const track = getValue(form, "track");
-    const members = getValue(form, "members");
-    const contactEmail = getValue(form, "contactEmail");
+    const submittedTeamName = getValue(form, "teamName");
+    const submittedMembers = getValue(form, "members");
+    const submittedContactEmail = getValue(form, "contactEmail");
+
+    const participantTeam = await loadParticipantTeam(env, event.id, participantEmail);
+    const teamName = participantTeam?.name || submittedTeamName;
+    const members =
+      participantTeam?.members.map((member) => `${member.displayName} - ${member.email}`).join("\n") ||
+      submittedMembers;
+    const contactEmail =
+      participantTeam?.createdByEmail ||
+      participantTeam?.members[0]?.email ||
+      submittedContactEmail;
 
     if (!teamName || !projectName || !description || !track || !contactEmail || !members) {
       return json({ error: "Please complete all required fields." }, 400);
@@ -125,13 +136,27 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
+    if (participantTeam?.id) {
+      const existingSubmission = await env.DB.prepare(
+        `SELECT id
+         FROM submissions
+         WHERE event_id = ? AND team_id = ?`
+      )
+        .bind(event.id, participantTeam.id)
+        .first<{ id: string }>();
+
+      if (existingSubmission) {
+        return json({ error: "This team has already submitted a project." }, 409);
+      }
+    }
+
     const normalizedContactEmail = contactEmail.toLowerCase();
 
     const id = crypto.randomUUID();
     await env.DB.prepare(
       `INSERT INTO submissions
-      (id, event_id, created_at, team_name, project_name, description, repo_url, demo_url, deck_url, track, members, contact_email)
-      VALUES (?, ?, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      (id, event_id, created_at, team_name, project_name, description, repo_url, demo_url, deck_url, track, members, contact_email, team_id, created_by_participant_email)
+      VALUES (?, ?, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
       .bind(
         id,
@@ -144,7 +169,9 @@ export const POST: APIRoute = async (context) => {
         deckUrl,
         track,
         members,
-        normalizedContactEmail
+        normalizedContactEmail,
+        participantTeam?.id || null,
+        participantEmail
       )
       .run();
 

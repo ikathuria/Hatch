@@ -4,7 +4,7 @@ import { site } from "../content/site";
 ---
 
 <BaseLayout title={`${site.brand.name} | Hackathon hosting platform`}>
-  <section class="mx-auto max-w-6xl px-6 pb-10 pt-10">
+  <section class="mx-auto max-w-6xl px-6 pb-18 pt-12">
     <div class="grid gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
       <div class="space-y-8">
         <div class="space-y-4">
@@ -22,21 +22,9 @@ import { site } from "../content/site";
           <a class="btn-ghost !rounded-full !px-8 !py-3.5 !font-mono !text-xs !uppercase !tracking-[0.2em]" href={site.hero.secondaryCta.href}>
             {site.hero.secondaryCta.label}
           </a>
-        </div>
-
-        <div class="grid gap-4 sm:grid-cols-3">
-          <div class="border-l border-lime/30 pl-4">
-            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime">Organizer-first</p>
-            <p class="mt-2 text-sm leading-relaxed text-cream/[0.55]">A calm workspace for setup, submissions, judging, and results.</p>
-          </div>
-          <div class="border-l border-sky/30 pl-4">
-            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-sky">Builder-aware</p>
-            <p class="mt-2 text-sm leading-relaxed text-cream/[0.55]">Public pages and flows that feel clear from apply through final gallery.</p>
-          </div>
-          <div class="border-l border-cream/[0.18] pl-4">
-            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-cream/70">Made to publish</p>
-            <p class="mt-2 text-sm leading-relaxed text-cream/[0.55]">Every event can end with structure, visibility, and a result people can revisit.</p>
-          </div>
+          <a class="btn-ghost !rounded-full !px-8 !py-3.5 !font-mono !text-xs !uppercase !tracking-[0.2em]" href="/events">
+            Explore events
+          </a>
         </div>
       </div>
 
@@ -53,156 +41,4 @@ import { site } from "../content/site";
       </aside>
     </div>
   </section>
-
-  <section class="mx-auto max-w-6xl px-6 py-8">
-    <div class="proof-strip">
-      {site.stats.map((stat) => (
-        <div class="proof-strip__item">
-          <p class="proof-strip__value">{stat.value}</p>
-          <p class="proof-strip__label">{stat.label}</p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <section id="features" class="mx-auto max-w-6xl px-6 py-14">
-    <div class="max-w-3xl space-y-3">
-      <span class="eyebrow !border-sky/[0.18] !bg-sky/[0.08] !font-mono !text-[0.68rem] !tracking-[0.24em] !text-sky">Product flow</span>
-      <h2 class="text-3xl font-bold tracking-[-0.07em] md:text-5xl">A launch system that stays warm without getting noisy.</h2>
-      <p class="text-base leading-relaxed text-cream/[0.58] md:text-lg">
-        Hatch gives structure to the messy middle of an event: the setup before launch, the people arriving, the projects taking shape, and the outcome everyone comes back to see.
-      </p>
-    </div>
-
-    <div class="fissure-divider" aria-hidden="true"></div>
-
-    <div class="grid gap-5 md:grid-cols-2">
-      {site.features.map((feature) => (
-        <article class="landing-feature-card">
-          <p class="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-cream/[0.34]">Core capability</p>
-          <h3 class="mt-4 text-2xl font-bold tracking-[-0.05em]">{feature.title}</h3>
-          <p class="mt-3 text-sm leading-relaxed text-cream/[0.58] md:text-base">{feature.description}</p>
-        </article>
-      ))}
-    </div>
-  </section>
-
-  <section id="how" class="mx-auto max-w-6xl px-6 py-12">
-    <div class="max-w-3xl space-y-3">
-      <span class="eyebrow !border-cream/[0.14] !bg-cream/[0.04] !font-mono !text-[0.68rem] !tracking-[0.24em] !text-cream/70">From first draft to public launch</span>
-      <h2 class="text-3xl font-bold tracking-[-0.07em] md:text-5xl">Prepare. Gather. Hatch.</h2>
-    </div>
-
-    <div class="mt-8 grid gap-5 md:grid-cols-3">
-      {site.steps.map((step, index) => (
-        <article class="landing-step-card">
-          <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime/80">0{index + 1}</p>
-          <h3 class="mt-5 text-2xl font-bold tracking-[-0.05em]">{step.title}</h3>
-          <p class="mt-3 text-sm leading-relaxed text-cream/[0.58] md:text-base">{step.description}</p>
-        </article>
-      ))}
-    </div>
-  </section>
-
-  <section id="events" class="mx-auto max-w-6xl px-6 py-12">
-    <div class="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-      <div>
-        <span class="eyebrow !border-lime/20 !bg-lime/[0.08] !font-mono !text-[0.68rem] !tracking-[0.24em] !text-lime">Live on Hatch</span>
-        <h2 class="mt-3 text-3xl font-bold tracking-[-0.07em] md:text-5xl">Ideas that already made it out into the world.</h2>
-        <p class="mt-3 max-w-2xl text-base leading-relaxed text-cream/[0.58]">
-          Published events are the proof. Hatch moves from planning to public pages, active submissions, and finished results without asking organizers to stitch together their own stack.
-        </p>
-      </div>
-      <a class="btn-ghost !rounded-full !px-5 !py-3 !font-mono !text-xs !uppercase !tracking-[0.2em]" href="/events">Browse all events</a>
-    </div>
-
-    <div class="grid gap-5 md:grid-cols-2" data-events-grid aria-live="polite">
-      <div class="landing-event-card !p-8 text-cream/40">Loading events...</div>
-    </div>
-  </section>
-
-  <section class="mx-auto max-w-5xl px-6 py-14">
-    <div class="landing-cta-panel text-center">
-      <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime/80">Start with the idea. Keep the structure.</p>
-      <h2 class="mt-4 text-3xl font-bold tracking-[-0.07em] md:text-5xl">Launch the next hackathon people actually remember.</h2>
-      <p class="mx-auto mt-4 max-w-2xl text-cream/60">
-        Create the page, open the flow, collect the work, and publish the outcome from one calm workspace.
-      </p>
-      <div class="mt-7 flex flex-wrap justify-center gap-3">
-        <a class="btn-primary !rounded-full !px-8 !py-3.5" href="/organizer/signup">Create organizer account</a>
-        <a class="btn-ghost !rounded-full !px-8 !py-3.5 !font-mono !text-xs !uppercase !tracking-[0.2em]" href="/events">See public events</a>
-      </div>
-    </div>
-  </section>
-
-  <script>
-    const grid = document.querySelector("[data-events-grid]");
-
-    const escapeHtml = (value) =>
-      String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-
-    const formatDate = (value) => {
-      if (!value) return "TBD";
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return value;
-      return new Intl.DateTimeFormat(undefined, {
-        month: "short",
-        day: "numeric",
-        year: "numeric"
-      }).format(date);
-    };
-
-    const renderEvents = (events) => {
-      if (!grid) return;
-      if (!events.length) {
-        grid.innerHTML = '<div class="landing-event-card !p-8 text-cream/45 italic border-dashed">No events are published yet.</div>';
-        return;
-      }
-
-      grid.innerHTML = events
-        .slice(0, 6)
-        .map((event) => {
-          const organizerId = String(event.organizerId || "").trim();
-          const href = organizerId ? `/events/${organizerId}/${event.slug}` : `/events/${event.slug}`;
-          return `
-            <article class="landing-event-card">
-              <div class="flex items-start justify-between gap-4">
-                <span class="status-pill !border-sky/[0.18] !bg-sky/[0.08] !font-mono !text-[0.66rem] !uppercase !tracking-[0.22em] !text-sky">${escapeHtml(event.mode || "Hackathon")}</span>
-                <span class="font-mono text-[0.66rem] uppercase tracking-[0.22em] text-cream/[0.36]">${escapeHtml(event.location || "Location TBD")}</span>
-              </div>
-              <h3 class="mt-8 text-3xl font-bold tracking-[-0.05em]">${escapeHtml(event.title || "Untitled event")}</h3>
-              <p class="mt-3 min-h-12 text-sm leading-relaxed text-cream/[0.58]">${escapeHtml(event.tagline || "No tagline yet.")}</p>
-              <div class="mt-8 flex items-end justify-between gap-4 border-t border-cream/[0.08] pt-5">
-                <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/40">${formatDate(event.startDate)} - ${formatDate(event.endDate)}</p>
-                <a class="inline-flex items-center gap-2 font-mono text-[0.7rem] uppercase tracking-[0.22em] text-lime transition-colors hover:text-cream" href="${href}">
-                  Open event
-                  <span aria-hidden="true">/</span>
-                </a>
-              </div>
-            </article>
-          `;
-        })
-        .join("");
-    };
-
-    const loadEvents = async () => {
-      if (!grid) return;
-      try {
-        const response = await fetch("/api/events");
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error || "Unable to load events.");
-        renderEvents(Array.isArray(payload.events) ? payload.events : []);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Unable to load events.";
-        grid.innerHTML = `<div class="landing-event-card !p-8 text-coral border-coral/20">${escapeHtml(message)}</div>`;
-      }
-    };
-
-    loadEvents();
-  </script>
 </BaseLayout>

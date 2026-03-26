@@ -1,37 +1,79 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import HatchEggMark from "../../components/HatchEggMark.astro";
 ---
 
 <BaseLayout title="Event Details | Hatch">
   {/* Event Hero */}
-  <section class="relative pt-12 pb-24 overflow-hidden">
+  <section class="relative overflow-hidden pb-16 pt-12">
     <div class="site-glow opacity-30"></div>
-    <div class="mx-auto max-w-6xl px-6 relative z-10">
-      <div class="card !p-0 overflow-hidden border-cream/10 shadow-[0_30px_100px_rgba(0,0,0,0.5)]">
-        <div class="relative hidden max-h-64 w-full overflow-hidden border-b border-cream/10 bg-cream/[0.03]" data-event-banner-wrap>
-          <img class="h-full w-full max-h-64 object-cover" data-event-banner alt="" />
-          <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" aria-hidden="true"></div>
-        </div>
-        <div class="bg-gradient-to-br from-violet/20 via-sky/10 to-transparent p-12 md:p-20">
-            <div class="space-y-8 max-w-4xl">
-                <div class="flex flex-wrap items-center gap-4">
-                  <span class="eyebrow !text-sky !bg-sky/10 !border-sky/20" data-event-mode>Loading...</span>
-                  <span class="text-xs uppercase tracking-widest text-cream/40 font-bold border-l border-cream/10 pl-4 hidden" data-event-org></span>
+    <div class="relative z-10 mx-auto max-w-6xl px-6">
+      <div class="grid gap-8 lg:grid-cols-[minmax(320px,380px)_minmax(0,1fr)]">
+        <div class="space-y-5">
+          <div class="card event-poster-card !p-0 overflow-hidden border-cream/[0.08]">
+            <div class="relative aspect-square overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(232,171,72,0.2),_transparent_34%),linear-gradient(180deg,_rgba(31,23,18,0.98),_rgba(17,13,10,0.96))]">
+              <div class="absolute inset-0 flex flex-col items-center justify-center gap-5 px-8 text-center" data-event-banner-placeholder>
+                <div class="event-poster-ring event-poster-ring--outer" aria-hidden="true"></div>
+                <div class="event-poster-ring event-poster-ring--inner" aria-hidden="true"></div>
+                <div class="event-poster-crack" aria-hidden="true"></div>
+                <div class="flex h-18 w-18 items-center justify-center rounded-full border border-cream/[0.12] bg-cream/[0.03] text-lime">
+                  <HatchEggMark class="h-10 w-7" />
                 </div>
-                <h1 class="text-5xl md:text-7xl font-bold tracking-tighter leading-tight" data-event-title>
-                    Synchronizing...
+                <div class="space-y-2">
+                  <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime/75">Hatch event page</p>
+                  <p class="text-sm leading-relaxed text-cream/55">A published banner will appear here. Until then, the event stays crisp and launch-ready.</p>
+                </div>
+              </div>
+
+              <div class="absolute inset-0 hidden" data-event-banner-wrap>
+                <img class="h-full w-full object-cover" data-event-banner alt="" />
+                <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/[0.15] to-transparent" aria-hidden="true"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid gap-4" data-event-facts>
+            <div class="card !p-6 text-cream/35 italic border-dashed">Loading event facts...</div>
+          </div>
+
+          <div class="card !p-7 hidden" data-event-socials-card>
+            <h3 class="mb-5 font-mono text-[0.72rem] uppercase tracking-[0.24em] text-lime">Connect</h3>
+            <div class="space-y-4" data-event-socials>
+              <!-- Hydrated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="card !p-8 md:!p-10">
+            <div class="space-y-7">
+              <div class="flex flex-wrap items-center gap-4">
+                <span class="eyebrow !border-sky/[0.2] !bg-sky/[0.08] !text-sky" data-event-mode>Loading...</span>
+                <span class="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-cream/[0.42] hidden" data-event-org></span>
+              </div>
+
+              <div class="space-y-4">
+                <h1 class="max-w-4xl text-4xl font-bold leading-tight tracking-[-0.07em] md:text-6xl" data-event-title>
+                  Synchronizing...
                 </h1>
-                <p class="text-xl text-cream/60 leading-relaxed font-medium" data-event-tagline></p>
-                
-                <div class="flex flex-wrap gap-8 text-sm font-bold uppercase tracking-widest text-cream/40 py-6 border-y border-cream/5" data-event-meta>
-                    {/* Hydrated by JS */}
+                <p class="max-w-3xl text-lg font-medium leading-relaxed text-cream/[0.62]" data-event-tagline></p>
+              </div>
+
+              <div class="card !p-6 event-callout-card">
+                <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+                  <div class="space-y-3">
+                    <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime">Take your place</p>
+                    <p class="max-w-xl text-sm leading-relaxed text-cream/[0.58]">
+                      Apply, submit, and share this event from one clean public page.
+                    </p>
+                  </div>
+                  <div class="flex flex-wrap gap-3">
+                    <a class="btn-primary !px-8 !py-3.5" data-apply-link href="#">Apply to Participate</a>
+                    <a class="btn-ghost !px-8 !py-3.5" data-submit-link href="#">Submit project</a>
+                  </div>
                 </div>
 
-                <div class="flex flex-wrap gap-6 pt-4">
-                    <a class="btn-primary !px-12 !py-4" data-apply-link href="#">Apply to Participate</a>
-                    <a class="btn-ghost !px-12 !py-4" data-submit-link href="#">Submit project</a>
-                </div>
-                <div class="flex flex-wrap items-center gap-3">
+                <div class="mt-5 flex flex-wrap items-center gap-3 border-t border-cream/[0.08] pt-5">
                   <button class="btn-ghost !px-5 !py-2 !text-xs" type="button" data-copy-link>
                     Copy event link
                   </button>
@@ -42,22 +84,41 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     Download .ics
                   </a>
                 </div>
-                <span class="text-xs text-cream/45 hidden" data-share-status role="status" aria-live="polite"></span>
+                <span class="mt-4 block text-xs text-cream/[0.45] hidden" data-share-status role="status" aria-live="polite"></span>
+              </div>
+
+              <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_290px]">
+                <div class="card !p-7">
+                  <h2 class="mb-5 font-mono text-[0.72rem] uppercase tracking-[0.24em] text-coral">About the Event</h2>
+                  <p class="max-w-3xl whitespace-pre-wrap text-base leading-relaxed text-cream/[0.72] md:text-lg" data-event-description></p>
+                </div>
+
+                <div class="card !p-7 border-violet/18 bg-violet/[0.04]">
+                  <h3 class="mb-5 font-mono text-[0.72rem] uppercase tracking-[0.24em] text-violet">Event Status</h3>
+                  <div class="space-y-5">
+                    <div class="flex items-center gap-4">
+                      <div class="h-2 w-2 rounded-full bg-lime animate-pulse"></div>
+                      <span class="text-sm font-medium text-cream" data-event-status-label>Loading status...</span>
+                    </div>
+                    <p class="text-sm leading-relaxed text-cream/[0.52]" data-event-status-copy>Loading event status...</p>
+                    <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.4] hidden" data-event-countdown></p>
+                    <a href="mailto:hello@hatch.dev" class="btn-ghost !w-full !justify-center !py-3 !text-xs uppercase tracking-widest" data-contact-link>
+                      Contact Organizer
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
-        </div>
-        
-        <div class="p-12 md:p-20 bg-ink-muted/30 backdrop-blur-xl">
-            <h2 class="text-xs font-bold uppercase tracking-[0.3em] text-violet mb-6">About the Event</h2>
-            <p class="text-lg text-cream/70 leading-relaxed max-w-4xl whitespace-pre-wrap" data-event-description></p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  {/* Content Grid */}
-  <section class="pb-32 relative">
+  {/* Public Content Grid */}
+  <section class="pb-32 relative" data-public-content>
     <div class="mx-auto max-w-6xl px-6">
-      <div class="grid lg:grid-cols-[1fr_350px] gap-16">
+      <div class="grid gap-16 lg:grid-cols-[1fr_330px]">
         {/* Main Content: Tabs */}
         <div class="space-y-10">
             <nav class="card !p-3 flex flex-wrap gap-2 w-fit" data-content-tabs>
@@ -107,38 +168,158 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
         {/* Sidebar: Dynamic Info */}
         <aside class="space-y-8">
-            <div class="card !p-8 border-violet/20 bg-violet/5">
-                <h3 class="text-sm font-bold uppercase tracking-widest text-violet mb-6">Event Status</h3>
-                <div class="space-y-6">
-                    <div class="flex items-center gap-4">
-                        <div class="w-2 h-2 rounded-full bg-lime animate-pulse"></div>
-                        <span class="text-sm font-medium text-cream" data-event-status-label>Loading status...</span>
-                    </div>
-                    <p class="text-xs text-cream/40 leading-relaxed" data-event-status-copy>Join a community of builders and manifest your vision into reality.</p>
-                    <p class="text-xs uppercase tracking-widest text-cream/45" data-event-countdown></p>
-                </div>
-            </div>
-
-            <div class="card !p-8 hidden" data-event-socials-card>
-                <h3 class="text-sm font-bold uppercase tracking-widest text-lime mb-6">Connect & Share</h3>
-                <div class="space-y-6" data-event-socials>
-                    <!-- Hydrated by JS -->
-                </div>
-            </div>
-
             <div class="card !p-8">
-                <h3 class="text-sm font-bold uppercase tracking-widest text-sky mb-6">Need Support?</h3>
-                <p class="text-sm text-cream/50 mb-6">Reach out to the organizers if you have questions about logistics, tracks, or deadlines.</p>
-                <a href="mailto:hello@hatch.dev" class="btn-ghost !w-full !py-3 !text-xs justify-center uppercase tracking-widest" data-contact-link>Contact Organizer</a>
+                <h3 class="mb-6 font-mono text-[0.72rem] uppercase tracking-[0.24em] text-sky">Need Support?</h3>
+                <p class="mb-6 text-sm leading-relaxed text-cream/[0.5]">Reach out to the organizers if you have questions about logistics, tracks, or deadlines.</p>
+                <a href="mailto:hello@hatch.dev" class="btn-ghost !w-full !justify-center !py-3 !text-xs uppercase tracking-widest" data-contact-link>Contact Organizer</a>
             </div>
         </aside>
       </div>
     </div>
   </section>
 
+  <section id="hacker-space" class="relative hidden pb-32" data-workspace>
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="card !p-6 md:!p-8">
+        <div class="flex flex-col gap-6 border-b border-cream/[0.08] pb-6 md:flex-row md:items-center md:justify-between">
+          <div class="space-y-2">
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime">Attendee workspace</p>
+            <h2 class="text-3xl font-bold tracking-[-0.06em] md:text-4xl">Hacker space</h2>
+            <p class="text-sm leading-relaxed text-cream/[0.56]" data-workspace-summary>
+              Loading attendee workspace...
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="status-pill !border-lime/20 !bg-lime/[0.08] !text-lime hidden" data-workspace-email></span>
+            <button class="btn-ghost !px-4 !py-2 !text-xs hidden" data-workspace-logout type="button">Sign out</button>
+          </div>
+        </div>
+
+        <div class="mt-8 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
+          <aside class="space-y-3">
+            <button class="workspace-nav-btn is-active" type="button" data-workspace-tab-btn data-workspace-tab-target="information">
+              Information
+            </button>
+            <button class="workspace-nav-btn" type="button" data-workspace-tab-btn data-workspace-tab-target="resources">
+              Resources
+            </button>
+            <button class="workspace-nav-btn" type="button" data-workspace-tab-btn data-workspace-tab-target="teams">
+              Teams
+            </button>
+            <button class="workspace-nav-btn" type="button" data-workspace-tab-btn data-workspace-tab-target="submissions">
+              Submissions
+            </button>
+          </aside>
+
+          <div class="space-y-5">
+            <section data-workspace-panel="information">
+              <div class="workspace-panel" data-workspace-information></div>
+            </section>
+
+            <section class="hidden" data-workspace-panel="resources">
+              <div class="workspace-panel" data-workspace-resources></div>
+            </section>
+
+            <section class="hidden" data-workspace-panel="teams">
+              <div class="workspace-panel" data-workspace-teams></div>
+            </section>
+
+            <section class="hidden" data-workspace-panel="submissions">
+              <div class="workspace-panel" data-workspace-submission></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <style>
+      .event-poster-card {
+          box-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+      }
+
+      .event-poster-ring {
+          position: absolute;
+          border: 1px solid rgba(255, 248, 236, 0.08);
+          border-radius: 999px;
+      }
+
+      .event-poster-ring--outer {
+          inset: 2.4rem;
+      }
+
+      .event-poster-ring--inner {
+          inset: 5.6rem;
+          border-color: rgba(131, 186, 196, 0.2);
+      }
+
+      .event-poster-crack {
+          position: absolute;
+          top: 5rem;
+          left: 50%;
+          width: 5px;
+          height: 11rem;
+          margin-left: -2px;
+          border-radius: 999px;
+          background: linear-gradient(180deg, rgba(120, 166, 175, 0.95), rgba(232, 171, 72, 0.95));
+          clip-path: polygon(45% 0%, 0% 14%, 70% 32%, 24% 48%, 84% 67%, 34% 84%, 58% 100%, 100% 100%, 100% 0%);
+          filter: drop-shadow(0 0 14px rgba(232, 171, 72, 0.28));
+      }
+
+      .event-callout-card {
+          background:
+              radial-gradient(circle at top left, rgba(232, 171, 72, 0.08), transparent 34%),
+              linear-gradient(180deg, rgba(31, 23, 18, 0.98), rgba(22, 17, 14, 0.95));
+      }
+
+      .workspace-nav-btn {
+          width: 100%;
+          display: inline-flex;
+          align-items: center;
+          justify-content: flex-start;
+          border: 1px solid transparent;
+          border-radius: 0.85rem;
+          background: transparent;
+          color: rgba(234, 223, 208, 0.62);
+          font-family: "IBM Plex Mono", monospace;
+          font-size: 0.78rem;
+          letter-spacing: 0.16em;
+          padding: 0.95rem 1rem;
+          text-transform: uppercase;
+          transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
+      }
+
+      .workspace-nav-btn:hover,
+      .workspace-nav-btn.is-active {
+          background: rgba(232, 171, 72, 0.08);
+          border-color: rgba(232, 171, 72, 0.18);
+          color: rgba(252, 246, 234, 0.96);
+      }
+
+      .workspace-panel {
+          border: 1px solid rgba(234, 223, 208, 0.08);
+          border-radius: 1rem;
+          background: linear-gradient(180deg, rgba(28, 22, 18, 0.98), rgba(18, 14, 12, 0.96));
+          padding: 1.5rem;
+      }
+
       details[open] summary svg {
           transform: rotate(180deg);
+      }
+
+      @media (max-width: 767px) {
+          .event-poster-ring--outer {
+              inset: 1.6rem;
+          }
+
+          .event-poster-ring--inner {
+              inset: 4rem;
+          }
+
+          .event-poster-crack {
+              top: 3.6rem;
+              height: 8.8rem;
+          }
       }
   </style>
 
@@ -151,7 +332,18 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const titleEl = document.querySelector("[data-event-title]");
     const taglineEl = document.querySelector("[data-event-tagline]");
     const descEl = document.querySelector("[data-event-description]");
-    const metaEl = document.querySelector("[data-event-meta]");
+    const publicContentEl = document.querySelector("[data-public-content]");
+    const workspaceEl = document.querySelector("[data-workspace]");
+    const workspaceSummaryEl = document.querySelector("[data-workspace-summary]");
+    const workspaceEmailEl = document.querySelector("[data-workspace-email]");
+    const workspaceLogoutBtn = document.querySelector("[data-workspace-logout]");
+    const workspaceTabButtons = Array.from(document.querySelectorAll("[data-workspace-tab-btn]"));
+    const workspacePanels = Array.from(document.querySelectorAll("[data-workspace-panel]"));
+    const workspaceInfoEl = document.querySelector("[data-workspace-information]");
+    const workspaceResourcesEl = document.querySelector("[data-workspace-resources]");
+    const workspaceTeamsEl = document.querySelector("[data-workspace-teams]");
+    const workspaceSubmissionEl = document.querySelector("[data-workspace-submission]");
+    const factsEl = document.querySelector("[data-event-facts]");
     const modeEl = document.querySelector("[data-event-mode]");
     const tracksEl = document.querySelector("[data-event-tracks]");
     const faqsEl = document.querySelector("[data-event-faqs]");
@@ -165,6 +357,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const socialsEl = document.querySelector("[data-event-socials]");
     const bannerWrap = document.querySelector("[data-event-banner-wrap]");
     const bannerImg = document.querySelector("[data-event-banner]");
+    const bannerPlaceholder = document.querySelector("[data-event-banner-placeholder]");
     const participantAuthCard = document.querySelector("[data-participant-auth]");
     const participantAuthCopy = document.querySelector("[data-participant-auth-copy]");
     const participantApplyLink = document.querySelector("[data-participant-apply-link]");
@@ -178,6 +371,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const shareStatusEl = document.querySelector("[data-share-status]");
     const googleCalendarLink = document.querySelector("[data-google-calendar]");
     const icsDownloadLink = document.querySelector("[data-ics-download]");
+    const contactLinks = Array.from(document.querySelectorAll("[data-contact-link]"));
 
     const BANNER_PREFIX = "/api/media/banner/";
     const BANNER_UUID =
@@ -185,13 +379,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
     const state = {
       event: null,
+      tracks: [],
       gallery: [],
       winners: null,
       resultsPublished: false,
       participantEventId: "",
       participantSessionEmail: "",
       participantEmail: "",
-      votedSubmissionIds: new Set()
+      votedSubmissionIds: new Set(),
+      workspace: null,
+      workspaceNotice: { panel: "", message: "", tone: "" }
     };
 
     const escapeHtml = (value) =>
@@ -230,6 +427,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     tabButtons.forEach((button) => {
       button.addEventListener("click", () =>
         activateTab(button.getAttribute("data-tab-target") || "tracks")
+      );
+    });
+
+    const activateWorkspaceTab = (tabId) => {
+      workspaceTabButtons.forEach((button) => {
+        const active = button.getAttribute("data-workspace-tab-target") === tabId;
+        button.classList.toggle("is-active", active);
+      });
+      workspacePanels.forEach((panel) => {
+        panel.classList.toggle("hidden", panel.getAttribute("data-workspace-panel") !== tabId);
+      });
+    };
+
+    workspaceTabButtons.forEach((button) => {
+      button.addEventListener("click", () =>
+        activateWorkspaceTab(button.getAttribute("data-workspace-tab-target") || "information")
       );
     });
 
@@ -279,6 +492,497 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       const hours = totalHours % 24;
       if (days > 0) return `${days}d ${hours}h`;
       return `${hours}h`;
+    };
+
+    const renderWorkspaceNotice = (panel) => {
+      if (state.workspaceNotice.panel !== panel || !state.workspaceNotice.message) return "";
+      const toneClass =
+        state.workspaceNotice.tone === "lime"
+          ? "text-lime"
+          : state.workspaceNotice.tone === "coral"
+            ? "text-coral"
+            : "text-sky";
+      return `<p class="mt-4 text-sm ${toneClass}">${escapeHtml(state.workspaceNotice.message)}</p>`;
+    };
+
+    const toggleWorkspaceMode = () => {
+      const active = Boolean(state.participantEmail && state.workspace);
+      workspaceEl?.classList.toggle("hidden", !active);
+      publicContentEl?.classList.toggle("hidden", active);
+
+      if (workspaceEmailEl) {
+        if (active) {
+          workspaceEmailEl.textContent = state.participantEmail;
+          workspaceEmailEl.classList.remove("hidden");
+        } else {
+          workspaceEmailEl.textContent = "";
+          workspaceEmailEl.classList.add("hidden");
+        }
+      }
+
+      if (workspaceLogoutBtn) {
+        workspaceLogoutBtn.classList.toggle("hidden", !state.participantSessionEmail);
+      }
+    };
+
+    const renderWorkspaceInformation = () => {
+      if (!workspaceInfoEl || !state.workspace) return;
+      const participant = state.workspace.participant || {};
+      const event = state.workspace.event || state.event || {};
+
+      workspaceInfoEl.innerHTML = `
+        <div class="space-y-6">
+          <div>
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-coral">Information</p>
+            <p class="mt-4 text-lg leading-relaxed text-cream/[0.72]">
+              ${escapeHtml(event.description || event.tagline || "Attendee details will appear here as the event takes shape.")}
+            </p>
+          </div>
+          <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div class="card !p-5">
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Date</p>
+              <p class="mt-3 text-lg font-bold tracking-[-0.04em]">${formatDate(event.startDate)} - ${formatDate(event.endDate)}</p>
+            </div>
+            <div class="card !p-5">
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Location</p>
+              <p class="mt-3 text-lg font-bold tracking-[-0.04em]">${escapeHtml(event.location || "Location TBD")}</p>
+            </div>
+            <div class="card !p-5">
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Mode</p>
+              <p class="mt-3 text-lg font-bold tracking-[-0.04em]">${escapeHtml(event.mode || "Hackathon")}</p>
+            </div>
+            <div class="card !p-5">
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Apply track</p>
+              <p class="mt-3 text-lg font-bold tracking-[-0.04em]">${escapeHtml(participant.applicationTrack || "Not selected")}</p>
+            </div>
+          </div>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="card !p-5">
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-lime">Team status</p>
+              <p class="mt-3 text-base leading-relaxed text-cream/[0.66]">${escapeHtml(participant.teamStatus || "No team preference recorded yet.")}</p>
+            </div>
+            <div class="card !p-5">
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-sky">Idea note</p>
+              <p class="mt-3 text-base leading-relaxed text-cream/[0.66]">${escapeHtml(participant.idea || "No application note was saved.")}</p>
+            </div>
+          </div>
+          ${renderWorkspaceNotice("information")}
+        </div>
+      `;
+    };
+
+    const renderWorkspaceResources = () => {
+      if (!workspaceResourcesEl || !state.workspace || !state.event) return;
+      const links = [];
+      if (state.event.websiteUrl) {
+        links.push(
+          `<a class="btn-ghost !justify-center !px-5 !py-3 !text-xs uppercase tracking-[0.2em]" href="${escapeHtml(state.event.websiteUrl)}" target="_blank" rel="noreferrer">Website</a>`
+        );
+      }
+      if (state.event.twitterUrl) {
+        links.push(
+          `<a class="btn-ghost !justify-center !px-5 !py-3 !text-xs uppercase tracking-[0.2em]" href="${escapeHtml(state.event.twitterUrl)}" target="_blank" rel="noreferrer">Twitter / X</a>`
+        );
+      }
+      if (state.event.discordUrl) {
+        links.push(
+          `<a class="btn-ghost !justify-center !px-5 !py-3 !text-xs uppercase tracking-[0.2em]" href="${escapeHtml(state.event.discordUrl)}" target="_blank" rel="noreferrer">Discord</a>`
+        );
+      }
+
+      workspaceResourcesEl.innerHTML = `
+        <div class="space-y-6">
+          <div>
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-coral">Resources</p>
+            <p class="mt-4 text-lg leading-relaxed text-cream/[0.68]">Everything an attendee typically needs in one place: organizer links, calendar tools, and the event URL.</p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            ${links.join("") || '<p class="text-sm text-cream/[0.52]">No organizer links have been added yet.</p>'}
+            ${
+              googleCalendarLink?.href
+                ? `<a class="btn-ghost !justify-center !px-5 !py-3 !text-xs uppercase tracking-[0.2em]" href="${escapeHtml(googleCalendarLink.href)}" target="_blank" rel="noreferrer">Google Calendar</a>`
+                : ""
+            }
+            ${
+              icsDownloadLink?.href
+                ? `<a class="btn-ghost !justify-center !px-5 !py-3 !text-xs uppercase tracking-[0.2em]" href="${escapeHtml(icsDownloadLink.href)}" download>Download .ics</a>`
+                : ""
+            }
+          </div>
+          <div class="card !p-5">
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-lime">Share</p>
+            <div class="mt-4 flex flex-wrap gap-3">
+              <button class="btn-primary !px-5 !py-3 !text-xs uppercase tracking-[0.2em]" type="button" data-workspace-copy-link>Copy event link</button>
+              <a class="btn-ghost !px-5 !py-3 !text-xs uppercase tracking-[0.2em]" href="mailto:hello@hatch.dev">Contact organizer</a>
+            </div>
+          </div>
+          ${renderWorkspaceNotice("resources")}
+        </div>
+      `;
+
+      workspaceResourcesEl.querySelector("[data-workspace-copy-link]")?.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          state.workspaceNotice = { panel: "resources", message: "Copied event link.", tone: "lime" };
+        } catch {
+          state.workspaceNotice = {
+            panel: "resources",
+            message: "Could not copy automatically. Copy the URL from your address bar.",
+            tone: "coral"
+          };
+        }
+        renderWorkspaceResources();
+      });
+    };
+
+    const renderWorkspaceTeams = () => {
+      if (!workspaceTeamsEl || !state.workspace) return;
+      const team = state.workspace.team;
+      const teams = Array.isArray(state.workspace.teams) ? state.workspace.teams : [];
+
+      workspaceTeamsEl.innerHTML = `
+        <div class="space-y-6">
+          <div>
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-coral">Teams</p>
+            <p class="mt-4 text-lg leading-relaxed text-cream/[0.68]">Create a team, join one with a code, and let submissions inherit the roster automatically.</p>
+          </div>
+
+          ${
+            team
+              ? `
+                <div class="card !p-6">
+                  <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Your team</p>
+                      <h3 class="mt-3 text-3xl font-bold tracking-[-0.05em]">${escapeHtml(team.name)}</h3>
+                    </div>
+                    <div class="space-y-2 md:text-right">
+                      <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Join code</p>
+                      <div class="inline-flex items-center gap-3 rounded-xl border border-lime/20 bg-lime/[0.08] px-4 py-3">
+                        <span class="font-mono text-2xl text-lime">${escapeHtml(team.joinCode)}</span>
+                        <button class="btn-ghost !px-3 !py-2 !text-xs" type="button" data-copy-join-code>Copy</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-6 grid gap-3 sm:grid-cols-2">
+                    ${team.members
+                      .map(
+                        (member) => `
+                          <div class="rounded-xl border border-cream/[0.08] bg-cream/[0.02] px-4 py-3">
+                            <p class="text-sm font-bold tracking-[-0.03em]">${escapeHtml(member.displayName)}</p>
+                            <p class="mt-1 text-xs text-cream/[0.42]">${escapeHtml(member.email)}</p>
+                          </div>
+                        `
+                      )
+                      .join("")}
+                  </div>
+                </div>
+              `
+              : `
+                <div class="grid gap-5 xl:grid-cols-2">
+                  <form class="card !p-6 space-y-4" data-team-create-form>
+                    <div>
+                      <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-lime">Create a team</p>
+                      <p class="mt-2 text-sm text-cream/[0.56]">Start a team and invite collaborators with a shared code.</p>
+                    </div>
+                    <input class="input-field" name="name" required placeholder="Nova Force" />
+                    <button class="btn-primary !w-full !justify-center !py-3" type="submit">Create team</button>
+                  </form>
+                  <form class="card !p-6 space-y-4" data-team-join-form>
+                    <div>
+                      <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-sky">Join a team</p>
+                      <p class="mt-2 text-sm text-cream/[0.56]">Already have teammates? Enter a join code to step into their workspace.</p>
+                    </div>
+                    <input class="input-field" name="joinCode" required placeholder="S5CXF" />
+                    <button class="btn-ghost !w-full !justify-center !py-3" type="submit">Join with code</button>
+                  </form>
+                </div>
+              `
+          }
+
+          <div class="card !p-6">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Team directory</p>
+                <p class="mt-2 text-sm text-cream/[0.56]">Who is already building in this event.</p>
+              </div>
+              <span class="status-pill !bg-transparent !text-cream/[0.48]">${teams.length} teams</span>
+            </div>
+            <div class="mt-5 grid gap-4 xl:grid-cols-2">
+              ${
+                teams.length
+                  ? teams
+                      .map(
+                        (entry) => `
+                          <div class="rounded-xl border border-cream/[0.08] bg-cream/[0.02] p-5">
+                            <div class="flex items-center justify-between gap-3">
+                              <h3 class="text-xl font-bold tracking-[-0.04em]">${escapeHtml(entry.name)}</h3>
+                              <span class="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-cream/[0.4]">${escapeHtml(String(entry.memberCount))} members</span>
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                              ${entry.members
+                                .map(
+                                  (member) => `
+                                    <span class="rounded-full border border-cream/[0.08] bg-cream/[0.03] px-3 py-2 text-xs text-cream/[0.68]">
+                                      ${escapeHtml(member.displayName)}
+                                    </span>
+                                  `
+                                )
+                                .join("")}
+                            </div>
+                          </div>
+                        `
+                      )
+                      .join("")
+                  : '<p class="text-sm text-cream/[0.52]">No teams have been created yet.</p>'
+              }
+            </div>
+          </div>
+          ${renderWorkspaceNotice("teams")}
+        </div>
+      `;
+
+      workspaceTeamsEl.querySelector("[data-copy-join-code]")?.addEventListener("click", async () => {
+        if (!team?.joinCode) return;
+        try {
+          await navigator.clipboard.writeText(team.joinCode);
+          state.workspaceNotice = { panel: "teams", message: "Copied join code.", tone: "lime" };
+        } catch {
+          state.workspaceNotice = { panel: "teams", message: "Could not copy the join code automatically.", tone: "coral" };
+        }
+        renderWorkspaceTeams();
+      });
+
+      workspaceTeamsEl.querySelector("[data-team-create-form]")?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+        const name = String(formData.get("name") || "").trim();
+        if (!name) return;
+        try {
+          const response = await fetch(`/api/participants/events/${slug}/teams${querySuffix}`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ name })
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(payload.error || "Unable to create team.");
+          state.workspaceNotice = { panel: "teams", message: "Team created. Your submission flow is ready.", tone: "lime" };
+          await loadWorkspace();
+          activateWorkspaceTab("teams");
+        } catch (error) {
+          state.workspaceNotice = { panel: "teams", message: error instanceof Error ? error.message : "Unable to create team.", tone: "coral" };
+          renderWorkspaceTeams();
+        }
+      });
+
+      workspaceTeamsEl.querySelector("[data-team-join-form]")?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+        const joinCode = String(formData.get("joinCode") || "").trim();
+        if (!joinCode) return;
+        try {
+          const response = await fetch(`/api/participants/events/${slug}/teams/join${querySuffix}`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ joinCode })
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(payload.error || "Unable to join team.");
+          state.workspaceNotice = { panel: "teams", message: "Joined team successfully.", tone: "lime" };
+          await loadWorkspace();
+          activateWorkspaceTab("teams");
+        } catch (error) {
+          state.workspaceNotice = { panel: "teams", message: error instanceof Error ? error.message : "Unable to join team.", tone: "coral" };
+          renderWorkspaceTeams();
+        }
+      });
+    };
+
+    const renderWorkspaceSubmission = () => {
+      if (!workspaceSubmissionEl || !state.workspace) return;
+      const team = state.workspace.team;
+      const submission = state.workspace.submission;
+      const tracks = Array.isArray(state.workspace.tracks) ? state.workspace.tracks : state.tracks;
+
+      workspaceSubmissionEl.innerHTML = `
+        <div class="space-y-6">
+          <div>
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-coral">Submissions</p>
+            <p class="mt-4 text-lg leading-relaxed text-cream/[0.68]">Once you have a team, the submission form pulls that roster in automatically.</p>
+          </div>
+          ${
+            !team
+              ? `
+                <div class="card !p-6">
+                  <h3 class="text-2xl font-bold tracking-[-0.04em]">Create or join a team first</h3>
+                  <p class="mt-3 text-sm leading-relaxed text-cream/[0.56]">Your project submission will inherit the team name and member list automatically once you are on a team.</p>
+                  <button class="btn-primary mt-5 !px-6 !py-3 !text-sm" type="button" data-open-teams-tab>Go to teams</button>
+                </div>
+              `
+              : submission
+                ? `
+                  <div class="card !p-6 space-y-5">
+                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-lime">Submitted</p>
+                        <h3 class="mt-3 text-3xl font-bold tracking-[-0.05em]">${escapeHtml(submission.projectName)}</h3>
+                        <p class="mt-2 text-sm text-cream/[0.48]">for ${escapeHtml(team.name)} on ${formatDate(submission.createdAt)}</p>
+                      </div>
+                      <span class="status-pill !border-lime/20 !bg-lime/[0.08] !text-lime">Ready for judging</span>
+                    </div>
+                    <p class="text-sm leading-relaxed text-cream/[0.62]">${escapeHtml(submission.description || "")}</p>
+                    <div class="flex flex-wrap gap-3">
+                      ${
+                        submission.repoUrl
+                          ? `<a class="btn-ghost !px-4 !py-2 !text-xs" href="${escapeHtml(submission.repoUrl)}" target="_blank" rel="noreferrer">Repo</a>`
+                          : ""
+                      }
+                      ${
+                        submission.demoUrl
+                          ? `<a class="btn-ghost !px-4 !py-2 !text-xs" href="${escapeHtml(submission.demoUrl)}" target="_blank" rel="noreferrer">Demo</a>`
+                          : ""
+                      }
+                      ${
+                        submission.deckUrl
+                          ? `<a class="btn-ghost !px-4 !py-2 !text-xs" href="${escapeHtml(submission.deckUrl)}" target="_blank" rel="noreferrer">Slides</a>`
+                          : ""
+                      }
+                    </div>
+                  </div>
+                `
+                : `
+                  <form class="card !p-6 space-y-6" data-workspace-submission-form>
+                    <div class="grid gap-5 md:grid-cols-2">
+                      <div class="card !p-5">
+                        <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Team</p>
+                        <p class="mt-3 text-2xl font-bold tracking-[-0.04em]">${escapeHtml(team.name)}</p>
+                      </div>
+                      <div class="card !p-5">
+                        <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Members</p>
+                        <p class="mt-3 text-sm leading-relaxed text-cream/[0.66]">${team.members.map((member) => escapeHtml(member.displayName)).join(", ")}</p>
+                      </div>
+                    </div>
+                    <div class="grid gap-5 md:grid-cols-2">
+                      <label class="space-y-2">
+                        <span class="form-label">Project name <span class="text-coral">*</span></span>
+                        <input class="input-field" name="projectName" required placeholder="Neural Bridge" />
+                      </label>
+                      <label class="space-y-2">
+                        <span class="form-label">Track <span class="text-coral">*</span></span>
+                        <select class="input-field" name="track" required>
+                          <option value="">Select track</option>
+                          ${tracks
+                            .map((track) => `<option value="${escapeHtml(track.name)}">${escapeHtml(track.name)}</option>`)
+                            .join("")}
+                        </select>
+                      </label>
+                      <label class="space-y-2">
+                        <span class="form-label">Repository URL</span>
+                        <input class="input-field" type="url" name="repoUrl" placeholder="https://github.com/your-repo" />
+                      </label>
+                      <label class="space-y-2">
+                        <span class="form-label">Demo URL</span>
+                        <input class="input-field" type="url" name="demoUrl" placeholder="https://your-demo.app" />
+                      </label>
+                      <label class="space-y-2 md:col-span-2">
+                        <span class="form-label">Slides URL</span>
+                        <input class="input-field" type="url" name="deckUrl" placeholder="https://your-pitch-deck" />
+                      </label>
+                    </div>
+                    <label class="space-y-2">
+                      <span class="form-label">Project description <span class="text-coral">*</span></span>
+                      <textarea class="input-field" name="description" rows="5" required placeholder="What did your team build and why does it matter?"></textarea>
+                    </label>
+                    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                      <span class="status-pill hidden !border-none !bg-transparent !p-0 text-sm" data-workspace-submit-status role="status" aria-live="polite"></span>
+                      <button class="btn-primary !px-8 !py-3.5" type="submit">Submit project</button>
+                    </div>
+                  </form>
+                `
+          }
+          ${renderWorkspaceNotice("submissions")}
+        </div>
+      `;
+
+      workspaceSubmissionEl.querySelector("[data-open-teams-tab]")?.addEventListener("click", () => {
+        activateWorkspaceTab("teams");
+      });
+
+      workspaceSubmissionEl.querySelector("[data-workspace-submission-form]")?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const statusEl = workspaceSubmissionEl.querySelector("[data-workspace-submit-status]");
+        const button = form.querySelector("button[type='submit']");
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          setStatus(statusEl, "Complete all required fields before submitting.", "!text-coral");
+          return;
+        }
+
+        if (button) {
+          button.disabled = true;
+          button.textContent = "Submitting...";
+        }
+        setStatus(statusEl, "", "");
+
+        try {
+          const response = await fetch(`/api/events/${slug}/submit${querySuffix}`, {
+            method: "POST",
+            body: new FormData(form)
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(payload.error || "Unable to submit project.");
+          state.workspaceNotice = { panel: "submissions", message: "Project submitted. Your hacker space is now locked to that submission.", tone: "lime" };
+          await loadWorkspace();
+          activateWorkspaceTab("submissions");
+        } catch (error) {
+          setStatus(statusEl, error instanceof Error ? error.message : "Unable to submit project.", "!text-coral");
+          if (button) {
+            button.disabled = false;
+            button.textContent = "Submit project";
+          }
+        }
+      });
+    };
+
+    const renderWorkspace = () => {
+      if (!state.workspace) return;
+      if (workspaceSummaryEl) {
+        const teamName = state.workspace.team?.name
+          ? `Team: ${state.workspace.team.name}.`
+          : "Create or join a team to unlock submission.";
+        workspaceSummaryEl.textContent = `${teamName} Resources, attendee info, and submissions now live here.`;
+      }
+      renderWorkspaceInformation();
+      renderWorkspaceResources();
+      renderWorkspaceTeams();
+      renderWorkspaceSubmission();
+      toggleWorkspaceMode();
+    };
+
+    const loadWorkspace = async () => {
+      if (!state.participantEmail) {
+        state.workspace = null;
+        toggleWorkspaceMode();
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/participants/events/${slug}/workspace${querySuffix}`);
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Unable to load hacker space.");
+        state.workspace = payload.workspace || null;
+        renderWorkspace();
+      } catch (error) {
+        state.workspace = null;
+        if (workspaceSummaryEl) {
+          workspaceSummaryEl.textContent =
+            error instanceof Error ? error.message : "Unable to load hacker space.";
+        }
+        toggleWorkspaceMode();
+      }
     };
 
     const updateEventStatus = () => {
@@ -422,17 +1126,20 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     };
 
     const updateSubmitCallToAction = () => {
-      if (!submitLink) return;
+      if (!submitLink || !applyLink) return;
       const canSubmit = Boolean(state.participantEmail);
-      submitLink.classList.remove("opacity-60");
+      submitLink.classList.remove("opacity-60", "hidden");
       submitLink.removeAttribute("aria-disabled");
 
       if (canSubmit) {
-        submitLink.href = `${routeBase}/submit`;
-        submitLink.textContent = "Submit project";
+        applyLink.href = "#hacker-space";
+        applyLink.textContent = "Open hacker space";
+        submitLink.classList.add("hidden");
         return;
       }
 
+      applyLink.href = `${routeBase}/apply`;
+      applyLink.textContent = "Apply to Participate";
       submitLink.href = `${routeBase}/apply`;
       submitLink.textContent = "Apply to unlock submission";
       submitLink.classList.add("opacity-60");
@@ -555,8 +1262,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         updateSubmitCallToAction();
         if (state.participantEmail) {
           await loadParticipantVotes();
+          await loadWorkspace();
         } else {
           state.votedSubmissionIds = new Set();
+          state.workspace = null;
+          toggleWorkspaceMode();
         }
         renderGallery();
       } catch {
@@ -566,6 +1276,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         state.votedSubmissionIds = new Set();
         renderParticipantAuth();
         updateSubmitCallToAction();
+        state.workspace = null;
+        toggleWorkspaceMode();
         renderGallery();
       }
     };
@@ -655,16 +1367,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         if (!response.ok) throw new Error(payload.error || "Event not found.");
         const { event, tracks, faqs, resultsPublished, gallery, winners } = payload;
         state.event = event;
+        state.tracks = Array.isArray(tracks) ? tracks : [];
         state.gallery = Array.isArray(gallery) ? gallery : [];
         state.winners = winners || null;
         state.resultsPublished = Boolean(resultsPublished);
 
         if (titleEl) titleEl.textContent = event.title;
         if (taglineEl) taglineEl.textContent = event.tagline || "";
-        if (bannerWrap && bannerImg && event.bannerUrl && isBannerImageSrc(String(event.bannerUrl))) {
+        if (bannerWrap && bannerImg && bannerPlaceholder && event.bannerUrl && isBannerImageSrc(String(event.bannerUrl))) {
           bannerImg.src = String(event.bannerUrl);
           bannerImg.alt = `${event.title} banner`;
           bannerWrap.classList.remove("hidden");
+          bannerPlaceholder.classList.add("hidden");
+        } else if (bannerWrap && bannerPlaceholder) {
+          bannerWrap.classList.add("hidden");
+          bannerPlaceholder.classList.remove("hidden");
         }
         if (descEl)
           descEl.textContent =
@@ -674,21 +1391,24 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         if (orgEl && event.organizationName) {
           orgEl.textContent = `Hosted by ${event.organizationName}`;
           orgEl.classList.remove("hidden");
+        } else if (orgEl) {
+          orgEl.classList.add("hidden");
+          orgEl.textContent = "";
         }
 
-        if (metaEl) {
-          metaEl.innerHTML = `
-            <div class="flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-violet"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              ${formatDate(event.startDate)} - ${formatDate(event.endDate)}
+        if (factsEl) {
+          factsEl.innerHTML = `
+            <div class="card !p-6">
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-coral">Date</p>
+              <p class="mt-4 text-xl font-bold tracking-[-0.04em] text-cream">${formatDate(event.startDate)} - ${formatDate(event.endDate)}</p>
             </div>
-            <div class="flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-              ${escapeHtml(event.location || "Location TBD")}
+            <div class="card !p-6">
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-sky">Location</p>
+              <p class="mt-4 text-xl font-bold tracking-[-0.04em] text-cream">${escapeHtml(event.location || "Location TBD")}</p>
             </div>
-            <div class="flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-coral"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-              Apply by ${formatDate(event.applicationDeadline)}
+            <div class="card !p-6">
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime">Apply by</p>
+              <p class="mt-4 text-xl font-bold tracking-[-0.04em] text-cream">${formatDate(event.applicationDeadline)}</p>
             </div>
           `;
         }
@@ -712,6 +1432,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           }
         }
 
+        contactLinks.forEach((link) => {
+          link.href = `mailto:${event.organizationName ? "hello@hatch.dev" : "hello@hatch.dev"}`;
+        });
+
         if (applyLink) applyLink.href = `${routeBase}/apply`;
         if (participantApplyLink) participantApplyLink.href = `${routeBase}/apply`;
         updateSubmitCallToAction();
@@ -727,6 +1451,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         if (descEl)
           descEl.textContent =
             "We could not load this event. It may be unpublished or unavailable.";
+        if (factsEl) factsEl.innerHTML = "";
         if (tracksEl) tracksEl.innerHTML = "";
         if (faqsEl) faqsEl.innerHTML = "";
         if (galleryEl) galleryEl.innerHTML = "";
@@ -741,8 +1466,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       state.votedSubmissionIds = new Set();
       renderParticipantAuth();
       updateSubmitCallToAction();
+      state.workspace = null;
+      toggleWorkspaceMode();
       renderGallery();
       setStatus(participantStatusEl, "Signed out", "!text-lime");
+    });
+
+    workspaceLogoutBtn?.addEventListener("click", async () => {
+      await fetch("/api/participants/logout", { method: "POST" });
+      state.participantEventId = "";
+      state.participantSessionEmail = "";
+      state.participantEmail = "";
+      state.workspace = null;
+      state.votedSubmissionIds = new Set();
+      renderParticipantAuth();
+      updateSubmitCallToAction();
+      toggleWorkspaceMode();
     });
 
     copyLinkBtn?.addEventListener("click", async () => {
@@ -762,6 +1501,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
     const init = async () => {
       activateTab("tracks");
+      activateWorkspaceTab("information");
       await loadEvent();
       updateEventStatus();
       window.setInterval(updateEventStatus, 60_000);

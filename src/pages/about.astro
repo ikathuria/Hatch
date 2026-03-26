@@ -1,0 +1,80 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../content/site";
+---
+
+<BaseLayout title={`About | ${site.brand.name}`} description="Learn how Hatch helps organizers turn early event ideas into real hackathons.">
+  <section class="mx-auto max-w-6xl px-6 py-12">
+    <div class="max-w-3xl space-y-4">
+      <span class="eyebrow !border-lime/20 !bg-lime/[0.08] !text-lime">About Hatch</span>
+      <h1 class="text-4xl font-bold tracking-[-0.07em] md:text-6xl">A calm launch system for hackathons that need to become real.</h1>
+      <p class="text-lg leading-relaxed text-cream/[0.62]">
+        Hatch exists for the moment between idea and launch: when an event needs structure, public presence, submissions, judging, and a clear outcome without turning into operational chaos.
+      </p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-6 py-6">
+    <div class="proof-strip">
+      {site.stats.map((stat) => (
+        <div class="proof-strip__item">
+          <p class="proof-strip__value">{stat.value}</p>
+          <p class="proof-strip__label">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-6 py-14">
+    <div class="max-w-3xl space-y-3">
+      <span class="eyebrow !border-sky/[0.18] !bg-sky/[0.08] !text-sky">Product flow</span>
+      <h2 class="text-3xl font-bold tracking-[-0.07em] md:text-5xl">The parts that usually get stitched together already live in one place.</h2>
+      <p class="text-base leading-relaxed text-cream/[0.58] md:text-lg">
+        Hatch keeps the public story and the operational workflow connected, so organizers can move from setup to submissions to results without juggling disconnected tools.
+      </p>
+    </div>
+
+    <div class="fissure-divider" aria-hidden="true"></div>
+
+    <div class="grid gap-5 md:grid-cols-2">
+      {site.features.map((feature) => (
+        <article class="landing-feature-card">
+          <p class="font-mono text-[0.66rem] uppercase tracking-[0.24em] text-cream/[0.34]">Core capability</p>
+          <h3 class="mt-4 text-2xl font-bold tracking-[-0.05em]">{feature.title}</h3>
+          <p class="mt-3 text-sm leading-relaxed text-cream/[0.58] md:text-base">{feature.description}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-6 py-12">
+    <div class="max-w-3xl space-y-3">
+      <span class="eyebrow !border-cream/[0.14] !bg-cream/[0.04] !text-cream/70">How it unfolds</span>
+      <h2 class="text-3xl font-bold tracking-[-0.07em] md:text-5xl">Prepare. Gather. Hatch.</h2>
+    </div>
+
+    <div class="mt-8 grid gap-5 md:grid-cols-3">
+      {site.steps.map((step, index) => (
+        <article class="landing-step-card">
+          <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime/80">0{index + 1}</p>
+          <h3 class="mt-5 text-2xl font-bold tracking-[-0.05em]">{step.title}</h3>
+          <p class="mt-3 text-sm leading-relaxed text-cream/[0.58] md:text-base">{step.description}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 py-14">
+    <div class="landing-cta-panel text-center">
+      <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime/80">Start with the idea. Keep the structure.</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-[-0.07em] md:text-5xl">Run the event from first draft to published outcome.</h2>
+      <p class="mx-auto mt-4 max-w-2xl text-cream/60">
+        Hatch gives you the public page, participant flow, judging system, and result layer in one place.
+      </p>
+      <div class="mt-7 flex flex-wrap justify-center gap-3">
+        <a class="btn-primary !rounded-full !px-8 !py-3.5" href="/organizer/signup">Create organizer account</a>
+        <a class="btn-ghost !rounded-full !px-8 !py-3.5 !font-mono !text-xs !uppercase !tracking-[0.2em]" href="/events">Browse events</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -12,8 +12,8 @@ export const site = {
       href: "/organizer/signup"
     },
     secondaryCta: {
-      label: "Explore events",
-      href: "#events"
+      label: "About Hatch",
+      href: "/about"
     }
   },
   stats: [
