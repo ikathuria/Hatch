@@ -10,6 +10,9 @@ const getValue = (form: FormData, key: string) => {
   return typeof value === "string" ? value.trim() : "";
 };
 
+const isGitHubRepoUrl = (value: string) =>
+  /^https:\/\/github\.com\/.+/i.test(value) || /^github\.com\/.+/i.test(value);
+
 export const POST: APIRoute = async (context) => {
   try {
     const env = getEnv(context.locals);
@@ -113,6 +116,13 @@ export const POST: APIRoute = async (context) => {
 
     if (!emailPattern.test(contactEmail)) {
       return json({ error: "Please provide a valid email." }, 400);
+    }
+
+    if (repoUrl && !isGitHubRepoUrl(repoUrl)) {
+      return json(
+        { error: "Repository URL must start with https://github.com/ or github.com/." },
+        400
+      );
     }
 
     const normalizedContactEmail = contactEmail.toLowerCase();

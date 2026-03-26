@@ -5,45 +5,45 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 <BaseLayout title="Organizer Signup | Hatch">
   <section class="mx-auto w-full max-w-lg px-6 py-20 min-h-[80vh] flex flex-col justify-center">
     <div class="card !p-12 relative overflow-hidden group">
-        <div class="absolute inset-0 bg-gradient-to-br from-lime/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-lime/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
       <div class="relative z-10 space-y-10">
         <div class="space-y-4">
-          <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Launch Interface</span>
-          <h1 class="text-4xl font-bold tracking-tighter">Connect with Hatch.</h1>
-          <p class="text-cream/50 leading-relaxed">Establish your organizer identity and start manifesting legendary hackathons.</p>
+          <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Create Organizer Account</span>
+          <h1 class="text-4xl font-bold tracking-tighter">Start organizing with Hatch.</h1>
+          <p class="text-cream/50 leading-relaxed">Create your account to launch events, manage submissions, and publish results.</p>
         </div>
 
         <form class="space-y-8" data-form>
           <div class="space-y-6">
             <div class="space-y-2">
-              <label class="form-label">Full Name</label>
+              <label class="form-label">Full Name <span class="text-coral">*</span></label>
               <input class="input-field" name="name" required placeholder="Alex Sterling" />
             </div>
             <div class="space-y-2">
-              <label class="form-label">Email Endpoint</label>
+              <label class="form-label">Email <span class="text-coral">*</span></label>
               <input class="input-field" name="email" type="email" required placeholder="alex@stellar.io" />
             </div>
             <div class="space-y-2">
-              <label class="form-label">Secret Credential</label>
-              <input class="input-field" name="password" type="password" required placeholder="••••••••" />
+              <label class="form-label">Password <span class="text-coral">*</span></label>
+              <input class="input-field" name="password" type="password" required placeholder="At least 8 characters" />
             </div>
           </div>
 
           <div class="space-y-6">
             <button class="btn-primary w-full justify-center !py-4 text-lg" type="submit">
-                Establish Account
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              Create account
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </button>
             <span class="status-pill w-full justify-center !bg-transparent !border-none hidden" data-status></span>
           </div>
         </form>
 
         <div class="pt-8 border-t border-cream/10 text-center">
-            <p class="text-sm text-cream/40">
-                Already registered? 
-                <a class="text-lime font-bold hover:underline ml-1" href="/organizer/login">Return to portal &rarr;</a>
-            </p>
+          <p class="text-sm text-cream/40">
+            Already have an account?
+            <a class="text-lime font-bold hover:underline ml-1" href="/organizer/login">Sign in &rarr;</a>
+          </p>
         </div>
       </div>
     </div>
@@ -57,11 +57,17 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       event.preventDefault();
       if (!form || !status) return;
 
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        window.alert("Please complete all required fields.");
+        return;
+      }
+
       const submitBtn = form.querySelector('button[type="submit"]');
       const originalText = submitBtn.textContent;
       submitBtn.disabled = true;
-      submitBtn.textContent = "Originating...";
-      
+      submitBtn.textContent = "Creating...";
+
       status.textContent = "";
       status.classList.add("hidden");
 
@@ -75,21 +81,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(result.error || "Origination failed.");
+          throw new Error(result.error || "Account creation failed.");
         }
-        submitBtn.textContent = "Account Active";
+        submitBtn.textContent = "Account created";
         submitBtn.classList.add("btn-primary--success");
         setTimeout(() => {
-            window.location.href = "/organizer/dashboard";
+          window.location.href = "/organizer/dashboard";
         }, 500);
       } catch (error) {
         submitBtn.disabled = false;
         submitBtn.classList.remove("btn-primary--success");
         submitBtn.textContent = originalText;
-        status.textContent = error.message;
+        status.textContent = error instanceof Error ? error.message : "Account creation failed.";
         status.classList.remove("hidden");
         status.classList.add("!text-coral", "font-bold");
       }
     });
   </script>
 </BaseLayout>
+

@@ -1,0 +1,343 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Create Event | Hatch">
+  <section class="mx-auto max-w-5xl px-6 py-12">
+    <div class="space-y-4 mb-10">
+      <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Event Builder</span>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">Create Event</h1>
+      <p class="text-cream/55 max-w-3xl">
+        Set up your event in tabs. Required fields are marked with <span class="text-coral">*</span>.
+      </p>
+    </div>
+
+    <form class="card !p-0 overflow-hidden" data-create-form>
+      <nav class="border-b border-cream/10 bg-ink-muted/40 px-4 sm:px-6 py-4 flex flex-wrap gap-2" data-tabs>
+        <button class="btn-ghost !px-4 !py-2 !text-xs" type="button" data-tab-btn data-tab-target="basics">Basics</button>
+        <button class="btn-ghost !px-4 !py-2 !text-xs" type="button" data-tab-btn data-tab-target="schedule">Schedule</button>
+        <button class="btn-ghost !px-4 !py-2 !text-xs" type="button" data-tab-btn data-tab-target="venue">Venue</button>
+        <button class="btn-ghost !px-4 !py-2 !text-xs" type="button" data-tab-btn data-tab-target="links">Links & Banner</button>
+      </nav>
+
+      <div class="p-6 sm:p-8 space-y-8">
+        <section data-tab-panel="basics" class="space-y-5">
+          <h2 class="text-2xl font-bold">Basics</h2>
+          <div class="space-y-2">
+            <label class="form-label" for="title">Event name <span class="text-coral">*</span></label>
+            <input class="input-field" id="title" name="title" required placeholder="April 3 Pilot Rehearsal" />
+          </div>
+          <div class="space-y-2">
+            <label class="form-label" for="slug">URL slug <span class="text-coral">*</span></label>
+            <input class="input-field font-mono" id="slug" name="slug" required placeholder="april-3-pilot-rehearsal" />
+            <p class="text-xs text-cream/40">Lowercase, numbers, hyphens only.</p>
+          </div>
+          <div class="space-y-2">
+            <label class="form-label" for="tagline">Tagline</label>
+            <input class="input-field" id="tagline" name="tagline" placeholder="One line summary" />
+          </div>
+          <div class="space-y-2">
+            <label class="form-label" for="description">Description</label>
+            <textarea class="input-field min-h-36" id="description" name="description" rows="6" placeholder="Describe your event, tracks, and expectations."></textarea>
+          </div>
+        </section>
+
+        <section data-tab-panel="schedule" class="space-y-5 hidden">
+          <h2 class="text-2xl font-bold">Schedule</h2>
+          <p class="text-sm text-cream/45">Use editable hour plus quarter-hour minute options.</p>
+          <div class="grid gap-6 md:grid-cols-2">
+            <div class="space-y-3">
+              <label class="form-label">Starts <span class="text-coral">*</span></label>
+              <div class="grid grid-cols-[1fr_90px_110px] gap-2">
+                <input class="input-field" type="date" data-date-field="start" required />
+                <input class="input-field" type="number" min="0" max="23" step="1" value="9" data-hour-field="start" required />
+                <select class="input-field" data-minute-field="start">
+                  <option value="00">00</option>
+                  <option value="15">15</option>
+                  <option value="30">30</option>
+                  <option value="45">45</option>
+                </select>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <label class="form-label">Ends <span class="text-coral">*</span></label>
+              <div class="grid grid-cols-[1fr_90px_110px] gap-2">
+                <input class="input-field" type="date" data-date-field="end" required />
+                <input class="input-field" type="number" min="0" max="23" step="1" value="18" data-hour-field="end" required />
+                <select class="input-field" data-minute-field="end">
+                  <option value="00">00</option>
+                  <option value="15">15</option>
+                  <option value="30">30</option>
+                  <option value="45">45</option>
+                </select>
+              </div>
+            </div>
+            <div class="space-y-3 md:col-span-2">
+              <label class="form-label">Application deadline</label>
+              <div class="grid grid-cols-[1fr_90px_110px] gap-2 max-w-xl">
+                <input class="input-field" type="date" data-date-field="deadline" />
+                <input class="input-field" type="number" min="0" max="23" step="1" value="23" data-hour-field="deadline" />
+                <select class="input-field" data-minute-field="deadline">
+                  <option value="00">00</option>
+                  <option value="15">15</option>
+                  <option value="30">30</option>
+                  <option value="45">45</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section data-tab-panel="venue" class="space-y-5 hidden">
+          <h2 class="text-2xl font-bold">Venue & Format</h2>
+          <div class="grid gap-6 md:grid-cols-2">
+            <div class="space-y-2">
+              <label class="form-label">Organization</label>
+              <input class="input-field" name="organizationName" placeholder="Acme Tech" />
+            </div>
+            <div class="space-y-2">
+              <label class="form-label">Location</label>
+              <input class="input-field" name="location" placeholder="City, venue, or Remote" />
+            </div>
+            <div class="space-y-2">
+              <label class="form-label">Format</label>
+              <select class="input-field" name="mode">
+                <option value="Hybrid">Hybrid</option>
+                <option value="In-person">In-person</option>
+                <option value="Online">Online</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label class="form-label">Capacity</label>
+              <input class="input-field" name="maxParticipants" type="number" min="1" placeholder="200" />
+            </div>
+          </div>
+        </section>
+
+        <section data-tab-panel="links" class="space-y-5 hidden">
+          <h2 class="text-2xl font-bold">Links & Banner</h2>
+          <div class="space-y-2">
+            <label class="form-label">Banner image URL</label>
+            <input class="input-field" name="bannerUrl" data-banner-url placeholder="https://... or upload below" />
+          </div>
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <label class="inline-flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-cream/20 bg-cream/[0.04] px-5 py-3 text-sm font-medium text-cream/80 transition-colors hover:border-lime/35 hover:bg-cream/[0.07]">
+              <input type="file" class="sr-only" accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp,.gif" data-banner-file />
+              <span data-banner-file-label>Choose image to upload</span>
+            </label>
+            <span class="text-xs text-cream/35" data-banner-upload-status></span>
+          </div>
+          <div class="hidden overflow-hidden rounded-2xl border border-cream/10 bg-cream/[0.04] aspect-[21/9] max-h-52" data-banner-preview-wrap>
+            <img class="h-full w-full object-cover" alt="Banner preview" data-banner-preview />
+          </div>
+          <div class="grid gap-6 md:grid-cols-2">
+            <div class="space-y-2">
+              <label class="form-label">Website</label>
+              <input class="input-field" name="websiteUrl" type="url" placeholder="https://..." />
+            </div>
+            <div class="space-y-2">
+              <label class="form-label">Twitter/X</label>
+              <input class="input-field" name="twitterUrl" type="url" placeholder="https://x.com/..." />
+            </div>
+            <div class="space-y-2 md:col-span-2">
+              <label class="form-label">Discord</label>
+              <input class="input-field" name="discordUrl" type="url" placeholder="https://discord.gg/..." />
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="border-t border-cream/10 bg-ink-muted/40 px-6 sm:px-8 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <label class="flex cursor-pointer items-center gap-3 select-none">
+          <input type="checkbox" name="isPublished" class="h-5 w-5 rounded border border-cream/20 bg-cream/[0.06] text-lime focus:ring-2 focus:ring-lime/35" />
+          <span class="text-sm font-medium text-cream/75">Publish immediately</span>
+        </label>
+        <div class="flex items-center gap-4">
+          <a class="btn-ghost !px-6" href="/organizer/dashboard">Cancel</a>
+          <span class="status-pill hidden !bg-transparent !border-none !p-0 text-sm" data-status></span>
+          <button class="btn-primary !px-8" type="submit">Create event</button>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    const form = document.querySelector("[data-create-form]");
+    const status = document.querySelector("[data-status]");
+    const tabs = Array.from(document.querySelectorAll("[data-tab-btn]"));
+    const panels = Array.from(document.querySelectorAll("[data-tab-panel]"));
+    const titleInput = document.querySelector("#title");
+    const slugInput = document.querySelector("#slug");
+    const bannerUrlInput = document.querySelector("[data-banner-url]");
+    const bannerPreviewWrap = document.querySelector("[data-banner-preview-wrap]");
+    const bannerPreviewImg = document.querySelector("[data-banner-preview]");
+    const bannerFileInput = document.querySelector("[data-banner-file]");
+    const bannerUploadStatus = document.querySelector("[data-banner-upload-status]");
+
+    const U_BANNER_PREFIX = "/api/media/banner/";
+    const U_BANNER_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const slugify = (raw) =>
+      raw.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+    const activateTab = (id) => {
+      tabs.forEach((btn) => {
+        const active = btn.getAttribute("data-tab-target") === id;
+        btn.classList.toggle("!bg-lime/10", active);
+        btn.classList.toggle("!border-lime/20", active);
+        btn.classList.toggle("!text-lime", active);
+      });
+      panels.forEach((panel) => {
+        panel.classList.toggle("hidden", panel.getAttribute("data-tab-panel") !== id);
+      });
+    };
+    tabs.forEach((tab) => tab.addEventListener("click", () => activateTab(tab.getAttribute("data-tab-target"))));
+    activateTab("basics");
+
+    let slugTouched = false;
+    titleInput?.addEventListener("input", () => {
+      if (slugTouched || !slugInput) return;
+      slugInput.value = slugify(titleInput.value);
+    });
+    slugInput?.addEventListener("input", () => {
+      slugTouched = true;
+    });
+
+    const isRenderableBannerUrl = (value) => {
+      const s = String(value).trim();
+      if (!s) return false;
+      if (s.startsWith(U_BANNER_PREFIX)) return U_BANNER_UUID.test(s.slice(U_BANNER_PREFIX.length));
+      try {
+        const u = new URL(s);
+        return u.protocol === "http:" || u.protocol === "https:";
+      } catch {
+        return false;
+      }
+    };
+
+    const refreshBannerPreview = () => {
+      const v = bannerUrlInput?.value?.trim() ?? "";
+      if (!bannerPreviewWrap || !bannerPreviewImg) return;
+      if (v && isRenderableBannerUrl(v)) {
+        bannerPreviewImg.src = v;
+        bannerPreviewWrap.classList.remove("hidden");
+      } else {
+        bannerPreviewWrap.classList.add("hidden");
+        bannerPreviewImg.removeAttribute("src");
+      }
+    };
+    bannerUrlInput?.addEventListener("input", refreshBannerPreview);
+
+    bannerFileInput?.addEventListener("change", async () => {
+      const file = bannerFileInput.files?.[0];
+      if (!file || !bannerUrlInput) return;
+      if (bannerUploadStatus) {
+        bannerUploadStatus.textContent = "";
+        bannerUploadStatus.classList.remove("!text-coral");
+      }
+      const fd = new FormData();
+      fd.append("file", file);
+      try {
+        const res = await fetch("/api/organizer/upload/banner", { method: "POST", body: fd });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Upload failed");
+        bannerUrlInput.value = typeof data.url === "string" ? data.url : "";
+        refreshBannerPreview();
+      } catch (error) {
+        if (bannerUploadStatus) {
+          bannerUploadStatus.textContent = error instanceof Error ? error.message : "Upload failed";
+          bannerUploadStatus.classList.add("!text-coral");
+        }
+        bannerFileInput.value = "";
+      }
+    });
+
+    const getDateValue = (key) => document.querySelector(`[data-date-field="${key}"]`)?.value || "";
+    const getHourValue = (key) => String(document.querySelector(`[data-hour-field="${key}"]`)?.value || "").trim();
+    const getMinuteValue = (key) => String(document.querySelector(`[data-minute-field="${key}"]`)?.value || "00").trim();
+
+    const toDateTime = (key, required = false) => {
+      const date = getDateValue(key);
+      const hourRaw = getHourValue(key);
+      const minute = getMinuteValue(key);
+      if (!date) return required ? null : "";
+      const hour = Number.parseInt(hourRaw, 10);
+      if (!Number.isFinite(hour) || hour < 0 || hour > 23) return null;
+      return `${date}T${String(hour).padStart(2, "0")}:${minute}`;
+    };
+
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!form || !status) return;
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Creating...";
+      status.textContent = "";
+      status.classList.add("hidden");
+
+      const startDate = toDateTime("start", true);
+      const endDate = toDateTime("end", true);
+      const applicationDeadline = toDateTime("deadline", false);
+      if (!startDate || !endDate) {
+        window.alert("Please set valid start/end date and hour values.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        return;
+      }
+
+      const maxParticipantsRaw = form.maxParticipants?.value ?? "";
+      const parsedMax = parseInt(String(maxParticipantsRaw), 10);
+      const payload = {
+        title: form.title?.value?.trim() || "",
+        slug: form.slug?.value?.trim() || "",
+        tagline: form.tagline?.value?.trim() || "",
+        description: form.description?.value?.trim() || "",
+        startDate,
+        endDate,
+        applicationDeadline: applicationDeadline || "",
+        organizationName: form.organizationName?.value?.trim() || "",
+        location: form.location?.value?.trim() || "",
+        mode: form.mode?.value || "Hybrid",
+        maxParticipants: maxParticipantsRaw === "" || !Number.isFinite(parsedMax) ? null : parsedMax,
+        bannerUrl: form.bannerUrl?.value?.trim() || "",
+        websiteUrl: form.websiteUrl?.value?.trim() || "",
+        twitterUrl: form.twitterUrl?.value?.trim() || "",
+        discordUrl: form.discordUrl?.value?.trim() || "",
+        isPublished: !!form.isPublished?.checked
+      };
+
+      if (!payload.title || !payload.slug) {
+        window.alert("Event name and URL slug are required.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/organizer/events", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || "Unable to create event.");
+        status.textContent = "Event created. Redirecting...";
+        status.classList.remove("hidden");
+        status.classList.add("!text-lime");
+        const id = String(result?.event?.id || "");
+        window.setTimeout(() => {
+          window.location.href = id ? `/organizer/events/${id}` : "/organizer/dashboard";
+        }, 450);
+      } catch (error) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        status.textContent = error instanceof Error ? error.message : "Unable to create event.";
+        status.classList.remove("hidden");
+        status.classList.add("!text-coral");
+        window.alert(status.textContent);
+      }
+    });
+  </script>
+</BaseLayout>
+

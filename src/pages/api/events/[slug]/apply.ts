@@ -2,6 +2,10 @@ import type { APIRoute } from "astro";
 import { json } from "../../../../lib/server/responses";
 import { getEnv } from "../../../../lib/server/env";
 import { emailPattern } from "../../../../lib/server/validation";
+import {
+  createParticipantSession,
+  createParticipantSessionCookie
+} from "../../../../lib/server/participant-auth";
 
 const getValue = (form: FormData, key: string) => {
   const value = form.get(key);
@@ -91,7 +95,13 @@ export const POST: APIRoute = async (context) => {
       )
       .run();
 
-    return json({ ok: true, id });
+    const session = await createParticipantSession(env, event.id, normalizedEmail);
+
+    return json(
+      { ok: true, id },
+      200,
+      { "set-cookie": createParticipantSessionCookie(context.request, session.token) }
+    );
   } catch (error) {
     return json({ error: "Unable to save registration." }, 500);
   }

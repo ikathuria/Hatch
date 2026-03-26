@@ -10,7 +10,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <div class="relative z-10 space-y-12">
         <div class="space-y-4">
           <div class="flex items-center gap-3">
-              <a href=".." class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors">
+              <a href="#" data-back-link class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
               </a>
               <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Mission Entry</span>
@@ -23,11 +23,11 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           <div class="grid md:grid-cols-2 gap-8">
             <div class="space-y-6">
                 <div class="space-y-2">
-                    <label class="form-label">Personnel Identifier</label>
+                    <label class="form-label">Personnel Identifier <span class="text-coral">*</span></label>
                     <input class="input-field" name="fullName" required placeholder="Jordan Lee" />
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">Communication Endpoint</label>
+                    <label class="form-label">Communication Endpoint <span class="text-coral">*</span></label>
                     <input class="input-field" type="email" name="email" required placeholder="you@stellar.io" />
                 </div>
                 <div class="space-y-2">
@@ -38,7 +38,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
             <div class="space-y-6">
                 <div class="space-y-2">
-                    <label class="form-label">Primary Specialization</label>
+                    <label class="form-label">Primary Specialization <span class="text-coral">*</span></label>
                     <select class="input-field" name="role" required>
                         <option value="">Select Specialization</option>
                         <option>Architect (Developer)</option>
@@ -49,7 +49,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
                     </select>
                 </div>
                 <div class="space-y-2">
-                    <label class="form-label">Target Track</label>
+                    <label class="form-label">Target Track <span class="text-coral">*</span></label>
                     <select class="input-field" name="track" required data-track-select>
                         <option value="">Choose an objective...</option>
                     </select>
@@ -64,7 +64,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           <div class="space-y-6 pt-6 border-t border-cream/5">
             <div class="grid md:grid-cols-2 gap-8">
                 <div class="space-y-2">
-                    <label class="form-label">Squad Configuration</label>
+                    <label class="form-label">Squad Configuration <span class="text-coral">*</span></label>
                     <select class="input-field" name="teamStatus" required>
                         <option value="">Select configuration</option>
                         <option>Solo Operator (Looking for Squad)</option>
@@ -76,7 +76,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
                     <label class="flex items-start gap-4 cursor-pointer group">
                         <input type="checkbox" name="consent" required class="w-6 h-6 rounded-lg bg-cream/5 border border-cream/10 accent-lime cursor-pointer mt-1" />
                         <span class="text-sm text-cream/40 group-hover:text-cream/60 transition-colors pt-1">
-                            I verify compliance with the <a class="text-lime font-bold hover:underline" href="/code-of-conduct">Protocol of Conduct</a>.
+                            I verify compliance with the <a class="text-lime font-bold hover:underline" href="/code-of-conduct">Protocol of Conduct</a> <span class="text-coral">*</span>.
                         </span>
                     </label>
                 </div>
@@ -99,9 +99,13 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
   <script>
     const pathParts = window.location.pathname.split("/").filter(Boolean);
-    const slug = pathParts[pathParts.length - 2] || "";
-    const organizerId = pathParts.length >= 4 ? pathParts[pathParts.length - 3] : "";
+    const hasOrganizerScopedPath =
+      pathParts[0] === "events" && pathParts.length >= 4;
+    const slug = hasOrganizerScopedPath ? pathParts[2] : pathParts[1] || "";
+    const organizerId = hasOrganizerScopedPath ? pathParts[1] : "";
+    const routeBase = organizerId ? `/events/${organizerId}/${slug}` : `/events/${slug}`;
     const querySuffix = organizerId ? `?organizerId=${encodeURIComponent(organizerId)}` : "";
+    const backLink = document.querySelector("[data-back-link]");
     const form = document.querySelector("[data-form]");
     const status = document.querySelector("[data-status]");
     const titleEl = document.querySelector("[data-event-title]");
@@ -109,6 +113,67 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const trackSelect = document.querySelector("[data-track-select]");
     const button = form?.querySelector("button[type='submit']");
     const defaultLabel = button?.textContent;
+    const fullNameInput = form?.querySelector("input[name='fullName']");
+    const emailInput = form?.querySelector("input[name='email']");
+
+    if (backLink) {
+      backLink.href = routeBase;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const setStatus = (message, tone = "") => {
+      if (!status) return;
+      if (!message) {
+        status.textContent = "";
+        status.classList.add("hidden");
+        status.classList.remove("!text-lime", "!text-coral", "!text-sky");
+        return;
+      }
+      status.textContent = message;
+      status.classList.remove("hidden", "!text-lime", "!text-coral", "!text-sky");
+      if (tone) status.classList.add(tone);
+    };
+
+    const prefillIdentity = async (eventId) => {
+      const rememberedName = window.localStorage.getItem("hatch.participant.name") || "";
+      const rememberedEmail = window.localStorage.getItem("hatch.participant.email") || "";
+
+      if (fullNameInput && rememberedName && !String(fullNameInput.value || "").trim()) {
+        fullNameInput.value = rememberedName;
+      }
+      if (emailInput && rememberedEmail && !String(emailInput.value || "").trim()) {
+        emailInput.value = rememberedEmail;
+      }
+
+      const [participantResult, organizerResult] = await Promise.allSettled([
+        fetch("/api/participants/me"),
+        fetch("/api/auth/me")
+      ]);
+
+      if (participantResult.status === "fulfilled" && participantResult.value.ok) {
+        const payload = await participantResult.value.json().catch(() => ({ participant: null }));
+        const participant = payload.participant || null;
+        if (participant && String(participant.eventId || "") === String(eventId || "")) {
+          if (emailInput) {
+            emailInput.value = String(participant.email || "");
+            emailInput.readOnly = true;
+            emailInput.classList.add("opacity-80");
+          }
+        }
+      }
+
+      if (organizerResult.status === "fulfilled" && organizerResult.value.ok) {
+        const payload = await organizerResult.value.json().catch(() => ({ organizer: null }));
+        const organizer = payload.organizer || null;
+        if (fullNameInput && organizer?.name && !String(fullNameInput.value || "").trim()) {
+          fullNameInput.value = String(organizer.name);
+        }
+        if (emailInput && organizer?.email && !String(emailInput.value || "").trim()) {
+          emailInput.value = String(organizer.email);
+        }
+      }
+    };
 
     const loadEvent = async () => {
       try {
@@ -127,27 +192,36 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
             trackSelect.appendChild(option);
           });
         }
+        await prefillIdentity(event?.id || "");
       } catch (error) {
-        if (status) {
-          status.textContent = "Signal failure: Event unavailable.";
-          status.classList.remove("hidden");
-          status.classList.add("!text-coral");
-        }
+        setStatus("Signal failure: Event unavailable.", "!text-coral");
         if (button) button.disabled = true;
       }
     };
 
     form?.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (!status || !form) return;
+      if (!form) return;
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        window.alert("Please complete all required fields.");
+        return;
+      }
+
+      const emailValue = String(emailInput?.value || "").trim();
+      if (!emailPattern.test(emailValue)) {
+        window.alert("Please provide a valid email address.");
+        emailInput?.focus();
+        return;
+      }
 
       if (button) {
           button.disabled = true;
           button.classList.remove("btn-primary--success");
           button.textContent = "Synchronizing...";
       }
-      status.textContent = "";
-      status.classList.add("hidden");
+      setStatus("", "");
 
       try {
         const response = await fetch(`/api/events/${slug}/apply${querySuffix}`, {
@@ -158,18 +232,22 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         if (!response.ok) {
           throw new Error(payload.error || "Uplink failure.");
         }
-        status.textContent = "Entry established. Monitor your inbox for confirmation.";
-        status.classList.remove("hidden");
-        status.classList.add("!text-lime", "font-bold");
-        form.reset();
+        const fullNameValue = String(fullNameInput?.value || "").trim();
+        if (fullNameValue) window.localStorage.setItem("hatch.participant.name", fullNameValue);
+        if (emailValue) window.localStorage.setItem("hatch.participant.email", emailValue);
+
+        setStatus("Entry established. Returning to event page...", "!text-lime");
         if (button) {
             button.textContent = "Success";
             button.classList.add("btn-primary--success");
         }
+        window.setTimeout(() => {
+          window.location.href = routeBase;
+        }, 900);
       } catch (error) {
-        status.textContent = error.message;
-        status.classList.remove("hidden");
-        status.classList.add("!text-coral", "font-bold");
+        const message = error instanceof Error ? error.message : "Uplink failure.";
+        setStatus(message, "!text-coral");
+        window.alert(message);
         if (button) {
             button.disabled = false;
             button.classList.remove("btn-primary--success");
@@ -181,3 +259,4 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     loadEvent();
   </script>
 </BaseLayout>
+

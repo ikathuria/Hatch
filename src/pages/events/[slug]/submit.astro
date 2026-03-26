@@ -10,10 +10,10 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       <div class="relative z-10 space-y-12">
         <div class="space-y-4">
           <div class="flex items-center gap-3">
-              <a href=".." class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-              </a>
-              <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Final Uplink</span>
+            <a href="#" data-back-link class="w-8 h-8 rounded-lg bg-cream/5 flex items-center justify-center hover:bg-cream/10 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </a>
+            <span class="eyebrow !text-violet !bg-violet/10 !border-violet/20">Final Uplink</span>
           </div>
           <h1 class="text-4xl md:text-5xl font-bold tracking-tighter" data-event-title>Submit Your Project</h1>
           <p class="text-lg text-cream/50 leading-relaxed font-medium" data-event-tagline>Transmit your final build data to the judging collective.</p>
@@ -22,19 +22,13 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         <div class="rounded-3xl border border-sky/20 bg-sky/5 p-5 space-y-4 hidden" data-auth-gate>
           <p class="text-xs uppercase tracking-widest font-bold text-sky">Participant access required</p>
           <p class="text-sm text-cream/70 leading-relaxed" data-auth-message>
-            Sign in as an authorized participant to unlock project submission.
+            Apply to this event first to unlock project submission.
           </p>
-          <div class="flex flex-col sm:flex-row gap-3" data-participant-login-wrap>
-            <input class="input-field !py-3 !px-4 !text-sm" data-participant-email-input type="email" placeholder="you@example.com" />
-            <button class="btn-primary !px-5 !py-3 !text-sm" type="button" data-participant-login-btn>Get Magic Link</button>
-          </div>
-          <div class="flex items-center justify-between gap-4">
-            <span class="text-xs text-cream/45 hidden" data-participant-email></span>
+          <div class="flex items-center gap-3">
+            <a class="btn-primary !px-5 !py-3 !text-sm" data-apply-link href="#">Apply to participate</a>
             <button class="btn-ghost !px-4 !py-2 !text-xs hidden" data-participant-logout type="button">Sign Out</button>
           </div>
-          <div class="text-xs text-cream/45 hidden" data-participant-link-wrap>
-            <a class="text-lime font-bold hover:underline" data-participant-link href="#" target="_self">Open your magic link</a>
-          </div>
+          <span class="text-xs text-cream/45 hidden" data-participant-email></span>
           <span class="status-pill hidden !bg-transparent !border-none !p-0 !text-xs" data-auth-status></span>
         </div>
 
@@ -42,59 +36,60 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           <fieldset class="space-y-10" data-submit-fieldset disabled>
             <div class="grid md:grid-cols-2 gap-8">
               <div class="space-y-6">
-                  <div class="space-y-2">
-                      <label class="form-label">Squad Designation</label>
-                      <input class="input-field" name="teamName" required placeholder="Nova Force" />
-                  </div>
-                  <div class="space-y-2">
-                      <label class="form-label">Project Identity</label>
-                      <input class="input-field" name="projectName" required placeholder="Neural Bridge v1.0" />
-                  </div>
-                  <div class="space-y-2">
-                      <label class="form-label">Target Track</label>
-                      <select class="input-field" name="track" required data-track-select>
-                          <option value="">Choosing objective...</option>
-                      </select>
-                  </div>
+                <div class="space-y-2">
+                  <label class="form-label">Squad Designation <span class="text-coral">*</span></label>
+                  <input class="input-field" name="teamName" required placeholder="Nova Force" />
+                </div>
+                <div class="space-y-2">
+                  <label class="form-label">Project Identity <span class="text-coral">*</span></label>
+                  <input class="input-field" name="projectName" required placeholder="Neural Bridge v1.0" />
+                </div>
+                <div class="space-y-2">
+                  <label class="form-label">Target Track <span class="text-coral">*</span></label>
+                  <select class="input-field" name="track" required data-track-select>
+                    <option value="">Choose an objective...</option>
+                  </select>
+                </div>
               </div>
 
               <div class="space-y-6">
-                   <div class="space-y-2">
-                      <label class="form-label">Source Nexus (Repository)</label>
-                      <input class="input-field" type="url" name="repoUrl" placeholder="https://github.com/..." />
-                  </div>
-                  <div class="space-y-2">
-                      <label class="form-label">Live Link (Demo)</label>
-                      <input class="input-field" type="url" name="demoUrl" placeholder="https://live-deploy.app" />
-                  </div>
-                  <div class="space-y-2">
-                      <label class="form-label">Briefing Artifact (Slides)</label>
-                      <input class="input-field" type="url" name="deckUrl" placeholder="https://pitch.deck/..." />
-                  </div>
+                <div class="space-y-2">
+                  <label class="form-label">Source Nexus (Repository)</label>
+                  <input class="input-field" type="url" name="repoUrl" placeholder="https://github.com/..." />
+                  <p class="text-xs text-cream/40">Must start with https://github.com/ or github.com/</p>
+                </div>
+                <div class="space-y-2">
+                  <label class="form-label">Live Link (Demo)</label>
+                  <input class="input-field" type="url" name="demoUrl" placeholder="https://live-deploy.app" />
+                </div>
+                <div class="space-y-2">
+                  <label class="form-label">Briefing Artifact (Slides)</label>
+                  <input class="input-field" type="url" name="deckUrl" placeholder="https://pitch.deck/..." />
+                </div>
               </div>
             </div>
 
             <div class="space-y-8 pt-6 border-t border-cream/5">
               <div class="space-y-2">
-                  <label class="form-label">Mission Briefing (Description)</label>
-                  <textarea class="input-field" name="description" rows="5" required placeholder="What did you manifest and why is it essential for the future?"></textarea>
+                <label class="form-label">Mission Briefing (Description) <span class="text-coral">*</span></label>
+                <textarea class="input-field" name="description" rows="5" required placeholder="What did you build and why does it matter?"></textarea>
               </div>
 
               <div class="grid md:grid-cols-2 gap-8">
-                  <div class="space-y-2">
-                      <label class="form-label">Contact Endpoint</label>
-                      <input class="input-field" type="email" name="contactEmail" required placeholder="lead@squad.io" />
-                  </div>
-                  <div class="space-y-2">
-                      <label class="form-label">Squad Manifest (Names + Emails)</label>
-                      <textarea class="input-field" name="members" rows="3" required placeholder="Avery P. - avery@io.com"></textarea>
-                  </div>
+                <div class="space-y-2">
+                  <label class="form-label">Contact Endpoint <span class="text-coral">*</span></label>
+                  <input class="input-field" type="email" name="contactEmail" required placeholder="lead@squad.io" />
+                </div>
+                <div class="space-y-2">
+                  <label class="form-label">Squad Manifest (Names + Emails) <span class="text-coral">*</span></label>
+                  <textarea class="input-field" name="members" rows="3" required placeholder="Avery P. - avery@io.com"></textarea>
+                </div>
               </div>
             </div>
 
             <div class="pt-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="status-pill !bg-transparent !border-none hidden" data-status></div>
-                <button class="btn-primary !px-16 !py-5 text-lg w-full md:w-auto" type="submit">Terminate Uplink (Submit)</button>
+              <div class="status-pill !bg-transparent !border-none hidden" data-status></div>
+              <button class="btn-primary !px-16 !py-5 text-lg w-full md:w-auto" type="submit">Submit Project</button>
             </div>
           </fieldset>
         </form>
@@ -104,9 +99,15 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
   <script>
     const pathParts = window.location.pathname.split("/").filter(Boolean);
-    const slug = pathParts[pathParts.length - 2] || "";
-    const organizerId = pathParts.length >= 4 ? pathParts[pathParts.length - 3] : "";
+    const hasOrganizerScopedPath =
+      pathParts[0] === "events" && pathParts.length >= 4;
+    const slug = hasOrganizerScopedPath ? pathParts[2] : pathParts[1] || "";
+    const organizerId = hasOrganizerScopedPath ? pathParts[1] : "";
+    const routeBase = organizerId ? `/events/${organizerId}/${slug}` : `/events/${slug}`;
     const querySuffix = organizerId ? `?organizerId=${encodeURIComponent(organizerId)}` : "";
+
+    const backLink = document.querySelector("[data-back-link]");
+    const applyLink = document.querySelector("[data-apply-link]");
     const form = document.querySelector("[data-form]");
     const submitFieldset = document.querySelector("[data-submit-fieldset]");
     const status = document.querySelector("[data-status]");
@@ -115,18 +116,16 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const trackSelect = document.querySelector("[data-track-select]");
     const button = form?.querySelector("button[type='submit']");
     const defaultLabel = button?.textContent;
+    const contactEmailInput = form?.querySelector("input[name='contactEmail']");
 
     const authGate = document.querySelector("[data-auth-gate]");
     const authMessage = document.querySelector("[data-auth-message]");
     const authStatus = document.querySelector("[data-auth-status]");
-    const participantEmailInput = document.querySelector("[data-participant-email-input]");
-    const participantLoginWrap = document.querySelector("[data-participant-login-wrap]");
-    const participantLoginBtn = document.querySelector("[data-participant-login-btn]");
-    const participantLoginDefaultLabel = participantLoginBtn?.textContent;
     const participantEmailEl = document.querySelector("[data-participant-email]");
     const participantLogoutBtn = document.querySelector("[data-participant-logout]");
-    const participantLinkWrap = document.querySelector("[data-participant-link-wrap]");
-    const participantLink = document.querySelector("[data-participant-link]");
+
+    if (backLink) backLink.href = routeBase;
+    if (applyLink) applyLink.href = `${routeBase}/apply`;
 
     const state = {
       eventId: "",
@@ -134,6 +133,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       sessionEmail: "",
       hasForeignSession: false
     };
+
+    const githubPattern = /^(https:\/\/github\.com\/.+|github\.com\/.+)$/i;
 
     const setStatus = (el, message, tone = "") => {
       if (!el) return;
@@ -153,7 +154,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       if (!button) return;
       button.disabled = !enabled;
       if (!enabled) {
-        button.textContent = "Participant login required";
+        button.textContent = "Participant access required";
       } else if (button.textContent !== "Complete") {
         button.textContent = defaultLabel;
       }
@@ -162,32 +163,25 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const renderAuthGate = () => {
       const authorized = Boolean(state.participantEmail);
       if (authGate) authGate.classList.toggle("hidden", authorized);
-
       if (participantEmailEl) {
         if (state.sessionEmail) {
           participantEmailEl.textContent = `Signed in as ${state.sessionEmail}`;
           participantEmailEl.classList.remove("hidden");
         } else {
-          participantEmailEl.textContent = "";
           participantEmailEl.classList.add("hidden");
+          participantEmailEl.textContent = "";
         }
       }
-
       if (participantLogoutBtn) {
         participantLogoutBtn.classList.toggle("hidden", !state.sessionEmail);
       }
-
-      if (participantLoginWrap) {
-        participantLoginWrap.classList.toggle("hidden", state.hasForeignSession || authorized);
-      }
-
       if (authMessage) {
         if (state.hasForeignSession) {
           authMessage.textContent =
-            "You are signed in for a different event. Sign out, then request a magic link for this event.";
+            "You are signed in for a different event. Sign out, then apply to this event to unlock submission.";
         } else {
           authMessage.textContent =
-            "Sign in as an authorized participant to unlock project submission.";
+            "Apply to this event first to unlock project submission.";
         }
       }
     };
@@ -203,8 +197,13 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         state.participantEmail =
           participant && participant.eventId === state.eventId ? participant.email || "" : "";
 
-        if (state.participantEmail && form?.contactEmail && !String(form.contactEmail.value || "").trim()) {
-          form.contactEmail.value = state.participantEmail;
+        if (contactEmailInput && state.participantEmail) {
+          contactEmailInput.value = state.participantEmail;
+          contactEmailInput.readOnly = true;
+          contactEmailInput.classList.add("opacity-80");
+        } else if (contactEmailInput) {
+          contactEmailInput.readOnly = false;
+          contactEmailInput.classList.remove("opacity-80");
         }
 
         setSubmissionEnabled(Boolean(state.participantEmail));
@@ -245,42 +244,6 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       }
     };
 
-    participantLoginBtn?.addEventListener("click", async () => {
-      const email = String(participantEmailInput?.value || "").trim();
-      if (!email) {
-        setStatus(authStatus, "Enter an email.", "!text-coral");
-        return;
-      }
-
-      try {
-        participantLoginBtn.disabled = true;
-        participantLoginBtn.textContent = "Generating...";
-        setStatus(authStatus, "Generating link...", "!text-sky");
-        const response = await fetch(`/api/participants/events/${slug}/request-magic-link${querySuffix}`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ email })
-        });
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error || "Unable to generate magic link.");
-
-        if (participantLinkWrap && participantLink) {
-          const verifyBase = String(payload.verifyUrl || "");
-          const separator = verifyBase.includes("?") ? "&" : "?";
-          const nextPath = encodeURIComponent(window.location.pathname);
-          participantLink.href = `${verifyBase}${separator}next=${nextPath}`;
-          participantLinkWrap.classList.remove("hidden");
-        }
-        setStatus(authStatus, "Magic link ready. Open it to sign in.", "!text-lime");
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Unable to generate magic link.";
-        setStatus(authStatus, message, "!text-coral");
-      } finally {
-        participantLoginBtn.disabled = false;
-        participantLoginBtn.textContent = participantLoginDefaultLabel || "Get Magic Link";
-      }
-    });
-
     participantLogoutBtn?.addEventListener("click", async () => {
       await fetch("/api/participants/logout", { method: "POST" });
       state.participantEmail = "";
@@ -293,12 +256,26 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 
     form?.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (!status || !form) return;
+      if (!form) return;
 
       if (!state.participantEmail) {
         setSubmissionEnabled(false);
         renderAuthGate();
-        setStatus(authStatus, "Sign in as a participant before submitting.", "!text-coral");
+        setStatus(authStatus, "Apply to this event before submitting.", "!text-coral");
+        window.alert("Apply to this event first to unlock submission.");
+        return;
+      }
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        window.alert("Please complete all required fields.");
+        return;
+      }
+
+      const repoValue = String(form.repoUrl?.value || "").trim();
+      if (repoValue && !githubPattern.test(repoValue)) {
+        window.alert("Repository URL must start with https://github.com/ or github.com/.");
+        form.repoUrl?.focus();
         return;
       }
 
@@ -318,16 +295,18 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         if (!response.ok) {
           throw new Error(payload.error || "Uplink failure.");
         }
-        setStatus(status, "Transmission successful. Judging collective notified.", "!text-lime");
-        form.reset();
-        if (form.contactEmail) form.contactEmail.value = state.participantEmail;
+        setStatus(status, "Submission received. Returning to event page...", "!text-lime");
         if (button) {
           button.textContent = "Complete";
           button.classList.add("btn-primary--success");
         }
+        window.setTimeout(() => {
+          window.location.href = routeBase;
+        }, 900);
       } catch (error) {
         const message = error instanceof Error ? error.message : "Uplink failure.";
         setStatus(status, message, "!text-coral");
+        window.alert(message);
         if (button) {
           button.disabled = false;
           button.classList.remove("btn-primary--success");
@@ -342,3 +321,4 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     loadEvent();
   </script>
 </BaseLayout>
+
