@@ -1,4 +1,5 @@
 import { extractEmails, normalizeEmail } from "./email";
+import { parseApplicationAnswers } from "./application-config";
 import type { Env } from "./types";
 
 export interface ResolvedEvent {
@@ -37,6 +38,29 @@ export interface TeamDirectoryEntry {
   name: string;
   memberCount: number;
   members: ParticipantTeamMember[];
+}
+
+export interface ParticipantSubmissionRecord {
+  id: string;
+  projectName: string;
+  description: string;
+  track: string;
+  repoUrl: string | null;
+  demoUrl: string | null;
+  deckUrl: string | null;
+  createdAt: string;
+}
+
+export interface ParticipantApplicationRecord {
+  id: string;
+  email: string;
+  fullName: string;
+  location: string;
+  teamStatus: string;
+  linkedinUrl: string;
+  githubUrl: string;
+  status: string;
+  customAnswers: Record<string, string>;
 }
 
 const fallbackDisplayName = (email: string) => {
@@ -103,21 +127,70 @@ export const resolvePublishedEventForParticipant = async (
 };
 
 export const isParticipantEligibleForEvent = async (env: Env, eventId: string, email: string) => {
+  const access = await getParticipantAccessState(env, eventId, email);
+  return access.allowed;
+};
+
+export const loadLatestParticipantApplication = async (
+  env: Env,
+  eventId: string,
+  email: string
+) => {
   const normalizedEmail = normalizeEmail(email);
-  if (!normalizedEmail) return false;
+  if (!normalizedEmail) return null;
 
-  const applications = await env.DB.prepare(
-    `SELECT email
+  const application = await env.DB.prepare(
+    `SELECT id, email, full_name as fullName, location, team_status as teamStatus,
+      linkedin_url as linkedinUrl, github_url as githubUrl, status, custom_answers as customAnswers
      FROM applications
-     WHERE event_id = ?`
+     WHERE event_id = ? AND lower(trim(email)) = ?
+     ORDER BY created_at DESC
+     LIMIT 1`
   )
-    .bind(eventId)
-    .all<{ email: string }>();
+    .bind(eventId, normalizedEmail)
+    .first<{
+      id: string;
+      email: string;
+      fullName: string | null;
+      location: string | null;
+      teamStatus: string | null;
+      linkedinUrl: string | null;
+      githubUrl: string | null;
+      status: string | null;
+      customAnswers: string | null;
+    }>();
 
-  const eligibleByApplication = (applications.results ?? []).some(
-    (row) => normalizeEmail(row.email) === normalizedEmail
-  );
-  if (eligibleByApplication) return true;
+  if (!application) return null;
+
+  return {
+    id: application.id,
+    email: normalizeEmail(application.email),
+    fullName: String(application.fullName || "").trim(),
+    location: String(application.location || "").trim(),
+    teamStatus: String(application.teamStatus || "").trim(),
+    linkedinUrl: String(application.linkedinUrl || "").trim(),
+    githubUrl: String(application.githubUrl || "").trim(),
+    status: String(application.status || "pending").trim() || "pending",
+    customAnswers: parseApplicationAnswers(application.customAnswers)
+  } satisfies ParticipantApplicationRecord;
+};
+
+export const getParticipantAccessState = async (env: Env, eventId: string, email: string) => {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) {
+    return { allowed: false, reason: "missing-email", application: null as ParticipantApplicationRecord | null };
+  }
+
+  const application = await loadLatestParticipantApplication(env, eventId, normalizedEmail);
+  if (application?.status === "approved") {
+    return { allowed: true, reason: "approved-application", application };
+  }
+  if (application?.status === "pending") {
+    return { allowed: false, reason: "pending-application", application };
+  }
+  if (application?.status === "rejected") {
+    return { allowed: false, reason: "rejected-application", application };
+  }
 
   const submissions = await env.DB.prepare(
     `SELECT contact_email as contactEmail, members
@@ -127,24 +200,21 @@ export const isParticipantEligibleForEvent = async (env: Env, eventId: string, e
     .bind(eventId)
     .all<{ contactEmail: string; members: string | null }>();
 
-  return (submissions.results ?? []).some((row) => {
+  const allowedBySubmission = (submissions.results ?? []).some((row) => {
     if (normalizeEmail(row.contactEmail) === normalizedEmail) return true;
     return extractEmails(row.members ?? "").includes(normalizedEmail);
   });
+
+  return {
+    allowed: allowedBySubmission,
+    reason: allowedBySubmission ? "existing-submission" : "no-access",
+    application
+  };
 };
 
 export const getParticipantDisplayName = async (env: Env, eventId: string, email: string) => {
   const normalizedEmail = normalizeEmail(email);
-  const application = await env.DB.prepare(
-    `SELECT full_name as fullName
-     FROM applications
-     WHERE event_id = ? AND lower(trim(email)) = ?
-     ORDER BY created_at DESC
-     LIMIT 1`
-  )
-    .bind(eventId, normalizedEmail)
-    .first<{ fullName: string | null }>();
-
+  const application = await loadLatestParticipantApplication(env, eventId, normalizedEmail);
   return String(application?.fullName || "").trim() || fallbackDisplayName(normalizedEmail);
 };
 
@@ -177,7 +247,7 @@ export const loadParticipantTeam = async (env: Env, eventId: string, email: stri
     `SELECT pt.id, pt.name, pt.join_code as joinCode, pt.created_by_email as createdByEmail
      FROM participant_team_members tm
      INNER JOIN participant_teams pt ON pt.id = tm.team_id
-     WHERE tm.event_id = ? AND tm.participant_email = ?`
+     WHERE tm.event_id = ? AND lower(trim(tm.participant_email)) = ?`
   )
     .bind(eventId, normalizeEmail(email))
     .first<{ id: string; name: string; joinCode: string; createdByEmail: string }>();
@@ -241,4 +311,52 @@ export const loadTeamDirectory = async (env: Env, eventId: string) => {
   );
 
   return entries;
+};
+
+export const loadParticipantSubmission = async (
+  env: Env,
+  eventId: string,
+  email: string,
+  teamId?: string | null
+) => {
+  const normalizedEmail = normalizeEmail(email);
+
+  const directMatch = await env.DB.prepare(
+    `SELECT id, project_name as projectName, description, track,
+      repo_url as repoUrl, demo_url as demoUrl, deck_url as deckUrl,
+      created_at as createdAt
+     FROM submissions
+     WHERE event_id = ?
+       AND (
+         (? IS NOT NULL AND team_id = ?)
+         OR lower(trim(created_by_participant_email)) = ?
+         OR lower(trim(contact_email)) = ?
+       )
+     ORDER BY created_at DESC
+     LIMIT 1`
+  )
+    .bind(eventId, teamId ?? null, teamId ?? null, normalizedEmail, normalizedEmail)
+    .first<ParticipantSubmissionRecord>();
+
+  if (directMatch) return directMatch;
+
+  const submissions = await env.DB.prepare(
+    `SELECT id, project_name as projectName, description, track,
+      repo_url as repoUrl, demo_url as demoUrl, deck_url as deckUrl,
+      members, created_at as createdAt
+     FROM submissions
+     WHERE event_id = ?
+     ORDER BY created_at DESC`
+  )
+    .bind(eventId)
+    .all<ParticipantSubmissionRecord & { members: string | null }>();
+
+  const fallback = (submissions.results ?? []).find((submission) =>
+    extractEmails(submission.members ?? "").includes(normalizedEmail)
+  );
+
+  if (!fallback) return null;
+
+  const { members: _members, ...record } = fallback;
+  return record satisfies ParticipantSubmissionRecord;
 };

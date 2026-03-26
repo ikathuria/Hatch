@@ -2,35 +2,9 @@ import type { APIRoute } from "astro";
 import { json } from "../../../../../lib/server/responses";
 import { getEnv } from "../../../../../lib/server/env";
 import { createParticipantMagicLink } from "../../../../../lib/server/participant-auth";
-import { normalizeEmail, extractEmails, isValidEmail } from "../../../../../lib/server/email";
+import { normalizeEmail, isValidEmail } from "../../../../../lib/server/email";
 import { enforceRateLimit, getClientIp } from "../../../../../lib/server/rate-limit";
-
-const findEligibleEmail = async (env: ReturnType<typeof getEnv>, eventId: string, email: string) => {
-  const applications = await env.DB.prepare(
-    `SELECT email
-     FROM applications
-     WHERE event_id = ?`
-  )
-    .bind(eventId)
-    .all<{ email: string }>();
-
-  if ((applications.results ?? []).some((row) => normalizeEmail(row.email) === email)) {
-    return true;
-  }
-
-  const submissions = await env.DB.prepare(
-    `SELECT contact_email as contactEmail, members
-     FROM submissions
-     WHERE event_id = ?`
-  )
-    .bind(eventId)
-    .all<{ contactEmail: string; members: string | null }>();
-
-  return (submissions.results ?? []).some((row) => {
-    if (normalizeEmail(row.contactEmail) === email) return true;
-    return extractEmails(row.members ?? "").includes(email);
-  });
-};
+import { getParticipantAccessState } from "../../../../../lib/server/participant-workspace";
 
 export const POST: APIRoute = async (context) => {
   try {
@@ -130,9 +104,15 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
-    const eligible = await findEligibleEmail(env, event.id, email);
-    if (!eligible) {
-      return json({ error: "No participant access was found for that email." }, 404);
+    const access = await getParticipantAccessState(env, event.id, email);
+    if (!access.allowed) {
+      if (access.reason === "pending-application") {
+        return json({ error: "Your application is pending organizer review." }, 403);
+      }
+      if (access.reason === "rejected-application") {
+        return json({ error: "Your application was not approved. Contact the organizer if you need help." }, 403);
+      }
+      return json({ error: "No approved participant access was found for that email." }, 404);
     }
 
     const magicLink = await createParticipantMagicLink(env, event.id, email);

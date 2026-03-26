@@ -4,6 +4,7 @@ import HatchEggMark from "../components/HatchEggMark.astro";
 import "../styles/global.css";
 import { resolveEnv } from "../lib/server/env";
 import { getOrganizerFromRequest } from "../lib/server/auth";
+import { getParticipantSessionFromRequest } from "../lib/server/participant-auth";
 
 const { title, description } = Astro.props;
 const pageTitle = title ?? `${site.brand.name}`;
@@ -11,6 +12,7 @@ const metaDescription = description ?? site.hero.description;
 
 const env = resolveEnv(Astro.locals);
 const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null;
+const participant = env ? await getParticipantSessionFromRequest(Astro.request, env) : null;
 ---
 
 <!doctype html>
@@ -60,6 +62,16 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
 
         <nav class="hidden items-center gap-8 md:flex">
           <a class="nav-link font-mono text-xs uppercase tracking-[0.2em]" href="/events">Events</a>
+          <a
+            class:list={[
+              "nav-link font-mono text-xs uppercase tracking-[0.2em]",
+              !participant && "hidden"
+            ]}
+            href="/participants/events"
+            data-participant-events-link
+          >
+            My Events
+          </a>
           <a class="nav-link font-mono text-xs uppercase tracking-[0.2em]" href="/about">About</a>
         </nav>
 
@@ -79,7 +91,7 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
                   Log out
                 </button>
                 <a class="btn-primary !rounded-full !px-6 !py-2.5 !text-xs" href="/organizer/dashboard">
-                  Organizer
+                  Organizer Hub
                 </a>
               </>
             ) : (
@@ -173,6 +185,32 @@ const organizer = env ? await getOrganizerFromRequest(Astro.request, env) : null
       });
 
       const logoutBtn = document.querySelector("[data-logout-header]");
+      const participantEventsLinks = Array.from(
+        document.querySelectorAll("[data-participant-events-link]")
+      );
+
+      const setParticipantNavVisible = (visible) => {
+        participantEventsLinks.forEach((link) => {
+          link.classList.toggle("hidden", !visible);
+        });
+      };
+
+      const syncParticipantNav = async () => {
+        try {
+          const response = await fetch("/api/participants/me");
+          const payload = await response.json().catch(() => ({ participant: null }));
+          setParticipantNavVisible(Boolean(payload.participant?.email));
+        } catch {
+          setParticipantNavVisible(false);
+        }
+      };
+
+      window.addEventListener("hatch:participant-session-changed", (event) => {
+        setParticipantNavVisible(Boolean(event?.detail?.participant?.email));
+      });
+
+      syncParticipantNav();
+
       logoutBtn?.addEventListener("click", async () => {
         try {
           const res = await fetch("/api/auth/logout", { method: "POST" });

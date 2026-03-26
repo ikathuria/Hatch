@@ -43,7 +43,7 @@ export const uiCopy = {
   },
   participant: {
     apply: {
-      success: "Application received. Redirecting..."
+      success: "Application received. Organizer approval is required before attendee access opens."
     },
     submit: {
       gated: "Apply to this event before submitting.",

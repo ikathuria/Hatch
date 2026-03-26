@@ -64,12 +64,12 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
                   <div class="space-y-3">
                     <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime">Take your place</p>
                     <p class="max-w-xl text-sm leading-relaxed text-cream/[0.58]">
-                      Apply, submit, and share this event from one clean public page.
+                      Apply, get approved, and run your full attendee flow from one clean public page.
                     </p>
                   </div>
                   <div class="flex flex-wrap gap-3">
                     <a class="btn-primary !px-8 !py-3.5" data-apply-link href="#">Apply to Participate</a>
-                    <a class="btn-ghost !px-8 !py-3.5" data-submit-link href="#">Submit project</a>
+                    <a class="btn-ghost !px-8 !py-3.5 hidden" data-submit-link href="#">Submit project</a>
                   </div>
                 </div>
 
@@ -143,7 +143,7 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
                 <div class="card !p-5 w-full md:w-auto space-y-3" data-participant-auth>
                   <p class="text-xs font-bold uppercase tracking-widest text-cream/35">Participant Voting</p>
                   <p class="text-xs text-cream/55 leading-relaxed" data-participant-auth-copy>
-                    Apply and sign in as a participant to vote.
+                    Apply first. Voting opens after organizer approval.
                   </p>
                   <div class="flex items-center gap-3">
                     <a class="btn-primary !px-5 !py-3 !text-sm" data-participant-apply-link href="#">Apply to participate</a>
@@ -183,10 +183,10 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
       <div class="card !p-6 md:!p-8">
         <div class="flex flex-col gap-6 border-b border-cream/[0.08] pb-6 md:flex-row md:items-center md:justify-between">
           <div class="space-y-2">
-            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime">Attendee workspace</p>
-            <h2 class="text-3xl font-bold tracking-[-0.06em] md:text-4xl">Hacker space</h2>
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-lime">Attendee hub</p>
+            <h2 class="text-3xl font-bold tracking-[-0.06em] md:text-4xl">Attendee Hub</h2>
             <p class="text-sm leading-relaxed text-cream/[0.56]" data-workspace-summary>
-              Loading attendee workspace...
+              Loading Attendee Hub...
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-3">
@@ -376,6 +376,7 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
     const BANNER_PREFIX = "/api/media/banner/";
     const BANNER_UUID =
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const DEFAULT_CONTACT_EMAIL = "hello@hatch.dev";
 
     const state = {
       event: null,
@@ -383,6 +384,7 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
       gallery: [],
       winners: null,
       resultsPublished: false,
+      applicationStatus: "",
       participantEventId: "",
       participantSessionEmail: "",
       participantEmail: "",
@@ -390,6 +392,7 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
       workspace: null,
       workspaceNotice: { panel: "", message: "", tone: "" }
     };
+    let workspaceOpenPending = window.location.hash === "#hacker-space";
 
     const escapeHtml = (value) =>
       String(value ?? "")
@@ -398,6 +401,10 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
+
+    const getContactEmail = () => String(state.event?.organizerEmail || "").trim() || DEFAULT_CONTACT_EMAIL;
+
+    const getContactHref = () => `mailto:${getContactEmail()}`;
 
     const setStatus = (el, message, tone = "") => {
       if (!el) return;
@@ -410,6 +417,18 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
       el.textContent = message;
       el.classList.remove("hidden", "!text-lime", "!text-coral", "!text-sky");
       if (tone) el.classList.add(tone);
+    };
+
+    const syncParticipantHeader = () => {
+      window.dispatchEvent(
+        new CustomEvent("hatch:participant-session-changed", {
+          detail: {
+            participant: state.participantEmail
+              ? { email: state.participantEmail, eventId: state.participantEventId }
+              : null
+          }
+        })
+      );
     };
 
     const activateTab = (tabId) => {
@@ -525,6 +544,23 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
       }
     };
 
+    const openWorkspaceIfRequested = () => {
+      if (!workspaceOpenPending && window.location.hash !== "#hacker-space") return;
+      if (!workspaceEl || workspaceEl.classList.contains("hidden")) return;
+
+      workspaceOpenPending = false;
+      window.requestAnimationFrame(() => {
+        workspaceEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    };
+
+    const queueWorkspaceOpen = () => {
+      workspaceOpenPending = true;
+      if (window.location.hash !== "#hacker-space") {
+        window.history.replaceState(null, "", `${routeBase}#hacker-space`);
+      }
+    };
+
     const renderWorkspaceInformation = () => {
       if (!workspaceInfoEl || !state.workspace) return;
       const participant = state.workspace.participant || {};
@@ -552,18 +588,14 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
               <p class="mt-3 text-lg font-bold tracking-[-0.04em]">${escapeHtml(event.mode || "Hackathon")}</p>
             </div>
             <div class="card !p-5">
-              <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Apply track</p>
-              <p class="mt-3 text-lg font-bold tracking-[-0.04em]">${escapeHtml(participant.applicationTrack || "Not selected")}</p>
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-cream/[0.42]">Selected location</p>
+              <p class="mt-3 text-lg font-bold tracking-[-0.04em]">${escapeHtml(participant.location || "Not selected")}</p>
             </div>
           </div>
-          <div class="grid gap-4 md:grid-cols-2">
+          <div class="grid gap-4 md:grid-cols-1">
             <div class="card !p-5">
               <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-lime">Team status</p>
               <p class="mt-3 text-base leading-relaxed text-cream/[0.66]">${escapeHtml(participant.teamStatus || "No team preference recorded yet.")}</p>
-            </div>
-            <div class="card !p-5">
-              <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-sky">Idea note</p>
-              <p class="mt-3 text-base leading-relaxed text-cream/[0.66]">${escapeHtml(participant.idea || "No application note was saved.")}</p>
             </div>
           </div>
           ${renderWorkspaceNotice("information")}
@@ -613,7 +645,7 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
             <p class="font-mono text-[0.68rem] uppercase tracking-[0.22em] text-lime">Share</p>
             <div class="mt-4 flex flex-wrap gap-3">
               <button class="btn-primary !px-5 !py-3 !text-xs uppercase tracking-[0.2em]" type="button" data-workspace-copy-link>Copy event link</button>
-              <a class="btn-ghost !px-5 !py-3 !text-xs uppercase tracking-[0.2em]" href="mailto:hello@hatch.dev">Contact organizer</a>
+              <a class="btn-ghost !px-5 !py-3 !text-xs uppercase tracking-[0.2em]" href="${escapeHtml(getContactHref())}">Contact organizer</a>
             </div>
           </div>
           ${renderWorkspaceNotice("resources")}
@@ -759,7 +791,13 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
         const formData = new FormData(form);
         const name = String(formData.get("name") || "").trim();
         if (!name) return;
+        const button = form.querySelector("button[type='submit']");
+        const defaultLabel = button?.textContent || "Create team";
         try {
+          if (button) {
+            button.disabled = true;
+            button.textContent = "Creating...";
+          }
           const response = await fetch(`/api/participants/events/${slug}/teams${querySuffix}`, {
             method: "POST",
             headers: { "content-type": "application/json" },
@@ -773,6 +811,11 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
         } catch (error) {
           state.workspaceNotice = { panel: "teams", message: error instanceof Error ? error.message : "Unable to create team.", tone: "coral" };
           renderWorkspaceTeams();
+        } finally {
+          if (button) {
+            button.disabled = false;
+            button.textContent = defaultLabel;
+          }
         }
       });
 
@@ -782,7 +825,13 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
         const formData = new FormData(form);
         const joinCode = String(formData.get("joinCode") || "").trim();
         if (!joinCode) return;
+        const button = form.querySelector("button[type='submit']");
+        const defaultLabel = button?.textContent || "Join with code";
         try {
+          if (button) {
+            button.disabled = true;
+            button.textContent = "Joining...";
+          }
           const response = await fetch(`/api/participants/events/${slug}/teams/join${querySuffix}`, {
             method: "POST",
             headers: { "content-type": "application/json" },
@@ -796,6 +845,11 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
         } catch (error) {
           state.workspaceNotice = { panel: "teams", message: error instanceof Error ? error.message : "Unable to join team.", tone: "coral" };
           renderWorkspaceTeams();
+        } finally {
+          if (button) {
+            button.disabled = false;
+            button.textContent = defaultLabel;
+          }
         }
       });
     };
@@ -934,7 +988,7 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
           });
           const payload = await response.json().catch(() => ({}));
           if (!response.ok) throw new Error(payload.error || "Unable to submit project.");
-          state.workspaceNotice = { panel: "submissions", message: "Project submitted. Your hacker space is now locked to that submission.", tone: "lime" };
+          state.workspaceNotice = { panel: "submissions", message: "Project submitted. Your Attendee Hub is now locked to that submission.", tone: "lime" };
           await loadWorkspace();
           activateWorkspaceTab("submissions");
         } catch (error) {
@@ -960,6 +1014,7 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
       renderWorkspaceTeams();
       renderWorkspaceSubmission();
       toggleWorkspaceMode();
+      openWorkspaceIfRequested();
     };
 
     const loadWorkspace = async () => {
@@ -972,14 +1027,17 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
       try {
         const response = await fetch(`/api/participants/events/${slug}/workspace${querySuffix}`);
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error || "Unable to load hacker space.");
+        if (!response.ok) throw new Error(payload.error || "Unable to load Attendee Hub.");
         state.workspace = payload.workspace || null;
         renderWorkspace();
       } catch (error) {
+        state.participantEmail = "";
         state.workspace = null;
+        renderParticipantAuth();
+        updateSubmitCallToAction();
         if (workspaceSummaryEl) {
           workspaceSummaryEl.textContent =
-            error instanceof Error ? error.message : "Unable to load hacker space.";
+            error instanceof Error ? error.message : "Unable to load Attendee Hub.";
         }
         toggleWorkspaceMode();
       }
@@ -1111,16 +1169,25 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
         participantLogoutBtn.classList.toggle("hidden", !hasAnySession);
       }
       if (participantApplyLink) {
-        participantApplyLink.classList.toggle("hidden", eventParticipantLoggedIn);
+        participantApplyLink.classList.toggle(
+          "hidden",
+          eventParticipantLoggedIn ||
+            state.applicationStatus === "pending" ||
+            state.applicationStatus === "rejected"
+        );
       }
       if (participantAuthCopy) {
         if (eventParticipantLoggedIn) {
           participantAuthCopy.textContent = "You are verified for this event. Voting is enabled.";
+        } else if (state.applicationStatus === "pending") {
+          participantAuthCopy.textContent = "Your application is pending organizer review.";
+        } else if (state.applicationStatus === "rejected") {
+          participantAuthCopy.textContent = "Your application was not approved for this event.";
         } else if (hasAnySession) {
           participantAuthCopy.textContent =
             "You are signed in for a different event. Apply here to unlock voting for this event.";
         } else {
-          participantAuthCopy.textContent = "Apply and sign in as a participant to vote.";
+          participantAuthCopy.textContent = "Apply first. Voting opens after organizer approval.";
         }
       }
     };
@@ -1128,23 +1195,56 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
     const updateSubmitCallToAction = () => {
       if (!submitLink || !applyLink) return;
       const canSubmit = Boolean(state.participantEmail);
-      submitLink.classList.remove("opacity-60", "hidden");
+      submitLink.classList.add("hidden");
+      submitLink.classList.remove("opacity-60");
       submitLink.removeAttribute("aria-disabled");
+      applyLink.classList.remove("opacity-60", "pointer-events-none");
+      applyLink.removeAttribute("aria-disabled");
 
       if (canSubmit) {
         applyLink.href = "#hacker-space";
-        applyLink.textContent = "Open hacker space";
-        submitLink.classList.add("hidden");
+        applyLink.textContent = "Open Attendee Hub";
+        return;
+      }
+
+      if (state.applicationStatus === "pending") {
+        applyLink.href = routeBase;
+        applyLink.textContent = "Pending Approval";
+        applyLink.classList.add("opacity-60", "pointer-events-none");
+        applyLink.setAttribute("aria-disabled", "true");
+        return;
+      }
+
+      if (state.applicationStatus === "rejected") {
+        applyLink.href = routeBase;
+        applyLink.textContent = "Rejected";
+        applyLink.classList.add("opacity-60", "pointer-events-none");
+        applyLink.setAttribute("aria-disabled", "true");
         return;
       }
 
       applyLink.href = `${routeBase}/apply`;
       applyLink.textContent = "Apply to Participate";
-      submitLink.href = `${routeBase}/apply`;
-      submitLink.textContent = "Apply to unlock submission";
-      submitLink.classList.add("opacity-60");
     };
 
+    const loadApplicationStatus = async () => {
+      state.applicationStatus = "";
+      if (!slug) return;
+
+      try {
+        const rememberedEmail = window.localStorage.getItem("hatch.participant.email") || "";
+        const statusUrl = new URL(`/api/participants/events/${slug}/application-status`, window.location.origin);
+        if (organizerId) statusUrl.searchParams.set("organizerId", organizerId);
+        if (rememberedEmail) statusUrl.searchParams.set("email", rememberedEmail);
+
+        const response = await fetch(statusUrl.toString());
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) return;
+        state.applicationStatus = String(payload.application?.status || "").trim().toLowerCase();
+      } catch {
+        state.applicationStatus = "";
+      }
+    };
     const renderGallery = () => {
       if (!galleryEl) return;
 
@@ -1258,8 +1358,12 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
           participantEventId && participantEventId === String(state.event?.id || "")
             ? participantEmail
             : "";
+        if (state.participantEmail) {
+          queueWorkspaceOpen();
+        }
         renderParticipantAuth();
         updateSubmitCallToAction();
+        syncParticipantHeader();
         if (state.participantEmail) {
           await loadParticipantVotes();
           await loadWorkspace();
@@ -1276,9 +1380,32 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
         state.votedSubmissionIds = new Set();
         renderParticipantAuth();
         updateSubmitCallToAction();
+        syncParticipantHeader();
         state.workspace = null;
         toggleWorkspaceMode();
         renderGallery();
+      }
+    };
+
+    const bootstrapLoggedInUserAccess = async () => {
+      if (state.participantEmail || !slug) return false;
+
+      try {
+        const response = await fetch(`/api/participants/events/${slug}/auto-access${querySuffix}`, {
+          method: "POST"
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload?.ok) return false;
+
+        const email = String(payload.participant?.email || "").trim();
+        if (email) {
+          window.localStorage.setItem("hatch.participant.email", email);
+        }
+
+        await loadParticipant();
+        return Boolean(state.participantEmail);
+      } catch {
+        return false;
       }
     };
 
@@ -1433,7 +1560,7 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
         }
 
         contactLinks.forEach((link) => {
-          link.href = `mailto:${event.organizationName ? "hello@hatch.dev" : "hello@hatch.dev"}`;
+          link.href = `mailto:${String(event.organizerEmail || "").trim() || DEFAULT_CONTACT_EMAIL}`;
         });
 
         if (applyLink) applyLink.href = `${routeBase}/apply`;
@@ -1466,6 +1593,7 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
       state.votedSubmissionIds = new Set();
       renderParticipantAuth();
       updateSubmitCallToAction();
+      syncParticipantHeader();
       state.workspace = null;
       toggleWorkspaceMode();
       renderGallery();
@@ -1481,6 +1609,7 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
       state.votedSubmissionIds = new Set();
       renderParticipantAuth();
       updateSubmitCallToAction();
+      syncParticipantHeader();
       toggleWorkspaceMode();
     });
 
@@ -1506,6 +1635,12 @@ import HatchEggMark from "../../components/HatchEggMark.astro";
       updateEventStatus();
       window.setInterval(updateEventStatus, 60_000);
       await loadParticipant();
+      if (!state.participantEmail) {
+        await bootstrapLoggedInUserAccess();
+      }
+      await loadApplicationStatus();
+      renderParticipantAuth();
+      updateSubmitCallToAction();
     };
 
     init();

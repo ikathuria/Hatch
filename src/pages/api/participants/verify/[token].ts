@@ -2,34 +2,8 @@ import type { APIRoute } from "astro";
 import { getEnv } from "../../../../lib/server/env";
 import { hashParticipantSecret, createParticipantSession, createParticipantSessionCookie } from "../../../../lib/server/participant-auth";
 import { json } from "../../../../lib/server/responses";
-import { normalizeEmail, extractEmails } from "../../../../lib/server/email";
-
-const findEligibleEmail = async (env: ReturnType<typeof getEnv>, eventId: string, email: string) => {
-  const applications = await env.DB.prepare(
-    `SELECT email
-     FROM applications
-     WHERE event_id = ?`
-  )
-    .bind(eventId)
-    .all<{ email: string }>();
-
-  if ((applications.results ?? []).some((row) => normalizeEmail(row.email) === email)) {
-    return true;
-  }
-
-  const submissions = await env.DB.prepare(
-    `SELECT contact_email as contactEmail, members
-     FROM submissions
-     WHERE event_id = ?`
-  )
-    .bind(eventId)
-    .all<{ contactEmail: string; members: string | null }>();
-
-  return (submissions.results ?? []).some((row) => {
-    if (normalizeEmail(row.contactEmail) === email) return true;
-    return extractEmails(row.members ?? "").includes(email);
-  });
-};
+import { normalizeEmail } from "../../../../lib/server/email";
+import { getParticipantAccessState } from "../../../../lib/server/participant-workspace";
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -74,8 +48,14 @@ export const GET: APIRoute = async (context) => {
       return json({ error: "Event not found." }, 404);
     }
 
-    const eligible = await findEligibleEmail(env, link.eventId, normalizeEmail(link.email));
-    if (!eligible) {
+    const access = await getParticipantAccessState(env, link.eventId, normalizeEmail(link.email));
+    if (!access.allowed) {
+      if (access.reason === "pending-application") {
+        return json({ error: "Your application is still pending organizer review." }, 403);
+      }
+      if (access.reason === "rejected-application") {
+        return json({ error: "Your application was not approved." }, 403);
+      }
       return json({ error: "This participant is no longer eligible to verify access." }, 403);
     }
 

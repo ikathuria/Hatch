@@ -3,6 +3,7 @@ import { json } from "../../../../../lib/server/responses";
 import { getEnv } from "../../../../../lib/server/env";
 import { requireParticipantSession } from "../../../../../lib/server/participant-auth";
 import { extractEmails, normalizeEmail } from "../../../../../lib/server/email";
+import { getParticipantAccessState } from "../../../../../lib/server/participant-workspace";
 
 type VoteEmailColumn = "participant_email" | "normalized_email";
 
@@ -58,33 +59,6 @@ const isSelfVote = (participantEmail: string, submission: { contactEmail: string
   normalizeEmail(submission.contactEmail) === participantEmail ||
   extractEmails(submission.members ?? "").includes(participantEmail);
 
-const loadEligibility = async (env: ReturnType<typeof getEnv>, eventId: string, email: string) => {
-  const applications = await env.DB.prepare(
-    `SELECT email
-     FROM applications
-     WHERE event_id = ?`
-  )
-    .bind(eventId)
-    .all<{ email: string }>();
-
-  if ((applications.results ?? []).some((row) => normalizeEmail(row.email) === email)) {
-    return true;
-  }
-
-  const submissions = await env.DB.prepare(
-    `SELECT contact_email as contactEmail, members
-     FROM submissions
-     WHERE event_id = ?`
-  )
-    .bind(eventId)
-    .all<{ contactEmail: string; members: string | null }>();
-
-  return (submissions.results ?? []).some((row) => {
-    if (normalizeEmail(row.contactEmail) === email) return true;
-    return extractEmails(row.members ?? "").includes(email);
-  });
-};
-
 export const POST: APIRoute = async (context) => {
   try {
     const env = getEnv(context.locals);
@@ -112,7 +86,7 @@ export const POST: APIRoute = async (context) => {
     const { participant, response } = await requireParticipantSession(context.request, env, event.id);
     if (response) return response;
 
-    const participantEligible = await loadEligibility(env, event.id, normalizeEmail(participant!.email));
+    const participantEligible = (await getParticipantAccessState(env, event.id, normalizeEmail(participant!.email))).allowed;
     if (!participantEligible) {
       return json({ error: "This participant is no longer eligible to vote." }, 403);
     }
@@ -172,6 +146,10 @@ export const GET: APIRoute = async (context) => {
     if (response) return response;
 
     const participantEmail = normalizeEmail(participant!.email);
+    const participantEligible = (await getParticipantAccessState(env, event.id, participantEmail)).allowed;
+    if (!participantEligible) {
+      return json({ error: "This participant is no longer eligible to access votes." }, 403);
+    }
     const voteEmailColumn = await detectVoteEmailColumn(env);
     if (!voteEmailColumn) {
       return json({ error: "Vote identity column is misconfigured." }, 500);
@@ -228,6 +206,10 @@ export const DELETE: APIRoute = async (context) => {
     if (!submissionId) return json({ error: "Missing submission id." }, 400);
 
     const participantEmail = normalizeEmail(participant!.email);
+    const participantEligible = (await getParticipantAccessState(env, event.id, participantEmail)).allowed;
+    if (!participantEligible) {
+      return json({ error: "This participant is no longer eligible to update votes." }, 403);
+    }
     const voteEmailColumn = await detectVoteEmailColumn(env);
     if (!voteEmailColumn) {
       return json({ error: "Vote identity column is misconfigured." }, 500);

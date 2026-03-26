@@ -12,6 +12,10 @@ import {
   type SubmissionRow,
   type VoteCountRow
 } from "../../../lib/server/judging";
+import {
+  parseApplicationFormFields,
+  parseParticipantLocations
+} from "../../../lib/server/application-config";
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -27,31 +31,35 @@ export const GET: APIRoute = async (context) => {
     let event: Record<string, unknown> | null = null;
     if (organizerId) {
       event = await env.DB.prepare(
-        `SELECT id, organizer_id as organizerId, slug, title, tagline, description, start_date as startDate, end_date as endDate,
-          location, mode, organization_name as organizationName, website_url as websiteUrl,
+        `SELECT events.id, events.organizer_id as organizerId, events.slug, events.title, events.tagline, events.description, events.start_date as startDate, events.end_date as endDate,
+          location, participant_location_options as participantLocationOptions, application_form_fields as applicationFormFieldsRaw, mode, organization_name as organizationName, website_url as websiteUrl,
           twitter_url as twitterUrl, discord_url as discordUrl, max_participants as maxParticipants,
           application_deadline as applicationDeadline, theme,
           banner_url as bannerUrl, results_status as resultsStatus,
-          results_published_at as resultsPublishedAt, is_published as isPublished
+          results_published_at as resultsPublishedAt, is_published as isPublished,
+          organizers.email as organizerEmail
          FROM events
-         WHERE slug = ?
-           AND organizer_id = ?
-           AND (is_published = 1 OR organizer_id = ?)`
+         JOIN organizers ON organizers.id = events.organizer_id
+         WHERE events.slug = ?
+           AND events.organizer_id = ?
+           AND (events.is_published = 1 OR events.organizer_id = ?)`
       )
         .bind(slug, organizerId, organizer?.id ?? "")
         .first<Record<string, unknown>>();
     } else {
       const matches = await env.DB.prepare(
-        `SELECT id, organizer_id as organizerId, slug, title, tagline, description, start_date as startDate, end_date as endDate,
-          location, mode, organization_name as organizationName, website_url as websiteUrl,
+        `SELECT events.id, events.organizer_id as organizerId, events.slug, events.title, events.tagline, events.description, events.start_date as startDate, events.end_date as endDate,
+          location, participant_location_options as participantLocationOptions, application_form_fields as applicationFormFieldsRaw, mode, organization_name as organizationName, website_url as websiteUrl,
           twitter_url as twitterUrl, discord_url as discordUrl, max_participants as maxParticipants,
           application_deadline as applicationDeadline, theme,
           banner_url as bannerUrl, results_status as resultsStatus,
-          results_published_at as resultsPublishedAt, is_published as isPublished
+          results_published_at as resultsPublishedAt, is_published as isPublished,
+          organizers.email as organizerEmail
          FROM events
-         WHERE slug = ?
-           AND (is_published = 1 OR organizer_id = ?)
-         ORDER BY is_published DESC, created_at DESC`
+         JOIN organizers ON organizers.id = events.organizer_id
+         WHERE events.slug = ?
+           AND (events.is_published = 1 OR events.organizer_id = ?)
+         ORDER BY events.is_published DESC, events.created_at DESC`
       )
         .bind(slug, organizer?.id ?? "")
         .all<Record<string, unknown>>();
@@ -204,7 +212,11 @@ export const GET: APIRoute = async (context) => {
     }
 
     return json({
-      event,
+      event: {
+        ...event,
+        participantLocations: parseParticipantLocations(event.participantLocationOptions),
+        applicationFormFields: parseApplicationFormFields(event.applicationFormFieldsRaw)
+      },
       tracks: tracks.results ?? [],
       faqs: faqs.results ?? [],
       resultsPublished,

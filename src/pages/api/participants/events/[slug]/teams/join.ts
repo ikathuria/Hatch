@@ -10,6 +10,26 @@ import {
 } from "../../../../../../lib/server/participant-workspace";
 import { normalizeEmail } from "../../../../../../lib/server/email";
 
+const getTeamJoinError = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  if (
+    message.includes(
+      "UNIQUE constraint failed: participant_team_members.event_id, participant_team_members.participant_email"
+    )
+  ) {
+    return { error: "You are already on a team for this event.", status: 409 };
+  }
+  if (
+    message.includes(
+      "UNIQUE constraint failed: participant_team_members.team_id, participant_team_members.participant_email"
+    )
+  ) {
+    return { error: "You are already on this team.", status: 409 };
+  }
+
+  return null;
+};
+
 export const POST: APIRoute = async (context) => {
   try {
     const env = getEnv(context.locals);
@@ -56,24 +76,26 @@ export const POST: APIRoute = async (context) => {
     const normalizedEmail = normalizeEmail(participant.email);
     const displayName = await getParticipantDisplayName(env, event.id, normalizedEmail);
 
-    await env.DB.prepare(
-      `INSERT INTO participant_team_members
-      (id, event_id, team_id, participant_email, display_name, created_at)
-      VALUES (?, ?, ?, ?, ?, datetime('now'))`
-    )
-      .bind(crypto.randomUUID(), event.id, team.id, normalizedEmail, displayName)
-      .run();
-
-    await env.DB.prepare(
-      `UPDATE participant_teams
-       SET updated_at = datetime('now')
-       WHERE id = ?`
-    )
-      .bind(team.id)
-      .run();
+    await env.DB.batch([
+      env.DB.prepare(
+        `INSERT INTO participant_team_members
+        (id, event_id, team_id, participant_email, display_name, created_at)
+        VALUES (?, ?, ?, ?, ?, datetime('now'))`
+      ).bind(crypto.randomUUID(), event.id, team.id, normalizedEmail, displayName),
+      env.DB.prepare(
+        `UPDATE participant_teams
+         SET updated_at = datetime('now')
+         WHERE id = ?`
+      ).bind(team.id)
+    ]);
 
     return json({ ok: true, teamId: team.id });
-  } catch {
+  } catch (error) {
+    const mapped = getTeamJoinError(error);
+    if (mapped) {
+      return json({ error: mapped.error }, mapped.status);
+    }
+
     return json({ error: "Unable to join team." }, 500);
   }
 };

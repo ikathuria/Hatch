@@ -99,6 +99,15 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
               <label class="form-label">Location</label>
               <input class="input-field" name="location" placeholder="City, venue, or Remote" />
             </div>
+            <div class="space-y-2 md:col-span-2">
+              <label class="form-label">Participant location options</label>
+              <textarea
+                class="input-field min-h-32"
+                name="participantLocations"
+                placeholder="San Francisco&#10;New York City&#10;Online"
+              ></textarea>
+              <p class="text-xs text-cream/40">One option per line for the application dropdown.</p>
+            </div>
             <div class="space-y-2">
               <label class="form-label">Format</label>
               <select class="input-field" name="mode">
@@ -298,6 +307,10 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         applicationDeadline: applicationDeadline || "",
         organizationName: form.organizationName?.value?.trim() || "",
         location: form.location?.value?.trim() || "",
+        participantLocations: String(form.participantLocations?.value || "")
+          .split(/\r?\n/)
+          .map((value) => value.trim())
+          .filter(Boolean),
         mode: form.mode?.value || "Hybrid",
         maxParticipants: maxParticipantsRaw === "" || !Number.isFinite(parsedMax) ? null : parsedMax,
         bannerUrl: form.bannerUrl?.value?.trim() || "",
@@ -340,4 +353,3 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     });
   </script>
 </BaseLayout>
-

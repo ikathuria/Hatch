@@ -11,6 +11,29 @@ import {
 } from "../../../../../lib/server/participant-workspace";
 import { normalizeEmail } from "../../../../../lib/server/email";
 
+const getTeamMutationError = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  if (message.includes("UNIQUE constraint failed: participant_teams.event_id, participant_teams.name")) {
+    return { error: "That team name is already taken.", status: 409 };
+  }
+  if (
+    message.includes(
+      "UNIQUE constraint failed: participant_team_members.event_id, participant_team_members.participant_email"
+    )
+  ) {
+    return { error: "You are already on a team for this event.", status: 409 };
+  }
+  if (
+    message.includes(
+      "UNIQUE constraint failed: participant_team_members.team_id, participant_team_members.participant_email"
+    )
+  ) {
+    return { error: "You are already on this team.", status: 409 };
+  }
+
+  return null;
+};
+
 export const POST: APIRoute = async (context) => {
   try {
     const env = getEnv(context.locals);
@@ -60,24 +83,26 @@ export const POST: APIRoute = async (context) => {
     const normalizedEmail = normalizeEmail(participant.email);
     const displayName = await getParticipantDisplayName(env, event.id, normalizedEmail);
 
-    await env.DB.prepare(
-      `INSERT INTO participant_teams
-      (id, event_id, name, join_code, created_by_email, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
-    )
-      .bind(teamId, event.id, name, joinCode, normalizedEmail)
-      .run();
-
-    await env.DB.prepare(
-      `INSERT INTO participant_team_members
-      (id, event_id, team_id, participant_email, display_name, created_at)
-      VALUES (?, ?, ?, ?, ?, datetime('now'))`
-    )
-      .bind(memberId, event.id, teamId, normalizedEmail, displayName)
-      .run();
+    await env.DB.batch([
+      env.DB.prepare(
+        `INSERT INTO participant_teams
+        (id, event_id, name, join_code, created_by_email, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+      ).bind(teamId, event.id, name, joinCode, normalizedEmail),
+      env.DB.prepare(
+        `INSERT INTO participant_team_members
+        (id, event_id, team_id, participant_email, display_name, created_at)
+        VALUES (?, ?, ?, ?, ?, datetime('now'))`
+      ).bind(memberId, event.id, teamId, normalizedEmail, displayName)
+    ]);
 
     return json({ ok: true, teamId });
-  } catch {
+  } catch (error) {
+    const mapped = getTeamMutationError(error);
+    if (mapped) {
+      return json({ error: mapped.error }, mapped.status);
+    }
+
     return json({ error: "Unable to create team." }, 500);
   }
 };

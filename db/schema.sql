@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS events (
   start_date TEXT,
   end_date TEXT,
   location TEXT,
+  participant_location_options TEXT,
+  application_form_fields TEXT,
   mode TEXT,
   organization_name TEXT,
   website_url TEXT,
@@ -72,6 +74,12 @@ CREATE TABLE IF NOT EXISTS applications (
   track TEXT,
   team_status TEXT,
   idea TEXT,
+  linkedin_url TEXT,
+  github_url TEXT,
+  status TEXT NOT NULL DEFAULT 'pending',
+  reviewed_at TEXT,
+  reviewed_by_organizer_id TEXT,
+  custom_answers TEXT,
   consent INTEGER NOT NULL,
   FOREIGN KEY (event_id) REFERENCES events(id)
 );

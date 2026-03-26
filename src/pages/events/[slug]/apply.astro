@@ -17,7 +17,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           <span class="eyebrow !border-lime/20 !bg-lime/10 !text-lime">Participant application</span>
         </div>
         <h1 class="text-4xl font-bold tracking-tight md:text-5xl" data-event-title>Apply to participate</h1>
-        <p class="text-cream/55" data-event-tagline>Tell organizers who you are and what you want to build.</p>
+        <p class="text-cream/55" data-event-tagline>Tell organizers who you are and give them enough context to review your application.</p>
       </div>
 
       <form class="space-y-8" data-form>
@@ -33,36 +33,12 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           </label>
 
           <label class="space-y-2">
-            <span class="form-label">Organization</span>
-            <input class="input-field" name="organization" placeholder="School, company, or community" />
-          </label>
-
-          <label class="space-y-2">
-            <span class="form-label">Primary role <span class="text-coral">*</span></span>
-            <select class="input-field" name="role" required>
-              <option value="">Select role</option>
-              <option>Developer</option>
-              <option>Designer</option>
-              <option>Product / Business</option>
-              <option>AI / Data</option>
-              <option>Other</option>
+            <span class="form-label">Location <span class="text-coral">*</span></span>
+            <select class="input-field" name="location" required data-location-select>
+              <option value="">Select location</option>
             </select>
           </label>
 
-          <label class="space-y-2">
-            <span class="form-label">Track <span class="text-coral">*</span></span>
-            <select class="input-field" name="track" required data-track-select>
-              <option value="">Select track</option>
-            </select>
-          </label>
-
-          <label class="space-y-2">
-            <span class="form-label">Location / time zone</span>
-            <input class="input-field" name="location" placeholder="Chicago, IL (UTC-6)" />
-          </label>
-        </div>
-
-        <div class="space-y-6 border-t border-cream/10 pt-6">
           <label class="space-y-2">
             <span class="form-label">Team status <span class="text-coral">*</span></span>
             <select class="input-field" name="teamStatus" required>
@@ -74,9 +50,18 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
           </label>
 
           <label class="space-y-2">
-            <span class="form-label">Project idea (optional)</span>
-            <textarea class="input-field" name="idea" rows="4" placeholder="What would you like to build?"></textarea>
+            <span class="form-label">LinkedIn <span class="text-coral">*</span></span>
+            <input class="input-field" name="linkedinUrl" required placeholder="https://linkedin.com/in/your-profile" />
           </label>
+
+          <label class="space-y-2">
+            <span class="form-label">GitHub <span class="text-coral">*</span></span>
+            <input class="input-field" name="githubUrl" required placeholder="https://github.com/your-handle" />
+          </label>
+        </div>
+
+        <div class="space-y-6 border-t border-cream/10 pt-6">
+          <div class="hidden space-y-6" data-custom-fields></div>
 
           <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-cream/10 bg-cream/5 p-4">
             <input type="checkbox" name="consent" required class="mt-1 h-5 w-5 rounded accent-lime" />
@@ -110,7 +95,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     const status = document.querySelector("[data-status]");
     const titleEl = document.querySelector("[data-event-title]");
     const taglineEl = document.querySelector("[data-event-tagline]");
-    const trackSelect = document.querySelector("[data-track-select]");
+    const locationSelect = document.querySelector("[data-location-select]");
+    const customFieldsEl = document.querySelector("[data-custom-fields]");
     const button = form?.querySelector("button[type='submit']");
     const defaultLabel = button?.textContent || "Submit application";
     const fullNameInput = form?.querySelector("input[name='fullName']");
@@ -119,6 +105,19 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
     if (backLink) backLink.href = routeBase;
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const slugify = (value) =>
+      String(value || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    const escapeHtml = (value) =>
+      String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 
     const setStatus = (message, tone = "") => {
       if (!status) return;
@@ -173,22 +172,92 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       }
     };
 
+    const renderCustomFields = (fields) => {
+      if (!customFieldsEl) return;
+      if (!Array.isArray(fields) || fields.length === 0) {
+        customFieldsEl.innerHTML = "";
+        customFieldsEl.classList.add("hidden");
+        return;
+      }
+
+      customFieldsEl.classList.remove("hidden");
+      customFieldsEl.innerHTML = fields
+        .map((field, index) => {
+          const fieldId = slugify(field?.id || field?.label || `question-${index + 1}`);
+          const label = String(field?.label || "").trim();
+          const helper = String(field?.helperText || "").trim();
+          const required = Boolean(field?.required);
+          const requiredAttr = required ? "required" : "";
+          const requiredMark = required ? '<span class="text-coral">*</span>' : "";
+
+          if (String(field?.type || "text") === "textarea") {
+            return `
+              <label class="space-y-2">
+                <span class="form-label">${escapeHtml(label)} ${requiredMark}</span>
+                ${helper ? `<span class="block text-sm text-cream/45">${escapeHtml(helper)}</span>` : ""}
+                <textarea class="input-field" name="customField:${fieldId}" rows="4" ${requiredAttr}></textarea>
+              </label>
+            `;
+          }
+
+          if (String(field?.type || "text") === "select") {
+            const options = Array.isArray(field?.options) ? field.options : [];
+            return `
+              <label class="space-y-2">
+                <span class="form-label">${escapeHtml(label)} ${requiredMark}</span>
+                ${helper ? `<span class="block text-sm text-cream/45">${escapeHtml(helper)}</span>` : ""}
+                <select class="input-field" name="customField:${fieldId}" ${requiredAttr}>
+                  <option value="">Select an option</option>
+                  ${options
+                    .map((option) => `<option value="${escapeHtml(option)}">${escapeHtml(option)}</option>`)
+                    .join("")}
+                </select>
+              </label>
+            `;
+          }
+
+          return `
+            <label class="space-y-2">
+              <span class="form-label">${escapeHtml(label)} ${requiredMark}</span>
+              ${helper ? `<span class="block text-sm text-cream/45">${escapeHtml(helper)}</span>` : ""}
+              <input class="input-field" name="customField:${fieldId}" ${requiredAttr} />
+            </label>
+          `;
+        })
+        .join("");
+    };
+
     const loadEvent = async () => {
       try {
         const response = await fetch(`/api/events/${slug}${querySuffix}`);
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(payload.error || "Event not found.");
-        const { event, tracks } = payload;
+        const { event } = payload;
         if (titleEl) titleEl.textContent = `Apply to ${event.title}`;
         if (taglineEl) taglineEl.textContent = event.tagline || "";
-        if (trackSelect) {
-          trackSelect.innerHTML = '<option value="">Select track</option>';
-          tracks.forEach((track) => {
+        renderCustomFields(Array.isArray(event?.applicationFormFields) ? event.applicationFormFields : []);
+        if (locationSelect) {
+          const configuredLocations = Array.isArray(event?.participantLocations)
+            ? event.participantLocations
+            : [];
+          const availableLocations =
+            configuredLocations.length > 0
+              ? configuredLocations
+              : event?.location
+                ? [event.location]
+                : [];
+
+          locationSelect.innerHTML = '<option value="">Select location</option>';
+          availableLocations.forEach((location) => {
             const option = document.createElement("option");
-            option.value = track.name;
-            option.textContent = track.name;
-            trackSelect.appendChild(option);
+            option.value = location;
+            option.textContent = location;
+            locationSelect.appendChild(option);
           });
+          if (availableLocations.length === 0 && button) {
+            button.disabled = true;
+            setStatus("Organizer needs to add participant locations before applications can open.", "!text-coral");
+          }
         }
         await prefillIdentity(event?.id || "");
       } catch {
@@ -242,7 +311,7 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
         }
         window.setTimeout(() => {
           window.location.href = routeBase;
-        }, 900);
+        }, 1100);
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to submit application.";
         setStatus(message, "!text-coral");

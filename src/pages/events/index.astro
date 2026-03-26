@@ -69,7 +69,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const countEl = document.querySelector("[data-events-count]");
     const resetBtn = document.querySelector("[data-events-reset]");
     const state = {
-      events: []
+      events: [],
+      participantEventId: "",
+      participantEmail: ""
     };
 
     const escapeHtml = (value) =>
@@ -168,7 +170,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           const tagline = escapeHtml(event.tagline || "No tagline yet.");
           const slug = escapeHtml(event.slug || "");
           const organizerId = escapeHtml(event.organizerId || "");
-          const href = organizerId ? `/events/${organizerId}/${slug}` : `/events/${slug}`;
+          const baseHref = organizerId ? `/events/${organizerId}/${slug}` : `/events/${slug}`;
+          const participantStatus = String(event.participantStatus || "").trim().toLowerCase();
+          const opensHackerSpace =
+            String(event.id || "") === state.participantEventId &&
+            (participantStatus === "approved" || participantStatus === "existing-submission");
+          const href = opensHackerSpace ? `${baseHref}#hacker-space` : baseHref;
           const location = escapeHtml(event.location || "Location TBD");
           const mode = escapeHtml(event.mode || "Hackathon");
           const start = formatDate(event.startDate);
@@ -187,7 +194,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               </div>
               <div class="text-xs uppercase tracking-widest text-cream/40">${escapeHtml(range)}</div>
               <a class="btn-primary !w-full justify-center" href="${href}">
-                Open Event
+                ${opensHackerSpace ? "Open Attendee Hub" : "Open Event"}
               </a>
             </article>
           `;
@@ -230,6 +237,19 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }
     };
 
+    const loadParticipantSession = async () => {
+      try {
+        const response = await fetch("/api/participants/me");
+        const payload = await response.json().catch(() => ({ participant: null }));
+        if (!response.ok) throw new Error("Unable to load participant session.");
+        state.participantEventId = String(payload.participant?.eventId || "");
+        state.participantEmail = String(payload.participant?.email || "").trim().toLowerCase();
+      } catch {
+        state.participantEventId = "";
+        state.participantEmail = "";
+      }
+    };
+
     searchInput?.addEventListener("input", rerender);
     modeSelect?.addEventListener("change", rerender);
     statusSelect?.addEventListener("change", rerender);
@@ -242,6 +262,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       rerender();
     });
 
-    loadEvents();
+    const init = async () => {
+      await Promise.all([loadParticipantSession(), loadEvents()]);
+      rerender();
+    };
+
+    init();
   </script>
 </BaseLayout>

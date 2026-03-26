@@ -21,7 +21,7 @@ export const GET: APIRoute = async (context) => {
     if (!event) return text("Event not found.", 404);
 
     const { results } = await env.DB.prepare(
-      `SELECT created_at, full_name, email, organization, role, location, track, team_status, idea, consent
+      `SELECT created_at, full_name, email, location, linkedin_url, github_url, team_status, status, custom_answers, reviewed_at, consent
        FROM applications WHERE event_id = ? ORDER BY created_at DESC`
     )
       .bind(id)
@@ -31,12 +31,13 @@ export const GET: APIRoute = async (context) => {
       "created_at",
       "full_name",
       "email",
-      "organization",
-      "role",
       "location",
-      "track",
+      "linkedin_url",
+      "github_url",
       "team_status",
-      "idea",
+      "status",
+      "custom_answers",
+      "reviewed_at",
       "consent"
     ];
     const csv = toCsv(results ?? [], headers);

@@ -3,9 +3,11 @@ import { getEnv } from "../../../../../lib/server/env";
 import { json } from "../../../../../lib/server/responses";
 import { requireParticipantSession } from "../../../../../lib/server/participant-auth";
 import {
+  loadLatestParticipantApplication,
   getParticipantDisplayName,
   isParticipantEligibleForEvent,
   loadParticipantTeam,
+  loadParticipantSubmission,
   loadTeamDirectory,
   resolvePublishedEventForParticipant
 } from "../../../../../lib/server/participant-workspace";
@@ -31,21 +33,17 @@ export const GET: APIRoute = async (context) => {
       return json({ error: "This participant is not eligible for this workspace." }, 403);
     }
 
-    const application = await env.DB.prepare(
-      `SELECT full_name as fullName, track, team_status as teamStatus, idea
-       FROM applications
-       WHERE event_id = ? AND lower(trim(email)) = ?
-       ORDER BY created_at DESC
-       LIMIT 1`
-    )
-      .bind(event.id, normalizeEmail(participant.email))
-      .first<{ fullName: string | null; track: string | null; teamStatus: string | null; idea: string | null }>();
+    const application = await loadLatestParticipantApplication(
+      env,
+      event.id,
+      normalizeEmail(participant.email)
+    );
 
     const tracks = await env.DB.prepare(
       `SELECT name, description, prize
        FROM event_tracks
        WHERE event_id = ?
-       ORDER BY created_at ASC`
+       ORDER BY name COLLATE NOCASE ASC`
     )
       .bind(event.id)
       .all<{ name: string; description: string | null; prize: string | null }>();
@@ -54,53 +52,23 @@ export const GET: APIRoute = async (context) => {
     const teams = await loadTeamDirectory(env, event.id);
     const participantDisplayName = await getParticipantDisplayName(env, event.id, participant.email);
 
-    let submission:
-      | {
-          id: string;
-          projectName: string;
-          description: string;
-          track: string;
-          repoUrl: string | null;
-          demoUrl: string | null;
-          deckUrl: string | null;
-          createdAt: string;
-        }
-      | null = null;
-
-    if (team?.id) {
-      submission = await env.DB.prepare(
-        `SELECT id, project_name as projectName, description, track,
-          repo_url as repoUrl, demo_url as demoUrl, deck_url as deckUrl,
-          created_at as createdAt
-         FROM submissions
-         WHERE event_id = ? AND team_id = ?
-         ORDER BY created_at DESC
-         LIMIT 1`
-      )
-        .bind(event.id, team.id)
-        .first<typeof submission>();
-    } else {
-      submission = await env.DB.prepare(
-        `SELECT id, project_name as projectName, description, track,
-          repo_url as repoUrl, demo_url as demoUrl, deck_url as deckUrl,
-          created_at as createdAt
-         FROM submissions
-         WHERE event_id = ? AND lower(trim(contact_email)) = ?
-         ORDER BY created_at DESC
-         LIMIT 1`
-      )
-        .bind(event.id, normalizeEmail(participant.email))
-        .first<typeof submission>();
-    }
+    const submission = await loadParticipantSubmission(
+      env,
+      event.id,
+      participant.email,
+      team?.id ?? null
+    );
 
     return json({
       workspace: {
         participant: {
           email: normalizeEmail(participant.email),
           displayName: participantDisplayName,
-          applicationTrack: String(application?.track || "").trim(),
+          location: String(application?.location || "").trim(),
           teamStatus: String(application?.teamStatus || "").trim(),
-          idea: String(application?.idea || "").trim()
+          linkedinUrl: String(application?.linkedinUrl || "").trim(),
+          githubUrl: String(application?.githubUrl || "").trim(),
+          customAnswers: application?.customAnswers || {}
         },
         event,
         tracks: tracks.results ?? [],
@@ -110,6 +78,6 @@ export const GET: APIRoute = async (context) => {
       }
     });
   } catch {
-    return json({ error: "Unable to load hacker space." }, 500);
+    return json({ error: "Unable to load Attendee Hub." }, 500);
   }
 };

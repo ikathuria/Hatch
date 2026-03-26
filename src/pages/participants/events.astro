@@ -1,0 +1,159 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="My Events | Hatch">
+  <section class="mx-auto max-w-6xl px-6 py-12 space-y-10">
+    <div class="space-y-4">
+      <span class="eyebrow !text-lime !bg-lime/10 !border-lime/20">Participant</span>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">My Events</h1>
+      <p class="text-cream/55 max-w-3xl leading-relaxed" data-participant-events-subtitle>
+        Loading your registered events...
+      </p>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-participant-events-grid>
+      <div class="card !p-10 text-cream/35 italic border-dashed col-span-full">
+        Loading your events...
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const grid = document.querySelector("[data-participant-events-grid]");
+    const subtitleEl = document.querySelector("[data-participant-events-subtitle]");
+
+    const escapeHtml = (value) =>
+      String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    const formatDate = (value) => {
+      if (!value) return "TBD";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return new Intl.DateTimeFormat(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      }).format(date);
+    };
+
+    const getStatusLabel = (event) => {
+      if (event.hasSubmission) return "Project submitted";
+      if (event.applicationStatus === "approved") return "Approved";
+      if (event.applicationStatus === "pending") return "Pending review";
+      if (event.applicationStatus === "rejected") return "Not approved";
+      return "Registered";
+    };
+
+    const getStatusClass = (event) => {
+      if (event.hasSubmission || event.applicationStatus === "approved") {
+        return "!bg-lime/10 !text-lime !border-lime/20";
+      }
+      if (event.applicationStatus === "rejected") {
+        return "!bg-coral/10 !text-coral !border-coral/20";
+      }
+      return "!bg-sky/10 !text-sky !border-sky/20";
+    };
+
+    const renderEvents = (events) => {
+      if (!grid) return;
+
+      if (!Array.isArray(events) || events.length === 0) {
+        grid.innerHTML = `
+          <div class="card !p-10 text-cream/35 italic border-dashed col-span-full">
+            You have not registered for any events yet.
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = events
+        .map((event) => {
+          const cta = event.href
+            ? `<a class="btn-primary !w-full justify-center" href="${escapeHtml(event.href)}">${
+                event.canOpenHub ? "Open Attendee Hub" : "Open Event"
+              }</a>`
+            : '<span class="text-xs uppercase tracking-widest text-cream/35">Not published yet</span>';
+
+          return `
+            <article class="card !p-8 flex flex-col gap-6">
+              <div class="flex items-center justify-between gap-3">
+                <span class="status-pill ${getStatusClass(event)}">${escapeHtml(getStatusLabel(event))}</span>
+                <span class="text-xs uppercase tracking-widest text-cream/35">${escapeHtml(
+                  event.mode || "Hackathon"
+                )}</span>
+              </div>
+              <div class="space-y-2">
+                <h2 class="text-2xl font-bold tracking-tight">${escapeHtml(event.title || "Untitled event")}</h2>
+                <p class="text-sm text-cream/55 leading-relaxed">${escapeHtml(
+                  event.tagline || event.organizationName || "No tagline yet."
+                )}</p>
+              </div>
+              <div class="space-y-2 text-sm text-cream/55">
+                <p>${escapeHtml(event.location || "Location TBD")}</p>
+                <p>${escapeHtml(`${formatDate(event.startDate)} - ${formatDate(event.endDate)}`)}</p>
+                ${
+                  event.projectName
+                    ? `<p>Project: ${escapeHtml(event.projectName)}</p>`
+                    : event.appliedAt
+                      ? `<p>Applied: ${escapeHtml(formatDate(event.appliedAt))}</p>`
+                      : ""
+                }
+              </div>
+              ${cta}
+            </article>
+          `;
+        })
+        .join("");
+    };
+
+    const loadParticipantEvents = async () => {
+      if (!grid) return;
+
+      try {
+        const response = await fetch("/api/participants/events");
+        const payload = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          if (subtitleEl) {
+            subtitleEl.textContent =
+              "Open attendee access from any event to see all of your registered events here.";
+          }
+          grid.innerHTML = `
+            <div class="card !p-10 text-cream/40 border-dashed col-span-full space-y-4">
+              <p>Participant sign-in is required before we can show your events.</p>
+              <a class="btn-primary !w-fit" href="/events">Browse Events</a>
+            </div>
+          `;
+          return;
+        }
+        if (!response.ok) {
+          throw new Error(payload.error || "Unable to load your events.");
+        }
+
+        if (subtitleEl) {
+          const email = String(payload.participant?.email || "").trim();
+          subtitleEl.textContent = email
+            ? `Signed in as ${email}. Here are the events you have registered for.`
+            : "Here are the events you have registered for.";
+        }
+
+        renderEvents(Array.isArray(payload.events) ? payload.events : []);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to load your events.";
+        if (subtitleEl) subtitleEl.textContent = message;
+        grid.innerHTML = `
+          <div class="card !p-10 text-coral italic border-coral/20 col-span-full">
+            ${escapeHtml(message)}
+          </div>
+        `;
+      }
+    };
+
+    loadParticipantEvents();
+  </script>
+</BaseLayout>

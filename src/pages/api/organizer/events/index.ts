@@ -4,6 +4,10 @@ import { json } from "../../../../lib/server/responses";
 import { getEnv } from "../../../../lib/server/env";
 import { normalizeSlug, slugPattern } from "../../../../lib/server/validation";
 import { isTrustedBannerReference } from "../../../../lib/server/upload-banner";
+import {
+  normalizeApplicationFormFields,
+  normalizeParticipantLocations
+} from "../../../../lib/server/application-config";
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -41,6 +45,8 @@ export const POST: APIRoute = async (context) => {
     const mode = String(payload.mode || "Hybrid").trim();
     const organizationName = String(payload.organizationName || "").trim();
     const location = String(payload.location || "").trim();
+    const participantLocations = normalizeParticipantLocations(payload.participantLocations);
+    const applicationFormFields = normalizeApplicationFormFields(payload.applicationFormFields);
     const applicationDeadline = String(payload.applicationDeadline || "").trim();
     const theme = String(payload.theme || "").trim();
     const websiteUrl = String(payload.websiteUrl || "").trim();
@@ -81,10 +87,11 @@ export const POST: APIRoute = async (context) => {
     await env.DB.prepare(
       `INSERT INTO events (
         id, organizer_id, created_at, updated_at, slug, title, tagline, description,
-        start_date, end_date, mode, organization_name, location,
+        start_date, end_date, mode, organization_name, location, participant_location_options,
+        application_form_fields,
         website_url, twitter_url, discord_url, max_participants,
         application_deadline, theme, banner_url, is_published
-      ) VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
       .bind(
         eventId,
@@ -98,6 +105,8 @@ export const POST: APIRoute = async (context) => {
         mode,
         organizationName,
         location,
+        JSON.stringify(participantLocations),
+        JSON.stringify(applicationFormFields),
         websiteUrl,
         twitterUrl,
         discordUrl,
@@ -120,6 +129,8 @@ export const POST: APIRoute = async (context) => {
           startDate,
           endDate,
           location,
+          participantLocations,
+          applicationFormFields,
           mode,
           applicationDeadline,
           isPublished: Boolean(isPublished)

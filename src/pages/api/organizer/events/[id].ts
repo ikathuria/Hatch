@@ -4,6 +4,12 @@ import { json } from "../../../../lib/server/responses";
 import { getEnv } from "../../../../lib/server/env";
 import { normalizeSlug, slugPattern } from "../../../../lib/server/validation";
 import { isTrustedBannerReference } from "../../../../lib/server/upload-banner";
+import {
+  normalizeApplicationFormFields,
+  normalizeParticipantLocations,
+  parseApplicationFormFields,
+  parseParticipantLocations
+} from "../../../../lib/server/application-config";
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -16,7 +22,7 @@ export const GET: APIRoute = async (context) => {
 
     const event = await env.DB.prepare(
       `SELECT id, organizer_id as organizerId, slug, title, tagline, description, start_date as startDate, end_date as endDate,
-        location, mode, organization_name as organizationName, website_url as websiteUrl,
+        location, participant_location_options as participantLocationOptions, application_form_fields as applicationFormFieldsRaw, mode, organization_name as organizationName, website_url as websiteUrl,
         twitter_url as twitterUrl, discord_url as discordUrl, max_participants as maxParticipants,
         application_deadline as applicationDeadline, theme,
         banner_url as bannerUrl, is_published as isPublished
@@ -40,7 +46,11 @@ export const GET: APIRoute = async (context) => {
       .all();
 
     return json({
-      event,
+      event: {
+        ...event,
+        participantLocations: parseParticipantLocations(event.participantLocationOptions),
+        applicationFormFields: parseApplicationFormFields(event.applicationFormFieldsRaw)
+      },
       tracks: tracks.results ?? [],
       faqs: faqs.results ?? []
     });
@@ -66,6 +76,8 @@ export const PUT: APIRoute = async (context) => {
     const startDate = String(payload.startDate || "").trim();
     const endDate = String(payload.endDate || "").trim();
     const location = String(payload.location || "").trim();
+    const participantLocations = normalizeParticipantLocations(payload.participantLocations);
+    const applicationFormFields = normalizeApplicationFormFields(payload.applicationFormFields);
     const mode = String(payload.mode || "").trim();
     const organizationName = String(payload.organizationName || "").trim();
     const websiteUrl = String(payload.websiteUrl || "").trim();
@@ -103,7 +115,7 @@ export const PUT: APIRoute = async (context) => {
     const update = await env.DB.prepare(
       `UPDATE events SET
         slug = ?, title = ?, tagline = ?, description = ?, start_date = ?, end_date = ?,
-        location = ?, mode = ?, organization_name = ?, website_url = ?, twitter_url = ?,
+        location = ?, participant_location_options = ?, application_form_fields = ?, mode = ?, organization_name = ?, website_url = ?, twitter_url = ?,
         discord_url = ?, max_participants = ?, application_deadline = ?, theme = ?,
         banner_url = ?, is_published = ?, updated_at = datetime('now')
        WHERE id = ? AND organizer_id = ?`
@@ -116,6 +128,8 @@ export const PUT: APIRoute = async (context) => {
         startDate,
         endDate,
         location,
+        JSON.stringify(participantLocations),
+        JSON.stringify(applicationFormFields),
         mode,
         organizationName,
         websiteUrl,
@@ -180,6 +194,8 @@ export const PUT: APIRoute = async (context) => {
         startDate,
         endDate,
         location,
+        participantLocations,
+        applicationFormFields,
         mode,
         organizationName,
         websiteUrl,

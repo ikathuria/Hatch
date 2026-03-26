@@ -59,6 +59,9 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
           <button class="btn-ghost !px-4 !py-2 !text-xs uppercase tracking-widest" type="button" data-tab-btn data-tab-id="faq">
             <span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-coral/90" data-tab-dot data-tab-dot-id="faq"></span>FAQ</span>
           </button>
+          <button class="btn-ghost !px-4 !py-2 !text-xs uppercase tracking-widest" type="button" data-tab-btn data-tab-id="applications">
+            <span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-coral/90" data-tab-dot data-tab-dot-id="applications"></span>Applications</span>
+          </button>
           <button class="btn-ghost !px-4 !py-2 !text-xs uppercase tracking-widest" type="button" data-tab-btn data-tab-id="judging" data-existing-only>
             <span class="inline-flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-coral/90" data-tab-dot data-tab-dot-id="judging"></span>Judging</span>
           </button>
@@ -146,6 +149,17 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
                     <input class="input-field" name="location" placeholder="San Francisco / Global" />
                 </div>
                 <div class="space-y-2">
+                    <label class="form-label">Participant location options</label>
+                    <textarea
+                      class="input-field min-h-[8.5rem]"
+                      name="participantLocations"
+                      placeholder="San Francisco&#10;New York City&#10;Online"
+                    ></textarea>
+                    <p class="text-xs leading-relaxed text-cream/35">
+                      One option per line. Applicants will choose from this dropdown when they register.
+                    </p>
+                </div>
+                <div class="space-y-2">
                     <label class="form-label">Format</label>
                     <select class="input-field" name="mode">
                         <option>Hybrid</option>
@@ -230,6 +244,69 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         <div class="grid gap-4" data-faqs></div>
       </section>
 
+      <section class="space-y-8" data-tab-section data-tab-id="applications">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <span class="w-8 h-8 rounded-lg bg-amber-400/10 text-amber-300 flex items-center justify-center font-bold text-xs border border-amber-300/20">05</span>
+                <h2 class="text-2xl font-bold tracking-tight">Applications</h2>
+            </div>
+            <button class="btn-ghost !py-2 !px-4 !text-xs uppercase tracking-widest hover:border-amber-300/30 hover:text-amber-200" type="button" data-add-application-field>
+                + Add Question
+            </button>
+        </div>
+        <div class="space-y-8">
+          <div class="card !p-10 border-cream/10 bg-cream/[0.02]">
+            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div class="space-y-3">
+                <p class="text-sm leading-relaxed text-cream/55 max-w-3xl">
+                  Every application already collects name, email, location, team status, LinkedIn, GitHub, and code-of-conduct consent.
+                  Add optional custom questions here so organizers can judge fit more clearly before approving access.
+                </p>
+                <div class="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.22em] text-cream/45">
+                  <span class="rounded-full border border-cream/10 px-3 py-2">Name</span>
+                  <span class="rounded-full border border-cream/10 px-3 py-2">Email</span>
+                  <span class="rounded-full border border-cream/10 px-3 py-2">Location</span>
+                  <span class="rounded-full border border-cream/10 px-3 py-2">Team status</span>
+                  <span class="rounded-full border border-cream/10 px-3 py-2">LinkedIn</span>
+                  <span class="rounded-full border border-cream/10 px-3 py-2">GitHub</span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-8 grid gap-5" data-application-fields></div>
+          </div>
+
+          <div class="card !p-10 border-cream/10 bg-cream/[0.02]" data-existing-only>
+            <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-[0.22em] text-cream/45">Approval queue</p>
+                <h3 class="mt-3 text-2xl font-bold tracking-tight">Review participant applications</h3>
+              </div>
+              <p class="text-sm text-cream/50" data-applications-summary>Loading applications...</p>
+            </div>
+            <div class="mt-8 overflow-x-auto">
+              <table class="w-full min-w-[980px] text-left text-sm">
+                <thead class="border-b border-cream/10 text-[11px] uppercase tracking-[0.22em] text-cream/40">
+                  <tr>
+                    <th class="pb-4 pr-4 font-medium">Participant</th>
+                    <th class="pb-4 pr-4 font-medium">Location</th>
+                    <th class="pb-4 pr-4 font-medium">LinkedIn</th>
+                    <th class="pb-4 pr-4 font-medium">GitHub</th>
+                    <th class="pb-4 pr-4 font-medium">Other details</th>
+                    <th class="pb-4 pr-4 font-medium">Status</th>
+                    <th class="pb-4 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody data-applications-body>
+                  <tr>
+                    <td class="py-6 text-cream/40" colspan="7">Loading applications...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <button class="hidden" type="submit" data-hidden-submit aria-hidden="true" tabindex="-1">Submit</button>
     </form>
 
@@ -237,7 +314,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
       {editorEventId ? (
         <section class="space-y-8" data-existing-only data-tab-section data-tab-id="judging">
           <div class="flex items-center gap-4 mb-2">
-            <span class="w-8 h-8 rounded-lg bg-violet/10 text-violet flex items-center justify-center font-bold text-xs border border-violet/20">05</span>
+            <span class="w-8 h-8 rounded-lg bg-violet/10 text-violet flex items-center justify-center font-bold text-xs border border-violet/20">06</span>
             <h2 class="text-2xl font-bold tracking-tight">Judging</h2>
           </div>
           <EventJudgingPanel eventId={editorEventId} />
@@ -247,7 +324,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
       {/* 5. Data Export */}
       <section class="space-y-8" data-existing-only data-tab-section data-tab-id="exports">
         <div class="flex items-center gap-4 mb-2">
-            <span class="w-8 h-8 rounded-lg bg-cream/10 text-cream flex items-center justify-center font-bold text-xs border border-cream/20">06</span>
+            <span class="w-8 h-8 rounded-lg bg-cream/10 text-cream flex items-center justify-center font-bold text-xs border border-cream/20">07</span>
             <h2 class="text-2xl font-bold tracking-tight">Exports</h2>
         </div>
         <div class="grid md:grid-cols-2 gap-8">
@@ -287,6 +364,10 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
     const subtitleEl = document.querySelector("[data-page-subtitle]");
     const tracksContainer = document.querySelector("[data-tracks]");
     const faqsContainer = document.querySelector("[data-faqs]");
+    const applicationFieldsContainer = document.querySelector("[data-application-fields]");
+    const addApplicationField = document.querySelector("[data-add-application-field]");
+    const applicationsBody = document.querySelector("[data-applications-body]");
+    const applicationsSummary = document.querySelector("[data-applications-summary]");
     const addTrack = document.querySelector("[data-add-track]");
     const addFaq = document.querySelector("[data-add-faq]");
     const publicLink = document.querySelector("[data-public-link]");
@@ -318,6 +399,14 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         .trim()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
+
+    const escapeHtml = (value) =>
+      String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 
     const formatForInput = (val) => {
       if (!val) return "";
@@ -394,6 +483,15 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         button.classList.toggle("!border-lime", isActive);
         button.setAttribute("aria-selected", isActive ? "true" : "false");
       });
+
+      tabDots.forEach((dot) => {
+        const id = dot.getAttribute("data-tab-dot-id");
+        const isActive = id === nextTabId;
+        const passed = dot.getAttribute("data-tab-passed") === "true";
+        dot.classList.toggle("bg-white", isActive);
+        dot.classList.toggle("bg-coral", !isActive && !passed);
+        dot.classList.toggle("bg-lime", !isActive && passed);
+      });
     };
 
     const sectionChecks = {
@@ -409,6 +507,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
       },
       tracks: () => true,
       faq: () => true,
+      applications: () => true,
       judging: () => true,
       exports: () => true
     };
@@ -425,8 +524,15 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         dot.classList.toggle("hidden", !isAvailable);
         if (!isAvailable) return;
         const passed = sectionChecks[id]?.() ?? true;
-        dot.classList.toggle("bg-coral", !passed);
-        dot.classList.toggle("bg-lime", passed);
+        dot.setAttribute("data-tab-passed", passed ? "true" : "false");
+        const isActive = tabButtons.some(
+          (button) =>
+            button.getAttribute("data-tab-id") === id &&
+            button.getAttribute("aria-selected") === "true"
+        );
+        dot.classList.toggle("bg-white", isActive);
+        dot.classList.toggle("bg-coral", !isActive && !passed);
+        dot.classList.toggle("bg-lime", !isActive && passed);
         if (!passed) needsWorkCount += 1;
       });
 
@@ -527,6 +633,56 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         `;
       }
 
+      if (type === "applicationField") {
+        const fieldId = String(data.id || "").trim() || `${slugify(data.label || "question") || "question"}-${Date.now()}`;
+        const fieldType = String(data.type || "text").trim() || "text";
+        wrapper.innerHTML = `
+          <div class="space-y-6 flex-1">
+            <input type="hidden" name="applicationFieldId" value="${escapeHtml(fieldId)}" />
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_180px_140px_auto]">
+              <div class="space-y-2">
+                <label class="form-label">Question label</label>
+                <input class="input-field" name="applicationFieldLabel" value="${escapeHtml(data.label || "")}" placeholder="Why do you want to join?" />
+              </div>
+              <div class="space-y-2">
+                <label class="form-label">Field type</label>
+                <select class="input-field" name="applicationFieldType">
+                  <option value="text" ${fieldType === "text" ? "selected" : ""}>Short text</option>
+                  <option value="textarea" ${fieldType === "textarea" ? "selected" : ""}>Long text</option>
+                  <option value="select" ${fieldType === "select" ? "selected" : ""}>Dropdown</option>
+                </select>
+              </div>
+              <label class="flex items-center gap-3 pt-8 text-sm text-cream/70">
+                <input class="h-4 w-4 rounded" type="checkbox" name="applicationFieldRequired" ${data.required ? "checked" : ""} />
+                Required
+              </label>
+              <button class="w-10 h-10 rounded-full bg-cream/5 flex items-center justify-center hover:bg-coral/20 hover:text-coral transition-all mt-8" type="button" data-remove>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <div class="grid gap-6 lg:grid-cols-2">
+              <div class="space-y-2">
+                <label class="form-label">Helper text</label>
+                <input class="input-field" name="applicationFieldHelp" value="${escapeHtml(data.helperText || "")}" placeholder="Optional guidance for applicants" />
+              </div>
+              <div class="space-y-2" data-application-field-options-wrap>
+                <label class="form-label">Dropdown options</label>
+                <textarea class="input-field min-h-[7rem]" name="applicationFieldOptions" placeholder="Option one&#10;Option two&#10;Option three">${escapeHtml(Array.isArray(data.options) ? data.options.join("\n") : "")}</textarea>
+              </div>
+            </div>
+          </div>
+        `;
+
+        const typeSelect = wrapper.querySelector("select[name='applicationFieldType']");
+        const optionsWrap = wrapper.querySelector("[data-application-field-options-wrap]");
+        const syncApplicationFieldType = () => {
+          const isSelect = typeSelect?.value === "select";
+          optionsWrap?.classList.toggle("hidden", !isSelect);
+        };
+        typeSelect?.addEventListener("change", syncApplicationFieldType);
+        syncApplicationFieldType();
+      }
+
       wrapper.querySelector("[data-remove]")?.addEventListener("click", () => {
         wrapper.style.opacity = "0";
         wrapper.style.transform = "scale(0.95)";
@@ -543,7 +699,157 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
       faqsContainer?.appendChild(buildRow("faq"));
     });
 
+    addApplicationField?.addEventListener("click", () => {
+      applicationFieldsContainer?.appendChild(buildRow("applicationField"));
+    });
+
+    const renderApplicationsTable = (applications = []) => {
+      if (!applicationsBody) return;
+      if (!Array.isArray(applications) || applications.length === 0) {
+        applicationsBody.innerHTML = `
+          <tr>
+            <td class="py-6 text-cream/40" colspan="7">No applications yet.</td>
+          </tr>
+        `;
+        if (applicationsSummary) applicationsSummary.textContent = "No participant applications yet.";
+        return;
+      }
+
+      const pendingCount = applications.filter((application) => application.status === "pending").length;
+      if (applicationsSummary) {
+        applicationsSummary.textContent =
+          `${applications.length} total application${applications.length === 1 ? "" : "s"} • ${pendingCount} pending review`;
+      }
+
+      applicationsBody.innerHTML = applications
+        .map((application) => {
+          const customAnswers = application.customAnswers && typeof application.customAnswers === "object"
+            ? Object.entries(application.customAnswers)
+            : [];
+          const detailsMarkup = [
+            application.teamStatus
+              ? `<div><span class="text-cream/35">Team</span><div class="mt-1 text-cream/75">${escapeHtml(application.teamStatus)}</div></div>`
+              : "",
+            ...customAnswers.map(
+              ([label, value]) =>
+                `<div><span class="text-cream/35">${escapeHtml(label)}</span><div class="mt-1 text-cream/75 whitespace-pre-wrap">${escapeHtml(value)}</div></div>`
+            )
+          ]
+            .filter(Boolean)
+            .join("");
+
+          const statusTone =
+            application.status === "approved"
+              ? "!bg-lime/10 !text-lime !border-lime/20"
+              : application.status === "rejected"
+                ? "!bg-coral/10 !text-coral !border-coral/20"
+                : "!bg-sky/10 !text-sky !border-sky/20";
+
+          const reviewActions =
+            application.status === "approved"
+              ? `
+                <div class="flex flex-wrap gap-2">
+                  <button class="btn-ghost !px-3 !py-2 !text-[11px] uppercase tracking-[0.18em]" type="button" data-application-status data-application-id="${escapeHtml(application.id)}" data-status="rejected">Reject</button>
+                </div>
+              `
+              : application.status === "rejected"
+                ? `
+                  <div class="flex flex-wrap gap-2">
+                    <button class="btn-primary !px-3 !py-2 !text-[11px] uppercase tracking-[0.18em]" type="button" data-application-status data-application-id="${escapeHtml(application.id)}" data-status="approved">Approve</button>
+                  </div>
+                `
+                : `
+                  <div class="flex flex-wrap gap-2">
+                    <button class="btn-primary !px-3 !py-2 !text-[11px] uppercase tracking-[0.18em]" type="button" data-application-status data-application-id="${escapeHtml(application.id)}" data-status="approved">Approve</button>
+                    <button class="btn-ghost !px-3 !py-2 !text-[11px] uppercase tracking-[0.18em]" type="button" data-application-status data-application-id="${escapeHtml(application.id)}" data-status="rejected">Reject</button>
+                  </div>
+                `;
+
+          return `
+            <tr class="border-b border-cream/8 align-top">
+              <td class="py-5 pr-4">
+                <div class="font-semibold text-cream">${escapeHtml(application.fullName || "Unnamed applicant")}</div>
+                <div class="mt-1 text-xs text-cream/45">${escapeHtml(application.email || "")}</div>
+                <div class="mt-2 text-[11px] uppercase tracking-[0.18em] text-cream/35">${escapeHtml(application.createdAt || "")}</div>
+              </td>
+              <td class="py-5 pr-4 text-cream/70">${escapeHtml(application.location || "Not set")}</td>
+              <td class="py-5 pr-4">
+                ${application.linkedinUrl ? `<a class="text-sky hover:underline" href="${escapeHtml(application.linkedinUrl)}" target="_blank" rel="noreferrer">Open</a>` : '<span class="text-cream/35">-</span>'}
+              </td>
+              <td class="py-5 pr-4">
+                ${application.githubUrl ? `<a class="text-sky hover:underline" href="${escapeHtml(application.githubUrl)}" target="_blank" rel="noreferrer">Open</a>` : '<span class="text-cream/35">-</span>'}
+              </td>
+              <td class="py-5 pr-4">
+                <div class="space-y-3 text-xs leading-relaxed">
+                  ${detailsMarkup || '<span class="text-cream/35">No extra answers</span>'}
+                </div>
+              </td>
+              <td class="py-5 pr-4">
+                <span class="status-pill ${statusTone}">${escapeHtml(application.status || "pending")}</span>
+              </td>
+              <td class="py-5">
+                ${reviewActions}
+              </td>
+            </tr>
+          `;
+        })
+        .join("");
+
+      applicationsBody.querySelectorAll("[data-application-status]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const applicationId = button.getAttribute("data-application-id");
+          const nextStatus = button.getAttribute("data-status");
+          if (!applicationId || !nextStatus) return;
+          button.disabled = true;
+          try {
+            const response = await fetch(`/api/organizer/events/${eventId}/applications/${applicationId}`, {
+              method: "PATCH",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ status: nextStatus })
+            });
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(result.error || "Unable to update application.");
+            setStatus(`Application ${nextStatus}.`, false);
+            await loadApplications();
+          } catch (error) {
+            setStatus(error instanceof Error ? error.message : "Unable to update application.", true);
+          } finally {
+            button.disabled = false;
+          }
+        });
+      });
+    };
+
+    const loadApplications = async () => {
+      if (isCreateMode || !eventId) {
+        renderApplicationsTable([]);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/organizer/events/${eventId}/applications`);
+        if (response.status === 401) {
+          window.location.href = "/organizer/login";
+          return;
+        }
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.error || "Unable to load applications.");
+        }
+        renderApplicationsTable(Array.isArray(payload.applications) ? payload.applications : []);
+      } catch (error) {
+        if (applicationsBody) {
+          applicationsBody.innerHTML = `
+            <tr>
+              <td class="py-6 text-coral" colspan="7">${escapeHtml(error instanceof Error ? error.message : "Unable to load applications.")}</td>
+            </tr>
+          `;
+        }
+      }
+    };
+
     const collectPayload = () => {
+      const participantLocationsField = form?.querySelector("textarea[name='participantLocations']");
       const trackRows = Array.from(tracksContainer?.children || []).map((row) => ({
         name: row.querySelector("input[name='trackName']")?.value || "",
         description: row.querySelector("textarea[name='trackDescription']")?.value || "",
@@ -553,6 +859,29 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         question: row.querySelector("input[name='faqQuestion']")?.value || "",
         answer: row.querySelector("textarea[name='faqAnswer']")?.value || ""
       }));
+      const applicationFormFields = Array.from(applicationFieldsContainer?.children || [])
+        .map((row, index) => {
+          const label = row.querySelector("input[name='applicationFieldLabel']")?.value || "";
+          const type = row.querySelector("select[name='applicationFieldType']")?.value || "text";
+          const helperText = row.querySelector("input[name='applicationFieldHelp']")?.value || "";
+          const required = Boolean(row.querySelector("input[name='applicationFieldRequired']")?.checked);
+          const id =
+            row.querySelector("input[name='applicationFieldId']")?.value ||
+            `${slugify(label) || "question"}-${index + 1}`;
+          const options = String(row.querySelector("textarea[name='applicationFieldOptions']")?.value || "")
+            .split(/\r?\n/)
+            .map((value) => value.trim())
+            .filter(Boolean);
+          return {
+            id,
+            label,
+            type,
+            helperText,
+            required,
+            options
+          };
+        })
+        .filter((field) => String(field.label || "").trim());
 
       const maxParticipantsRaw = form.maxParticipants?.value?.trim() || "";
       const parsedMaxParticipants = Number.parseInt(maxParticipantsRaw, 10);
@@ -565,6 +894,11 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         startDate: form.startDate.value,
         endDate: form.endDate.value,
         location: form.location.value,
+        participantLocations: String(participantLocationsField?.value || "")
+          .split(/\r?\n/)
+          .map((value) => value.trim())
+          .filter(Boolean),
+        applicationFormFields,
         mode: form.mode.value,
         organizationName: form.organizationName.value,
         websiteUrl: form.websiteUrl.value,
@@ -601,6 +935,12 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
           form.startDate.value = formatForInput(event.startDate);
           form.endDate.value = formatForInput(event.endDate);
           form.location.value = event.location || "";
+          const participantLocationsField = form.querySelector("textarea[name='participantLocations']");
+          if (participantLocationsField) {
+            participantLocationsField.value = Array.isArray(event.participantLocations)
+              ? event.participantLocations.join("\n")
+              : "";
+          }
           form.mode.value = event.mode || "Hybrid";
           form.organizationName.value = event.organizationName || "";
           form.websiteUrl.value = event.websiteUrl || "";
@@ -625,6 +965,11 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
         (payload.faqs || []).forEach((faq) => {
           faqsContainer.appendChild(buildRow("faq", faq));
         });
+        applicationFieldsContainer.innerHTML = "";
+        (event.applicationFormFields || []).forEach((field) => {
+          applicationFieldsContainer.appendChild(buildRow("applicationField", field));
+        });
+        await loadApplications();
         refreshSectionHealth();
       } catch (error) {
         setStatus("Unable to load event: " + (error instanceof Error ? error.message : "Unknown error."), true);
@@ -735,6 +1080,7 @@ const editorEventId = rawEditorId && rawEditorId !== "new" ? String(rawEditorId)
       if (form?.mode) form.mode.value = "Hybrid";
       setPublicLink(form?.slug?.value || "");
       activateTab("core");
+      renderApplicationsTable([]);
       refreshSectionHealth();
     } else {
       setButtonsState(false, defaultTopLabel, defaultSubmitLabel);

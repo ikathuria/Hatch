@@ -3,8 +3,8 @@ import { json } from "../../../../lib/server/responses";
 import { getEnv } from "../../../../lib/server/env";
 import { emailPattern } from "../../../../lib/server/validation";
 import { requireParticipantSession } from "../../../../lib/server/participant-auth";
-import { extractEmails, normalizeEmail } from "../../../../lib/server/email";
-import { loadParticipantTeam } from "../../../../lib/server/participant-workspace";
+import { normalizeEmail } from "../../../../lib/server/email";
+import { getParticipantAccessState, loadParticipantTeam } from "../../../../lib/server/participant-workspace";
 
 const getValue = (form: FormData, key: string) => {
   const value = form.get(key);
@@ -68,33 +68,8 @@ export const POST: APIRoute = async (context) => {
     }
 
     const participantEmail = normalizeEmail(participant!.email);
-    const applications = await env.DB.prepare(
-      `SELECT email
-       FROM applications
-       WHERE event_id = ?`
-    )
-      .bind(event.id)
-      .all<{ email: string }>();
-
-    const eligibleByApplication = (applications.results ?? []).some(
-      (row) => normalizeEmail(row.email) === participantEmail
-    );
-
-    let participantEligible = eligibleByApplication;
-    if (!participantEligible) {
-      const submissions = await env.DB.prepare(
-        `SELECT contact_email as contactEmail, members
-         FROM submissions
-         WHERE event_id = ?`
-      )
-        .bind(event.id)
-        .all<{ contactEmail: string; members: string | null }>();
-
-      participantEligible = (submissions.results ?? []).some((row) => {
-        if (normalizeEmail(row.contactEmail) === participantEmail) return true;
-        return extractEmails(row.members ?? "").includes(participantEmail);
-      });
-    }
+    const access = await getParticipantAccessState(env, event.id, participantEmail);
+    const participantEligible = access.allowed;
 
     if (!participantEligible) {
       return json({ error: "This participant is not eligible to submit in this event." }, 403);
